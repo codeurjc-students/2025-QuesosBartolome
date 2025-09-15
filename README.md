@@ -40,31 +40,31 @@ The project will be carried out in phases, each with a defined start and end dat
 ### Phase 1: Definition of functionalities and screens.
 - Start date:
 - End date:
-In this phase, the general aspects of the application will be defined, along with its functionalities, which will be divided into basic, intermediate, and advanced. The roles of the different users will also be established. Additionally, the designs of the application’s screens will be created.
+- In this phase, the general aspects of the application will be defined, along with its functionalities, which will be divided into basic, intermediate, and advanced. The roles of the different users will also be established. Additionally, the designs of the application’s screens will be created.
 ### Phase 2: Repository, testing, and CI.
 - Start date:
 - End date:
-The Git repository will be created, a minimum set of automated tests will be implemented, and the CI system will be configured.
+- The Git repository will be created, a minimum set of automated tests will be implemented, and the CI system will be configured.
 ### Phase 3: Version 0.1 - Basic functionality and Docker.
 - Start date:
 - End date:
-Development of the application will begin by implementing the basic functionality and its automated tests. The application will also be packaged in Docker. At the end of this phase, the first release (version 0.1) of the application will be delivered.
+- Development of the application will begin by implementing the basic functionality and its automated tests. The application will also be packaged in Docker. At the end of this phase, the first release (version 0.1) of the application will be delivered.
 ### Phase 4: Version 0.2 - Intermediate functionality.
 - Start date:
 - End date:
-Development will continue with the implementation of intermediate functionalities, resulting in version 0.2 of the application.
+- Development will continue with the implementation of intermediate functionalities, resulting in version 0.2 of the application.
 ### Phase 5: Version 1.0 - Advanced functionality.
 - Start date:
 - End date:
-The application development will be completed with the implementation of advanced functionalities, resulting in the final release (version 1.0) of the application.
+- The application development will be completed with the implementation of advanced functionalities, resulting in the final release (version 1.0) of the application.
 ### Phase 6: Report.
 - Start date:
 - End date:
-The final degree project report will be written.
+- The final degree project report will be written.
 ### Phase 7: Defense.
 - Start date:
 - End date:
-The defense of the final degree project will take place.
+- The defense of the final degree project will take place.
 ### Gantt Chart
 
 
