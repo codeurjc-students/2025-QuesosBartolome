@@ -192,7 +192,7 @@ On the main page, the cheeses with the highest average rating will be displayed 
 
 ## Tracking  
 
-- GitHub Project  
+- [GitHub Project](https://github.com/orgs/codeurjc-students/projects/27)  
 
 ## Author  
 
