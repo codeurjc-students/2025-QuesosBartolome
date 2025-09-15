@@ -4,129 +4,155 @@ The platform provides customers with a more convenient way to place their orders
 In addition, the application gives administrators tools to track cheese sales through graphs and automates the process of confirming orders and generating invoices for customers.
 ## Objectives
 ### Functional Objectives
-Los principales objetivos funcionales de la aplicación son la realización de pedidos por parte de los usuarios registrados y las valoraciones a los productos pedidos por estos, y por parte de los administradores la tramitación de pedidos, control de los productos, generación de facturas y el análisis de las ventas mediante diferentes gráficos.
+The main functional objectives of the application are: for registered users, placing orders and leaving reviews for the products they purchase; and for administrators, managing orders, controlling products, generating invoices, and analyzing sales through different charts.
 
-- **Realización de pedidos:** Los usuarios registrados podrán añadir diferentes productos a su pedido y posteriormente mandar el pedido a la quesería.
-- **Valoración de productos:** Los usuarios registrados podrán añadir reseñas de los productos que han pedido.
-- **Control del perfil:** Los usuarios registrados podrán modificar su perfil siempre que lo deseen.
-- **Control del Stock:** Los administradores podrán añadir nuevos quesos al catalogo así como añadir stock de cada uno de los quesos.
-- **Control de los pedidos:** Los administradores podrán ver los pedidos realizados a la quesería y tramitarlos si así lo desean.
-- **Visualización de graficas:** Los administradores podrán ver graficas que muestren diferentes parámetros de la venta de los quesos por meses tanto por los clientes como por cada tipo de queso.
-- **Control de usuarios:** Los administradores podrán banear los usuarios que deseen sin han tenido algún tipo de conducta inapropiada.
+- **Placing orders:** Registered users can add different products to their order and then send it to the dairy.
 
-### Objetivos Técnicos
-Los aspectos más técnicos de la aplicación pasan por un control exhausto del código mediante pruebas automáticas unitarias y de integración testeando la lógica de negocio, los servicios con la base de datos y verificando el comportamiento de los componentes y servicios de una API REST. Además, también se hará un análisis estático del código que ira reportando las violaciones y warnings encontrados realizando un seguimiento durante todo el desarrollo de la aplicación.
-También añadiremos tecnologías complementarias para mejorar la experiencia de los usuarios en nuestra aplicación y usando nuestros servicios como puede ser la generación de facturas, él envió de correos y el uso de mapas para posicionar elementos.
+- **Product reviews:** Registered users can leave reviews for the products they have purchased.
 
-- **Pruebas automáticas unitarias y de integración:** Pruebas que se ejecutaran automáticamente para asegurar una buena calidad del código comprobando la lógica de negocio y los diferentes servicios y componentes de la aplicación.
-- **Análisis estático de código:** Análisis estático de código con SonarQube con el fin de mejorar la calidad, seguridad y mantenibilidad del código de forma continua durante todo el proyecto.
-- **Envió de correos:** Envió de correos a los clientes con mensajes importantes o con las facturas emitidas por la empresa.
-- **Generación de PDFs:** Generación de facturas a partir de los pedidos de los clientes.
-- **Uso de mapas:** Uso de un mapa de Google Maps para ubicar la quesería en la sección "acerca de nosotros".
+- **Profile management:** Registered users can update their profile whenever they wish.
 
-## Metodología
-El proyecto se ira realizando por fases cada una con una fecha de inicio y final, cada fase contiene una serie de tareas que tienen como objetivo la realización del trabajo de fin de grado de una forma organizada y efectiva.
+- **Stock management:** Administrators can add new cheeses to the catalog as well as update stock levels for each cheese.
 
-### Fase 1: Definición de funcionalidades y pantallas.
-Fecha inicio:
-Fecha fin:
-En esta fase se definirán los aspectos generales de la aplicación, se definirán sus funcionalidades dividiéndolas en básicas, intermedias y avanzadas, además de definir los roles de los diferentes usuarios. Por otra parte, se realizaran los diseños de las pantallas de la futura aplicación.
-### Fase 2: Repositorio, pruebas y CI.
-Fecha inicio:
-Fecha fin:
-Se creará el repositorio de git, se implementaran unos mínimos tests automáticos y se configurara el sistema de CI.
-### Fase 3: Versión 0.1 - Funcionalidad básica y Docker.
-Fecha inicio:
-Fecha fin:
-Se iniciará el desarrollo de la aplicación implementando la funcionalidad básica y sus pruebas automáticas y además se empaquetara la aplicación en Docker, al finalizar esta fase saldrá el primer reléase la versión 0.1 de la aplicación.
-### Fase 4: Versión 0.2 - Funcionalidad intermedia.
-Fecha inicio:
-Fecha fin:
-Se continuará el desarrollo implementando las funcionalidades intermedias y se obtendrá la versión 0.2 de la aplicación.
-### Fase 5: Versión 1.0 - Funcionalidad avanzada.
-Fecha inicio:
-Fecha fin:
-Se finalizará el desarrollo de la aplicación con la implementación de las funcionalidades avanzadas obteniendo el ultimo reléase la versión 1.0 de la aplicación.
-### Fase 6: Memoria.
-Fecha inicio:
-Fecha fin:
-Se elaborará la memoria del trabajo de fin de grado.
-### Fase 7: Defensa.
-Fecha inicio:
-Fecha fin:
-Se realiza el acto de defensa del TFG.
-### Diagrama de Gant
+- **Order management:** Administrators can view and process orders placed with the dairy.
+
+- **Sales charts:** Administrators can access charts that display different sales metrics by month, both by customer and by cheese type.
+
+- **User management:** Administrators can ban users who have engaged in inappropriate behavior.
+
+### Technical Objectives
+The more technical aspects of the application focus on thorough code control through automated unit and integration tests, covering business logic, database services, and verifying the behavior of components and services of a REST API. In addition, static code analysis will be performed to report violations and warnings, with continuous monitoring throughout the development of the application.
+We will also integrate complementary technologies to enhance the user experience in our application and services, such as invoice generation, email sending, and the use of maps to locate elements.
+
+- **Automated unit and integration tests:** Tests that run automatically to ensure good code quality by checking the business logic and the different services and components of the application.
+
+- **Static code analysis:** Static code analysis with SonarQube to continuously improve the quality, security, and maintainability of the code throughout the project.
+
+- **Email sending:** Sending emails to customers with important messages or invoices issued by the company.
+
+- **PDF generation:** Generating invoices from customer orders.
+
+- **Use of maps:** Using Google Maps to display the location of the dairy in the "About Us" section.
+
+## Methodology
+The project will be carried out in phases, each with a defined start and end date. Every phase includes a set of tasks aimed at completing the final degree project in an organized and effective way.
+
+### Phase 1: Definition of functionalities and screens.
+- Start date:
+- End date:
+In this phase, the general aspects of the application will be defined, along with its functionalities, which will be divided into basic, intermediate, and advanced. The roles of the different users will also be established. Additionally, the designs of the application’s screens will be created.
+### Phase 2: Repository, testing, and CI.
+- Start date:
+- End date:
+The Git repository will be created, a minimum set of automated tests will be implemented, and the CI system will be configured.
+### Phase 3: Version 0.1 - Basic functionality and Docker.
+- Start date:
+- End date:
+Development of the application will begin by implementing the basic functionality and its automated tests. The application will also be packaged in Docker. At the end of this phase, the first release (version 0.1) of the application will be delivered.
+### Phase 4: Version 0.2 - Intermediate functionality.
+- Start date:
+- End date:
+Development will continue with the implementation of intermediate functionalities, resulting in version 0.2 of the application.
+### Phase 5: Version 1.0 - Advanced functionality.
+- Start date:
+- End date:
+The application development will be completed with the implementation of advanced functionalities, resulting in the final release (version 1.0) of the application.
+### Phase 6: Report.
+- Start date:
+- End date:
+The final degree project report will be written.
+### Phase 7: Defense.
+- Start date:
+- End date:
+The defense of the final degree project will take place.
+### Gantt Chart
 
 
-## Funcionalidades detalladas
-A continuación, presentaremos todas las funcionalidades de la aplicación divididas entre básicas, intermedias y avanzadas y especificando a que tipo de usuario va dirigida.
+## Detailed Features
+Below, we present all the functionalities of the application, divided into basic, intermediate, and advanced, specifying which type of user they are intended for.
 
-### Funcionalidad básica.
-| Usuarios | Funcionalidades |
+### Basic Functionality.
+| Users | Functionalities |
 |----------|-----------------|
-| Usuarios no registrados| -Visualizar los quesos, sus características y sus reseñas <br> -Ver sección "Acerca de Nosotros" <br> -Ver los perfiles de los usuarios de las reseñas <br> -Registrarse <br> -Iniciar Sesión |
-| Usuarios registrados | -Hacer pedidos <br> -Acceder a su perfil |
-| Administradores | -Añadir y eliminar quesos <br> -Ver pedidos <br> -Ver clientes <br> -Controlar Stock |
+| Unregistered users | -View cheeses, their characteristics, and reviews <br> -See the "Acerca de nosotros" section <br> -View profiles of review authors <br> -Register <br> -Log in |
+| Registered users | -Place orders <br> -Access their profile |
+| Administrators | -Add and remove cheeses <br> -View orders <br> -View customers <br> -Manage stock |
 
-### Funcionalidad intermedia.
-| Usuarios | Funcionalidades |
+### Intermediate Functionality.
+| Users | Functionalities |
 |----------|-----------------|
-| Usuarios registrados | -Modificar su perfil <br> -Modificar sus credenciales <br> -Poder ver, modificar y eliminar sus reseñas |
-| Administradores | -Banear Usuarios <br> -Ver gráficas |
-### Funcionalidad Avanzada.
-| Usuarios | Funcionalidades |
+| Registered users | -Edit their profile <br> -Change their credentials <br> -View, edit, and delete their reviews |
+| Administrators | -Ban users <br> -View charts |
+### Advanced Functionality.
+| Users | Functionalities |
 |----------|-----------------|
-| Administradores | -Tramitar Pedidos <br> -Generar facturas <br> -Enviar correos a los usuarios <br> -Filtrar gráficos por quesos y clientes |
+| Administrators | -Process orders <br> -Generate invoices <br> -Send emails to users <br> -Filter charts by cheeses and customers |
 
-## Análisis
-### Pantallas y navegación.
-A continuación, mostraremos las pantallas de nuestra aplicación en forma de wireframes de estas con una breve descripción.
-#### Pantalla principal
-Esta pantalla muestra los quesos disponibles en la quesería y en función del usuario que acceda a esta tendrá diferentes opciones en el menú.
+## Analysis
+### Screens and Navigation.
+Below, we present the screens of our application in the form of wireframes, along with a brief description.
 
-#### Registrarse
-Formulario para rellenar los datos para realizar el registro de un nuevo cliente.
+#### Main Screen
 
-#### Iniciar sesión
-Formulario para iniciar sesión.
+This screen displays the cheeses available in the dairy. Depending on the type of user accessing it, different options will appear in the menu.
 
-#### Acerca de nosotros
-Sección con un poco de información sobre la quesería y con un mapa que muestra su ubicación y un QR a algina página de interés.
+#### Register
 
-#### Producto
-Página que muestra la información detallada del queso su precio y desde donde se puede añadir a el pedido si eres un usuario registrado.
+Form for entering the data required to register a new customer.
 
-#### Mi pedido
-Sección que muestra todos los quesos que has añadido al pedido y desde donde se lo puedes mandar a la empresa para que lo tramiten.
+#### Log In
 
-#### Valoración
-Pequeña pantalla con un breve formulario para valorar el queso.
+Form to log in.
 
-#### Ver pedido 
-Apartado donde los administradores pueden ver todos los pedidos de la cola y pueden verlos y tramitarlos.
+#### About Us
 
-#### Tramitar Pedido
-Pagina que muestra un resumen del pedido y que permite tramitar el pedido.
+Section with some information about the dairy, including a map showing its location and a QR code linking to a page of interest.
 
-#### Ver clientes
-Apartado que muestra una tabla con todos los clientes de la quesería pudiendo acceder a sus perfiles y banearlos si así lo desea el administrador.
+#### Product
 
-#### Facturas
-Sección donde se pueden ver las facturas emitidas por la quesería.
+Page displaying detailed information about a cheese, its price, and—if you are a registered user—an option to add it to your order.
 
-#### Nuevo Queso
-Formulario para que el administrador pueda añadir un nuevo queso al catálogo.
+#### My Order
+
+Section showing all the cheeses you have added to your order, from where you can send it to the company for processing.
+
+#### Review
+
+Small screen with a brief form for reviewing a cheese.
+
+#### View Order
+
+Section where administrators can see all pending orders in the queue and decide whether to process them.
+
+#### Process Order
+
+Page showing a summary of the order and allowing it to be processed.
+
+#### View Customers
+
+Section displaying a table with all of the dairy’s customers, allowing administrators to access their profiles and ban them if necessary.
+
+#### Invoices
+
+Section where invoices issued by the dairy can be viewed.
+
+#### New Cheese
+
+Form that allows the administrator to add a new cheese to the catalog.
 
 #### Stock
-Sección desde la cual el administrador controla el stock de los quesos existentes en el catálogo.
 
-#### Graficas
-Pagina desde la cual los administradores pueden observar las gráficas de las ventas de sus quesos y analizarlas.
+Section where the administrator manages the stock of existing cheeses in the catalog.
+
+#### Charts
+
+Page where administrators can view and analyze charts of cheese sales.
 
 #### Error
-Ejemplo de un error en la aplicación y de cómo el sistema avisa al usuario independientemente del tipo que sea.
 
-#### Navegación
+Example of an application error and how the system notifies the user, regardless of the type of error.
+
+#### Navigation
 
 ### Entidades
 | Entidad | Atributos | Relaciones |
