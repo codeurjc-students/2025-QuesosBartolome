@@ -82,7 +82,7 @@ Below, we present all the functionalities of the application, divided into basic
 | Users | Functionalities |
 |----------|-----------------|
 | Registered users | -Edit their profile <br> -Change their credentials <br> -View, edit, and delete their reviews |
-| Administrators | -Ban users <br> -View charts |
+| Administrators | -Ban users <br> -View charts <br> -Edit cheeses in the catalog |
 ### Advanced Functionality.
 | Users | Functionalities |
 |----------|-----------------|
@@ -154,44 +154,48 @@ Example of an application error and how the system notifies the user, regardless
 
 #### Navigation
 
-### Entidades
-| Entidad | Atributos | Relaciones |
+### Entities  
+| Entity | Attributes | Relationships |
 |---------|-----------|------------|
-| Usuario | -Id <br> -Nombre <br> -Contraseña <br> -Gmail <br> -Dirección <br> -NIF <br> -Imagen | |
-| Queso | -Id <br> -Nombre <br> -Precio <br> -Descripción <br> -Fecha de fabricación <br> -Fecha de caducidad <br> -Tipo <br> -Imagen | |
-| Pedidos | -Id <br> -Cliente <br> -Lista de quesos | |
-| Facturas | -Id <br> -Nº de factura <br> -Cliente <br> -Lista de quesos <br> -Kg <br> - Precio total | |
-| Valoración | -Id <br> -Usuario <br> -Queso <br> -Puntuación <br> -Comentario | |
+| User | -Id <br> -Name <br> -Password <br> -Email <br> -Address <br> -Type <br> -Tax ID <br> -Image | -Users are related to reviews <br> -Users are related to orders <br> -Users are related to invoices |
+| Cheese | -Id <br> -Name <br> -Price <br> -Description <br> -Manufacturing date <br> -Expiration date <br> -Type <br> -Image <br> -Review list | -Cheeses are related to orders <br> -Cheeses are related to reviews |
+| Orders | -Id <br> -Customer <br> -Cheese list | -Orders are related to users <br> -Orders are related to cheeses <br> -Orders are related to invoices |
+| Invoices | -Id <br> -Invoice No. <br> -Customer <br> -Cheese list <br> -Kg <br> -Total price | -Invoices are related to users <br> -Invoices are related to orders |
+| Review | -Id <br> -User <br> -Cheese <br> -Rating <br> -Comment | -Reviews are related to users <br> -Reviews are related to cheeses |
 
-### Permisos de los usuarios
+### User Permissions  
 
-Los usuarios registrados son dueños de sus propias reseñas que hayan puesto a cada queso, ellos pueden crearlas, verlas, modificarlas y borrarlas cuando ellos lo deseen.
-Los administradores por otra parte pueden hacer los mismo con los quesos del catálogo.
+Registered users are the owners of their own reviews for each cheese; they can create, view, edit, and delete them whenever they wish.  
+Users are also the owners of their active order until it is confirmed; they can edit and view it whenever they want.  
+Administrators, on the other hand, can create, view, edit, and delete cheeses in the catalog.  
+Administrators can convert orders into invoices and view them.  
+Administrators can also ban users.  
 
-### Imágenes
+### Images  
 
-Las entidades de Queso y Usuario tendrán una imagen asociada.
+The Cheese and User entities will have an associated image.  
 
-### Gráficos
+### Charts  
 
-Los grafico serán gráficos de barras, únicamente serán visibles por los administradores en el eje x se mostraran los meses del año y en el eje y los € vendidos cada mes o los Kg vendidos cada mes, además estos se podrán filtrar por cliente para saber lo que compra cada cliente por mes y también por queso para saber lo que se vende cada queso, para posteriormente poder analizar las ventas de la quesería.
+The charts will be bar charts, visible only to administrators. On the x-axis, the months of the year will be displayed, and on the y-axis, either the € sold each month or the Kg sold each month.  
+Additionally, they can be filtered by customer (to see what each customer buys per month) and by cheese (to see how much of each cheese is sold), in order to analyze the dairy’s sales.  
 
-### Tecnología complementaria
+### Complementary Technology  
 
-- **Envió de correos:** Envió de correos a los clientes con mensajes importantes o con las facturas emitidas por la empresa.
-- **Generación de PDFs:** Generación de facturas a partir de los pedidos de los clientes.
-- **Uso de mapas:** Uso de un mapa de Google Maps para ubicar la quesería en la sección "acerca de nosotros".
+- **Email sending:** Sending emails to customers with important messages or invoices issued by the company.  
+- **PDF generation:** Generating invoices from customer orders.  
+- **Use of maps:** Using Google Maps to display the dairy’s location in the "About Us" section.  
 
-### Algoritmo o consulta avanzada
+### Advanced Algorithm or Query  
 
-En la página principal se mostrarán primero los quesos cuya valoración media sea más alta obteniendo esta de las valoraciones de los clientes.
+On the main page, the cheeses with the highest average rating will be displayed first, with this rating calculated from customer reviews.  
 
-## Seguimiento
+## Tracking  
 
-- Blog
-- Github Project
+- GitHub Project  
 
-## Autor
+## Author  
 
-El desarrollo de esta aplicación se hace en el contexto de trabajo de fin de grado del grado en Ingeniería de software en la ETSII de la Universidad Rey Juan Carlos de Madrid.
-Trabajo realizado por el estudiante de 4º de carrera Víctor Bartolomé Letosa y tutorizado por Michel Maes Bermejo.
+The development of this application is carried out as part of the final degree project for the Software Engineering degree at the ETSII of Universidad Rey Juan Carlos in Madrid.  
+Work completed by fourth-year student Víctor Bartolomé Letosa, supervised by Michel Maes Bermejo.  
+
