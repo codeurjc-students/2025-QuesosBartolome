@@ -194,6 +194,9 @@ Example of an application error and how the system notifies the user, regardless
 | Invoices | -Id <br> -Invoice No. <br> -Customer <br> -Cheese list <br> -Kg <br> -Total price | -Invoices are related to users <br> -Invoices are related to orders |
 | Review | -Id <br> -User <br> -Cheese <br> -Rating <br> -Comment | -Reviews are related to users <br> -Reviews are related to cheeses |
 
+
+![Entities](Images/Entities.png)
+
 ### User Permissions  
 
 Registered users are the owners of their own reviews for each cheese; they can create, view, edit, and delete them whenever they wish.  
