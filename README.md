@@ -95,6 +95,7 @@ Below, we present the screens of our application in the form of wireframes, alon
 #### Main Screen
 
 This screen displays the cheeses available in the dairy. Depending on the type of user accessing it, different options will appear in the menu.
+![Main Screen](Images/MainScreen.png)
 
 #### Register
 
