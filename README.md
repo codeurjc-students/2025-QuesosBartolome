@@ -100,60 +100,76 @@ This screen displays the cheeses available in the dairy. Depending on the type o
 #### Register
 
 Form for entering the data required to register a new customer.
+![Register](Images/Register.png)
 
 #### Log In
 
 Form to log in.
+![Log In](Images/login.png)
 
 #### About Us
 
 Section with some information about the dairy, including a map showing its location and a QR code linking to a page of interest.
+![About Us](Images/AcercaDeNosotros.png)
 
 #### Product
 
 Page displaying detailed information about a cheese, its price, and—if you are a registered user—an option to add it to your order.
+![Product](Images/Chesee.png)
 
 #### My Order
 
 Section showing all the cheeses you have added to your order, from where you can send it to the company for processing.
+![My Order](Images/MyOrder.png)
 
 #### Review
 
 Small screen with a brief form for reviewing a cheese.
+![Review](Images/Review.png)
 
-#### View Order
+#### View Orders
 
 Section where administrators can see all pending orders in the queue and decide whether to process them.
+![View Order](Images/ViewOrders.png)
 
 #### Process Order
 
 Page showing a summary of the order and allowing it to be processed.
+![Process Order](Images/ProcessOrder.png)
 
 #### View Customers
 
 Section displaying a table with all of the dairy’s customers, allowing administrators to access their profiles and ban them if necessary.
+![View Customers](Images/ViewCustomers.png)
 
 #### Invoices
 
 Section where invoices issued by the dairy can be viewed.
+![Invoices](Images/Invoices.png)
 
 #### New Cheese
 
 Form that allows the administrator to add a new cheese to the catalog.
+![New Cheese](Images/NewCheese.png)
 
 #### Stock
 
 Section where the administrator manages the stock of existing cheeses in the catalog.
+![Stock](Images/Stock.png)
 
 #### Charts
 
 Page where administrators can view and analyze charts of cheese sales.
+![Charts](Images/Charts.png)
 
 #### Error
 
 Example of an application error and how the system notifies the user, regardless of the type of error.
+![Error](Images/Error.png)
 
 #### Navigation
+
+![Navigation](Images/Navigation.png)
 
 ### Entities  
 | Entity | Attributes | Relationships |
