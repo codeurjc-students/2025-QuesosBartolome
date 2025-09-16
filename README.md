@@ -38,8 +38,8 @@ We will also integrate complementary technologies to enhance the user experience
 The project will be carried out in phases, each with a defined start and end date. Every phase includes a set of tasks aimed at completing the final degree project in an organized and effective way.
 
 ### Phase 1: Definition of functionalities and screens.
-- Start date:
-- End date:
+- Start date: September 10, 2025
+- End date: September 16, 2025
 - In this phase, the general aspects of the application will be defined, along with its functionalities, which will be divided into basic, intermediate, and advanced. The roles of the different users will also be established. Additionally, the designs of the application’s screens will be created.
 ### Phase 2: Repository, testing, and CI.
 - Start date:
