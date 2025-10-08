@@ -1,0 +1,11 @@
+<h2>Quesos Bartolome</h2>
+
+<ul>
+  <li *ngFor="let cheese of cheeses">
+    <strong class="cheese-name">{{ cheese.name }}</strong> - {{ cheese.price }} €
+    <p>{{ cheese.description }}</p>
+    <small>Type: {{ cheese.type }}</small><br>
+    <small>Manufactured: {{ cheese.manufactureDate }}</small><br>
+    <small>Expires: {{ cheese.expirationDate }}</small>
+  </li>
+</ul>
