@@ -77,6 +77,3 @@ jobs:
         env:
           CI: true
         run: npm run test -- --watch=false --browsers=ChromeHeadless
-
-        # Use --watch=false to run once in CI and --browsers=ChromeHeadless
-        run: npm run test -- --watch=false --browsers=ChromeHeadless
