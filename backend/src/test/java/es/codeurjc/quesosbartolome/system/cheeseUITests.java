@@ -28,14 +28,14 @@ public class cheeseUITests {
         wait = new WebDriverWait(driver, Duration.ofSeconds(15));
     }
 
-    @AfterEach
+    @AfterEach 
     public void teardown() {
         if (driver != null) driver.quit();
     }
 
     @Test
     public void testQuesosSemicuradoYAzulVisibles() {
-        
+
         driver.get("http://localhost:4200/");
 
 
