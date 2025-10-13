@@ -9,13 +9,15 @@ import org.junit.jupiter.api.*;
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.support.ui.*;
-import org.springframework.boot.test.context.SpringBootTest;
 
-@SpringBootTest(
-    webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT,
-    properties = "server.port=8080"
-)
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.web.server.LocalServerPort;
+
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class cheeseUITests {
+
+    @LocalServerPort
+    private int port; 
 
     private WebDriver driver;
     private WebDriverWait wait;
@@ -33,9 +35,10 @@ public class cheeseUITests {
 
     @Test
     public void testQuesosSemicuradoYAzulVisibles() {
+        
         driver.get("http://localhost:4200/");
 
-        // Esperar hasta que los elementos de queso aparezcan
+
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".cheese-name")));
 
         List<WebElement> nombres = driver.findElements(By.cssSelector(".cheese-name"));
@@ -48,5 +51,7 @@ public class cheeseUITests {
 
         assertTrue(semicurado, "El queso 'Semicurado' debería aparecer en la página");
         assertTrue(azul, "El queso 'Azul' debería aparecer en la página");
+
+
     }
 }
