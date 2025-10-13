@@ -30,7 +30,7 @@ jobs:
           path: ~/.m2/repository
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
 
-      - name: Build backend & run tests
+      - name: Build backend & run unit tests
         working-directory: ./backend
         run: mvn -B clean test -Dtest=**/unit/**/*Test.java
 
@@ -59,6 +59,24 @@ jobs:
         working-directory: ./frontend
         run: npm ci
 
+      
+      - name: Start backend server
+        working-directory: ./backend
+        run: |
+          nohup mvn spring-boot:run > target/backend.log 2>&1 &
+
+     
+      - name: Wait for backend to be ready
+        run: |
+          for i in {1..30}; do
+            if curl -s http://localhost:8080/api/v1/cheeses > /dev/null; then
+              exit 0
+            fi
+            sleep 5
+          done
+          cat backend/target/backend.log || true
+          exit 1
+
       - name: Build frontend
         working-directory: ./frontend
         run: npm run build -- --configuration=production
@@ -68,3 +86,4 @@ jobs:
         env:
           CI: true
         run: npm run test -- --watch=false --browsers=ChromeHeadless
+
