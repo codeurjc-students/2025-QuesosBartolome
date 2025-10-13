@@ -74,7 +74,6 @@ jobs:
             fi
             sleep 5
           done
-          cat backend/target/backend.log || true
           exit 1
 
       - name: Build frontend
