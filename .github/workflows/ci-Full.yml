@@ -83,7 +83,7 @@ jobs:
           npm run build
 
       - name: Start Angular app
-        working-directory: ./frontend/WrapItUp-Planner
+        working-directory: ./frontend
         run: |
           nohup npm start -- --host 0.0.0.0 --port 4200 > angular.log 2>&1 &
           sleep 8
@@ -91,12 +91,12 @@ jobs:
 
       # --- BACKEND TESTS ---
       - name: Run all backend tests
-        working-directory: ./backend/wrapitup_planner
+        working-directory: ./backend
         run: mvn test -B
 
       # --- FRONTEND TESTS ---
       - name: Run all frontend tests (headless)
-        working-directory: ./frontend/WrapItUp-Planner
+        working-directory: ./frontend
         env:
           CI: true
         run: |
