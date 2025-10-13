@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 public class CheeseService {
 
     @Autowired
-    private CheeseRepository cheeseRepository;
+    private CheeseRepository cheeseRepository; 
 
     @Autowired
     private CheeseMapper cheeseMapper;
