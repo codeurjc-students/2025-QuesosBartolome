@@ -19,7 +19,6 @@ describe('CheeseService (integration)', () => {
   it('should fetch cheeses from real API', (done) => {
     service.getAllCheeses().subscribe({
       next: (cheeses: CheeseDTO[]) => {
-        console.log(cheeses);
         
         expect(cheeses.length).toBeGreaterThan(0);
 

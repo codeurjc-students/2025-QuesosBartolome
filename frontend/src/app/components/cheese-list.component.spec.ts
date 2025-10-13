@@ -20,27 +20,25 @@ describe('CheeseListComponent (unit)', () => {
       { id: 2, name: 'Azul', price: 12, description: '', type: '', manufactureDate: '', expirationDate: '' }
     ]));
 
-    // 🔸 Configuramos TestBed para usar el mock
+    
     await TestBed.configureTestingModule({
-      imports: [CheeseListComponent], // ✅ los standalone van aquí
+      imports: [CheeseListComponent], 
       providers: [{ provide: CheeseService, useValue: mockService }]
     }).compileComponents();
 
-    // 🔸 Creamos el componente y ejecutamos el ciclo de vida
+    
     fixture = TestBed.createComponent(CheeseListComponent);
     component = fixture.componentInstance;
-    fixture.detectChanges(); // ejecuta ngOnInit() y renderiza el HTML
+    fixture.detectChanges(); 
   });
 
   it('should render Semicurado and Azul', () => {
     const debug: DebugElement = fixture.debugElement;
 
-    // 🔸 Busca en el DOM todos los elementos con clase .cheese-name
     const names = debug
       .queryAll(By.css('.cheese-name'))
       .map(de => de.nativeElement.textContent.trim());
 
-    // 🔸 Aserciones
     expect(names).toContain('Semicurado');
     expect(names).toContain('Azul');
     expect(names.length).toBe(2); // opcional: asegura que solo hay 2 quesos
