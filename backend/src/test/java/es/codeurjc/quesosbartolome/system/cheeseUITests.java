@@ -8,6 +8,7 @@ import java.util.List;
 import org.junit.jupiter.api.*;
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.support.ui.*;
 
 import org.springframework.boot.test.context.SpringBootTest;
@@ -24,7 +25,14 @@ public class cheeseUITests {
 
     @BeforeEach
     public void setup() {
-        driver = new ChromeDriver();
+         ChromeOptions options = new ChromeOptions();
+        options.addArguments("--headless=new"); 
+        options.addArguments("--no-sandbox");
+        options.addArguments("--disable-dev-shm-usage");
+        options.addArguments("--disable-gpu");
+        options.addArguments("--remote-allow-origins=*");
+        options.addArguments("--user-data-dir=/tmp/chrome-user-data-" + System.currentTimeMillis());
+        driver = new ChromeDriver(options);
         wait = new WebDriverWait(driver, Duration.ofSeconds(15));
     }
 
