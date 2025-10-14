@@ -12,7 +12,6 @@ import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.support.ui.*;
 
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.server.LocalServerPort;
 
 @SpringBootTest(classes = es.codeurjc.quesosbartolome.QuesosbartolomeApplication.class)
 public class cheeseUITests {
