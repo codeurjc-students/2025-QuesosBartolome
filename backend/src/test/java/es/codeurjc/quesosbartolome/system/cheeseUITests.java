@@ -14,18 +14,15 @@ import org.openqa.selenium.support.ui.*;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(classes = es.codeurjc.quesosbartolome.QuesosbartolomeApplication.class)
 public class cheeseUITests {
-
-    @LocalServerPort
-    private int port; 
 
     private WebDriver driver;
     private WebDriverWait wait;
 
     @BeforeEach
     public void setup() {
-         ChromeOptions options = new ChromeOptions();
+        ChromeOptions options = new ChromeOptions();
         options.addArguments("--headless=new"); 
         options.addArguments("--no-sandbox");
         options.addArguments("--disable-dev-shm-usage");
