@@ -89,11 +89,6 @@ jobs:
           sleep 8
           echo "✅ Angular app started on port 4200 (for e2e tests)."
 
-      # --- BACKEND TESTS ---
-      - name: Run all backend tests
-        working-directory: ./backend
-        run: mvn test -B
-
       # --- FRONTEND TESTS ---
       - name: Run all frontend tests (headless)
         working-directory: ./frontend
@@ -101,4 +96,9 @@ jobs:
           CI: true
         run: |
           npm run test -- --no-watch --browsers=ChromeHeadless --source-map=false
+          
+      # --- BACKEND TESTS ---
+      - name: Run all backend tests
+        working-directory: ./backend
+        run: mvn test -B
 
