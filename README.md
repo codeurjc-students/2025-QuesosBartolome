@@ -2,6 +2,8 @@
 Quesos Bartolomé is a website that manages the sales of cheeses from a small-town dairy in Aldeonte, a village in Segovia.
 The platform provides customers with a more convenient way to place their orders, while also allowing them to read reviews from other buyers and share their own feedback on the products they purchase.
 In addition, the application gives administrators tools to track cheese sales through graphs and automates the process of confirming orders and generating invoices for customers.
+
+It is important to note that, to date, only the functional objectives and technical objectives of the Quesos Bartolomé application have been clearly defined. Development has begun, but the implementation is not functional yet.
 ## Objectives
 ### Functional Objectives
 The main functional objectives of the application are: for registered users, placing orders and leaving reviews for the products they purchase; and for administrators, managing orders, controlling products, generating invoices, and analyzing sales through different charts.
@@ -233,3 +235,62 @@ On the main page, the cheeses with the highest average rating will be displayed 
 The development of this application is carried out as part of the final degree project for the Software Engineering degree at the ETSII of Universidad Rey Juan Carlos in Madrid.  
 Work completed by fourth-year student Víctor Bartolomé Letosa, supervised by Michel Maes Bermejo.  
 
+## Guía de desarrollo
+
+### Índice
+[Functional Objectives](#author)
+[Functional Objectives](#author)
+[Functional Objectives](#author)
+[Functional Objectives](#author)
+[Functional Objectives](#author)
+
+### Introducción
+
+La aplicacción Quesos Bartolomé se ha desarrollado siguiendo una arquitectura web de tipo SPA (Single Page Application). Lo que separa esta aplicación en tres parte el Cliente (frontend), el servidor (backend) y la base de datos para almacenar la infomración de la aplicación, este tipo de web mejora el rendimiento de la web y mejora la experiencia de usuario al permitir la interacción asíncrona y la actualización de contenido sin necesidad de recargar la página.
+Partes detalladas:
+
+| Parte del Sistema | Explicación |
+|---------|-----------|
+| Frontend | - Utilizando Angular, es responsable de la interfaz gráfica y de la interacción con el usuario, hace peticiones y consume la API REST de backend |
+| Backend | - Implementado con Spring Boot, gestiona la lógica de negocio, el control de acceso, la validación de datos y la comunicación con la base de datos. |
+| Base de Datos | - Base de datos MySQL que guarda los datos de la aplicación |
+
+### Resumen Tecnico
+
+| Categoria | Descripción |
+|---------|-----------|
+| Tipo | - Web SPA + API REST (arquitectura cliente-servidor desacoplada). |
+| Frontend | - Angular, desarrollado en TypeScript, compilado a JavaScript. |
+| Backend | - Spring Boot (Java 21). Gestiona la lógica de negocio, la autenticación y la API REST. Maven se utiliza para la gestión de dependencias y construcción del proyecto. |
+| Base de Datos | - Base de datos MySQL donde se almacenan entidades del sistema.(Quesos, Pedidos, Usuarios...) |
+| Herramientas de desarrollo | - Virtual Studio Code para frontend y backend. Uso de npm para la gestión de paquetes del frontend y Maven para el backend. Docker se usa para contenedores en despliegue, y Postman para probar la API REST. |
+| Control de calidad | - Tests unitarios, integración y sistema. JUnit, RestAssured, Karma/Jasmine, Selenium. SonarQube para análisis estático y GitHub Actions para CI/CD automatizado. |
+| Despliegue | - Docker |
+| Proceso | - Desarrollo iterativo e incremental, con control de versiones mediante Git Flow simplificado (ramas feature/ y main). Integración continua configurada en GitHub Actions. |
+
+### Tecnologías
+
+| Tecnologías | Descripción | Link |
+|---------|-----------|----------|
+| Angular | - Framework de desarrollo web de tipo SPA (Single Page Application) mantenido por Google. | - https://angular.io |
+| Spring Boot | - Framework para el desarrollo de aplicaciones Java que simplifica la creación de servicios web y APIs REST. | - https://spring.io/projects/spring-boot |
+| TypeScript | - Lenguaje de programación que extiende JavaScript con tipado estático y características orientadas a objetos. | - https://www.typescriptlang.org |
+| Java 21 | -Lenguaje de programación empleado en el backend. | - https://www.oracle.com/java/ |
+| MySQL | - Sistema de gestión de bases de datos relacional usado para almacenar la información persistente de la aplicación (usuarios, productos, pedidos…). | - https://www.mysql.com |
+| MapStruct | - Biblioteca Java que automatiza el mapeo entre entidades y DTOs. | - https://mapstruct.org |
+| Karma + Jasmine | - Conjunto de herramientas de testing del frontend. Jasmine define la sintaxis de los tests unitarios y de integración, mientras que Karma actúa como ejecutor (test runner) en entornos reales de navegador (como Chrome Headless). | - https://karma-runner.github.io <br> - https://jasmine.github.io |
+| Rest Assured | - Librería Java para pruebas automatizadas de APIs REST. | - https://rest-assured.io |
+| Selenium | - Framework de automatización de pruebas E2E (end-to-end) para aplicaciones web. | - https://www.selenium.dev |
+
+### Herramientas
+
+| Herramientas | Descripción | Link |
+|---------|-----------|----------|
+| Visual Studio Code | - Entorno de desarrollo ligero y multiplataforma. | - https://code.visualstudio.com |
+| Maven | - Herramienta de gestión y automatización de proyectos Java. | - https://maven.apache.org |
+| npm (Node Package Manager) | - Permite instalar y administrar las dependencias del proyecto Angular. | - https://www.npmjs.com |
+| Postman | -Herramienta gráfica para el diseño, prueba de APIs REST. | - https://www.postman.com |
+| Git y GitHub | - Sistema de control de versiones distribuido (Git) y plataforma de colaboración (GitHub) empleados para el desarrollo coordinado del proyecto. | - https://git-scm.com <br> - https://github.com |
+| GitHub Actions | - Servicio de integración y entrega continua (CI/CD) integrado en GitHub. | - https://github.com/features/actions |
+| SonarQube | - Plataforma de análisis estático del código fuente. | - [https://www.SonarQube.com](https://www.sonarsource.com/products/sonarqube/) |
+| Docker | - Plataforma de virtualización basada en contenedores. Permite empaquetar el frontend, backend y base de datos. | - https://www.docker.com |
