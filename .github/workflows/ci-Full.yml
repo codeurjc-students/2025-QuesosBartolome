@@ -41,6 +41,20 @@ jobs:
         with:
           distribution: temurin
           java-version: '21'
+          
+      - name: Cache SonarQube packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.sonar/cache
+          key: ${{ runner.os }}-sonar
+          restore-keys: ${{ runner.os }}-sonar
+
+      - name: Cache Maven packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2
+          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-m2
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
@@ -62,13 +76,13 @@ jobs:
         working-directory: ./backend
         run: |
           nohup mvn spring-boot:run > backend.log 2>&1 &
-          echo "⏳ Waiting for backend to start on port 8080..."
+          echo "Waiting for backend to start on port 8080..."
           for i in {1..30}; do
             if nc -z localhost 8080; then
-              echo "✅ Backend is up on port 8080!"
+              echo "Backend is up on port 8080!"
               break
             fi
-            echo "🕒 Waiting... ($i/30)"
+            echo "Waiting... ($i/30)"
             sleep 3
           done
 
@@ -98,4 +112,13 @@ jobs:
       - name: Run all backend tests
         working-directory: ./backend
         run: mvn test -B
+
+      # --- SONARQUBE ---
+      - name: Build and analyze
+        working-directory: ./backend
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar
+                 -Dsonar.projectKey=codeurjc-students_2025-QuesosBartolome
+                 -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml
 
