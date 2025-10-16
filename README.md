@@ -291,6 +291,167 @@ Partes detalladas:
 | npm (Node Package Manager) | - Permite instalar y administrar las dependencias del proyecto Angular. | - https://www.npmjs.com |
 | Postman | -Herramienta gráfica para el diseño, prueba de APIs REST. | - https://www.postman.com |
 | Git y GitHub | - Sistema de control de versiones distribuido (Git) y plataforma de colaboración (GitHub) empleados para el desarrollo coordinado del proyecto. | - https://git-scm.com <br> - https://github.com |
-| GitHub Actions | - Servicio de integración y entrega continua (CI/CD) integrado en GitHub. | - https://github.com/features/actions |
-| SonarQube | - Plataforma de análisis estático del código fuente. | - [https://www.SonarQube.com](https://www.sonarsource.com/products/sonarqube/) |
+| GitHub Actions | - Servicio de integración y entrega continua (CI/CD) integrado en GitHub. | -https://github.com/features/actions |
+| SonarQube | - Plataforma de análisis estático del código fuente. | - https://www.sonarsource.com/products/sonarqube/ |
 | Docker | - Plataforma de virtualización basada en contenedores. Permite empaquetar el frontend, backend y base de datos. | - https://www.docker.com |
+
+### Arquitectura
+
+#### Despliegue
+La aplicación Quesos Bartolomé tiene una arquitectura de despliege con procesos independientes que se comunican entre si.
+
+- Frontend: Implementado en Angular se ejecuta como una SPA, contine la interfaz de usuario y se comunica con el servicio mediante la API REST.
+- Backend: Desarrollado en Spring Boot funciona como servicio de la aplicación proporcionando la API REST que usa el cliente.
+
+#### API REST
+La api rest esta debidamente documentada usando OpenApi.
+
+URL API
+
+### Control de calidad
+Con el objetico de asegurar la calidad y fiabilidad del código de la aplicación Quesos Bartolome se han llevado a cabo una serie de pruebas automaticas tanto para el cliente como para el servidor, las pruebas son: sistema (E2E), unitarias e integración.
+Todas estas pruebas se ejecutan autimaticamente mediante los workflows en GitHub Actions, dependiendo del tipo de control de calidad (CI-Feature (Solo pruebas unitarias) CI-Full (Todas las pruebas y analisis estatico de Codigo)).
+
+#### Pruebas de sistema (E2E)
+
+- Pruebas servicio: Valida el correcto funcionamiento de la API REST desarrollada con Spring Boot, esta prueba se desarrolla utilizaco la libreria Rest Assured de Java.
+- Pruebas cliente: Se desarrolla con Selenium WebDriver para verificar el comportamiento del interfaz de usuario de Angular.
+
+#### Pruebas unitarias
+
+- Pruebas servicio: Se han implementado pruebas unitarias con JUnit 5 para los servicios del backend. En este tipo de prubas se utiliza un doble de la base de datos para no hacer las pruebas con los datos reales.
+- Pruebas cliente: Se han implementado pruebas unitarias utilizando el framework Jasmine/Karma junto con el sistema de testing propio de Angular con el objetivo de comprobar la funcionalidad de cada componente.
+
+#### Pruebas de integración
+
+- Pruebas servicio: Las pruebas de integración se ejecutan usando la base de datos real validando asi que el servicio se integra correctamente con esta.
+- Pruebas cliente: Se comprueba que el servicio obtiene los datos de la API real y los pasa correctamente al componente de presentación.
+
+#### Cobertura
+
+#### Resultados Tests
+
+#### Analisís estático de código 
+
+### Proceso de desarrollo
+
+El desarrollo de la aplicación Queso Bartolome se ha realizado mediante un proceso iterativo e incremental siguiendo los principios del Manifiesto Ágil, tomando prácticas de Programación Extrema (XP) y una gestión visual basada en Kanban.
+Por lo que a lo largo del proceso se iran entregando versiones funcionales del sistema cada cierto tiempo, centradas en funcionalidades concretas y con una retroalimentación continua por parte del tutor de practicas.
+
+#### Gestión de tareas
+
+Para la gestión de las tareas  se han utilizado las herramientas GitHub Issues y GitHub Projects:
+
+-Cada nueva funcionalidad o incidencia se registrara como una Issue y sera añadida al tablero con el reto de issues, el tablero se divide en diferentes apartados (Todo, In progress, Done) que muestran el estado de cada issue o tarea lo que facilita el seguimiento del flujo de trabajo.
+
+#### Git
+
+El código fuente se gestionó mediante el sistema de control de versiones Git, alojado en un repositorio remoto en GitHub.
+Se aplicó una estrategia de ramas ligera inspirada en Git Flow, adaptada a las necesidades del proyecto:
+
+- main → rama principal.
+- feature/* → ramas destinadas al desarrollo de nuevas funcionalidades.
+- fix/* → ramas para correcciones puntuales.
+
+Por cada funcinalidad se creara una rama feature/ y en ella se desarrolara su implementación al estar completa y si pasa el control (CI) se integrara en la rama main mediante un Pull Request.
+
+**Metricas del repositorio:**
+
+| Métrica | Valor |
+|---------|-------|
+| Commits | -  | 
+| Ramas | -  | 
+| Issues | -  | 
+| Pull Requests | -  | 
+
+#### Integración continua
+
+La aplicación Quesos Bartolomé tiene un sistema de Integración Continua (CI) con GitHub Actions, se han definido dos niveles de control de calidad:
+
+| Control de calidad | Descripción |
+|---------|-------|
+| CI-feature | - Se ejecuta automáticamente en cada commit o push sobre una rama de funcionalidad. Se ejecutan los test unitarios.  | 
+| CI-Full | - Se ejecuta automáticamente cuando se abre una Pull Request hacia la rama main. Se ejecutan tanto el en cliente como en el servidor todos los test y ademas se hace el analisis estatico de código con SonarQube. Si no se pasa este control no se producira el Pull Request  | 
+
+### Ejecución y edición de código
+A continuación se indicaran los pasos para la ejecucción de la aplicación.
+
+#### Clonado del repositorio
+
+```bash
+git clone https://github.com/codeurjc-students/quesos-bartolome.git
+cd quesos-bartolome
+```
+#### Ejecución
+**Configurar Base de datos (SQL)**
+Configurar variables de entorno:
+
+```bash
+spring.datasource.url=
+spring.datasource.username=
+spring.datasource.password=
+spring.jpa.hibernate.ddl-auto=create-drop
+```
+
+**Servidor (Backend)**
+
+```bash
+cd backend
+mvn clean install
+mvn spring-boot:run
+```
+Se levantara el Servidor en  http://localhost:8080
+**Cliente (Frontend)**
+
+```bash
+cd frontend
+npm install
+ng serve
+```
+La aplicación se iniciara en http://localhost:4200 
+
+#### Uso de herramientas
+
+- Visual Studio Code: Entorno principal para ver y editar el código fuente tanto del servidor como del cliente.
+
+- Postman: herramienta para interactuar con la API REST del servidor. (PostmanCollection)
+#### Ejecucción de Tests
+Ejecutar estes comandos en la terminal con el servicio ejecutandose.
+
+-Cliente: Con el servicio ejecutandose.
+```bash
+cd frontend
+ng test
+```
+-Servidor: Con el Cliente funcionando.
+```bash
+cd backend
+mvn test
+```
+#### Crear una release
+
+Para generar una versión lista para despliegue:
+
+- Backend (Spring Boot)
+```bash
+cd backend
+mvn clean package
+```
+Esto genera un archivo .jar ejecutable en target/quesosbartolome-0.0.1-SNAPSHOT.jar:
+
+```bash
+java -jar target/quesosbartolome-0.0.1-SNAPSHOT.jar
+```
+
+- Frontend (Angular)
+```bash
+cd frontend
+ng build --configuration production
+```
+El resultado se genera en frontend/dist/, listo para ser desplegado en un servidor web o integrado con el backend.
+
+
+
+
+
+ 
