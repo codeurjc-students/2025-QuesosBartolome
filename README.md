@@ -427,8 +427,9 @@ The application will run at http://localhost:4200
 
 - Visual Studio Code: Main environment for viewing and editing source code for both the server and client.
 
-- Postman: Tool to interact with the server’s REST API. (Postman Collection).
-- 
+- Postman: Tool to interact with the server’s REST API. Postman Collection in `docs/Postman/QuesosBartolome.postman_collection.json`
+
+
 #### Running Tests
 
 -Cliente: 
@@ -451,7 +452,7 @@ To generate a deployable version:
 cd backend
 mvn clean package
 ```
-This generates an executable .jar file in target/quesosbartolome-0.0.1-SNAPSHOT.jar:
+This generates an executable `.jar` file in `target/quesosbartolome-0.0.1-SNAPSHOT.jar`
 
 ```bash
 java -jar target/quesosbartolome-0.0.1-SNAPSHOT.jar
@@ -462,7 +463,7 @@ java -jar target/quesosbartolome-0.0.1-SNAPSHOT.jar
 cd frontend
 ng build --configuration production
 ```
-The output is generated in frontend/dist/, ready to be deployed to a web server or integrated with the backend.
+The output is generated in `frontend/dist/`, ready to be deployed to a web server or integrated with the backend.
 
 
 
