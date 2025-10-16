@@ -333,17 +333,21 @@ All tests are executed automatically through GitHub Actions workflows, depending
 
 #### Coverage
 - Backend Coverage:
+![Backend Coverage](Images/CoverageBackend.png)
 
 - Frontend Coverage:
+![Frontend Coverage](Images/CoverageFrontend.png)
 
 #### Test Results
 
 - Service: 7 tests executed:
-
+![TestBackend](Images/TestPassedBackend.png)
 - Client: 2 tests executed:
-
+![TestFrontend](Images/TestPassedFrontend.png)
 #### Static Code Analysis 
+![Sonar1](Images/SonarQube1.png)
 
+![Sonar2](Images/SonarQube2.png)
 ### Development Process
 
 The development of the Quesos Bartolomé application has been carried out using an iterative and incremental process following the principles of the Agile Manifesto, incorporating practices from Extreme Programming (XP) and a visual management system based on Kanban.
