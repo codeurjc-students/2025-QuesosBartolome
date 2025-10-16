@@ -383,7 +383,8 @@ git clone https://github.com/codeurjc-students/quesos-bartolome.git
 cd quesos-bartolome
 ```
 #### Ejecución
-**Configurar Base de datos (SQL)**
+
+- **Configurar Base de datos (SQL)**
 Configurar variables de entorno:
 
 ```bash
@@ -393,7 +394,7 @@ spring.datasource.password=
 spring.jpa.hibernate.ddl-auto=create-drop
 ```
 
-**Servidor (Backend)**
+- **Servidor (Backend)**
 
 ```bash
 cd backend
@@ -401,7 +402,7 @@ mvn clean install
 mvn spring-boot:run
 ```
 Se levantara el Servidor en  http://localhost:8080
-**Cliente (Frontend)**
+- **Cliente (Frontend)**
 
 ```bash
 cd frontend
