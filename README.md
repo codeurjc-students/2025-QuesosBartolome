@@ -44,8 +44,8 @@ The project will be carried out in phases, each with a defined start and end dat
 - End date: September 16, 2025
 - In this phase, the general aspects of the application will be defined, along with its functionalities, which will be divided into basic, intermediate, and advanced. The roles of the different users will also be established. Additionally, the designs of the application’s screens will be created.
 ### Phase 2: Repository, testing, and CI.
-- Start date:
-- End date:
+- Start date: September 16, 2025
+- End date: October 16, 2025
 - The Git repository will be created, a minimum set of automated tests will be implemented, and the CI system will be configured.
 ### Phase 3: Version 0.1 - Basic functionality and Docker.
 - Start date:
