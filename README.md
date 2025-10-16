@@ -248,30 +248,6 @@ Work completed by fourth-year student Víctor Bartolomé Letosa, supervised by M
 - [Development Process](#docs/readme/Development_Process.md)
 - [Running and Editing the Code](#docs/readme/Running_and_Editing_the_Code.md)
 
-### Introduction
-
-The Quesos Bartolomé application has been developed following a Single Page Application (SPA) web architecture. This structure divides the system into three main parts: the client (frontend), the server (backend), and the database used to store the application’s information. This type of architecture improves web performance and enhances the user experience by allowing asynchronous interaction and content updates without the need to reload the entire page.
-
-Detailed components:
-| System Component | Description |
-|---------|-----------|
-| Frontend | - Developed with Angular, it is responsible for the graphical interface and user interaction. It makes requests and consumes the REST API provided by the backend. |
-| Backend | - Implemented with Spring Boot, it handles business logic, access control, data validation, and communication with the database. |
-| Database | - A MySQL database used to store the application’s data. |
-
-### Technical Summary
-
-| Category | Description |
-|---------|-----------|
-| Type | - Web SPA + REST API (decoupled client-server architecture). |
-| Frontend | - Angular, developed in TypeScript and compiled to JavaScript. |
-| Backend | -Spring Boot (Java 21). Manages business logic, authentication, and the REST API. Maven is used for dependency management and project build. |
-| Database | - MySQL database where system entities are stored (Cheeses, Orders, Users, etc.). |
-| Development Tools | - Visual Studio Code for frontend and backend. npm is used for frontend package management and Maven for the backend. Docker is used for containerized deployment, and Postman for REST API testing. |
-| Quality Control | - Unit, integration, and system tests. JUnit, RestAssured, Karma/Jasmine, Selenium. SonarQube for static code analysis and GitHub Actions for automated CI/CD. |
-| Deployment | - Docker |
-| Process | -Iterative and incremental development with version control using a simplified Git Flow (feature/ and main branches). Continuous integration configured in GitHub Actions. |
-
 ### Technologies
 
 | Technology | Description | Link |
