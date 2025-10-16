@@ -238,155 +238,166 @@ Work completed by fourth-year student Víctor Bartolomé Letosa, supervised by M
 ## Guía de desarrollo
 
 ### Índice
-[Functional Objectives](#author)
-[Functional Objectives](#author)
-[Functional Objectives](#author)
-[Functional Objectives](#author)
-[Functional Objectives](#author)
 
-### Introducción
+-[Introduction](#Introduction)
+-[Resumen Tecnico](#Resumen_Tecnico)
+-[Tecnologías](#Tecnologías)
+-[Herramientas](#Herramientas)
+-[Arquitectura](#Arquitectura)
+-[Control de calidad](#Control_de_calidad)
+-[Proceso de desarrollo](#Proceso_de_desarrollo)
+-[Ejecución y edición de código](#Ejecución_y_edición_de_código)
 
-La aplicacción Quesos Bartolomé se ha desarrollado siguiendo una arquitectura web de tipo SPA (Single Page Application). Lo que separa esta aplicación en tres parte el Cliente (frontend), el servidor (backend) y la base de datos para almacenar la infomración de la aplicación, este tipo de web mejora el rendimiento de la web y mejora la experiencia de usuario al permitir la interacción asíncrona y la actualización de contenido sin necesidad de recargar la página.
-Partes detalladas:
+### Introduction
 
-| Parte del Sistema | Explicación |
+The Quesos Bartolomé application has been developed following a Single Page Application (SPA) web architecture. This structure divides the system into three main parts: the client (frontend), the server (backend), and the database used to store the application’s information. This type of architecture improves web performance and enhances the user experience by allowing asynchronous interaction and content updates without the need to reload the entire page.
+
+Detailed components:
+| System Component | Description |
 |---------|-----------|
-| Frontend | - Utilizando Angular, es responsable de la interfaz gráfica y de la interacción con el usuario, hace peticiones y consume la API REST de backend |
-| Backend | - Implementado con Spring Boot, gestiona la lógica de negocio, el control de acceso, la validación de datos y la comunicación con la base de datos. |
-| Base de Datos | - Base de datos MySQL que guarda los datos de la aplicación |
+| Frontend | - Developed with Angular, it is responsible for the graphical interface and user interaction. It makes requests and consumes the REST API provided by the backend. |
+| Backend | - Implemented with Spring Boot, it handles business logic, access control, data validation, and communication with the database. |
+| Database | - A MySQL database used to store the application’s data. |
 
-### Resumen Tecnico
+### Technical Summary
 
-| Categoria | Descripción |
+| Category | Description |
 |---------|-----------|
-| Tipo | - Web SPA + API REST (arquitectura cliente-servidor desacoplada). |
-| Frontend | - Angular, desarrollado en TypeScript, compilado a JavaScript. |
-| Backend | - Spring Boot (Java 21). Gestiona la lógica de negocio, la autenticación y la API REST. Maven se utiliza para la gestión de dependencias y construcción del proyecto. |
-| Base de Datos | - Base de datos MySQL donde se almacenan entidades del sistema.(Quesos, Pedidos, Usuarios...) |
-| Herramientas de desarrollo | - Virtual Studio Code para frontend y backend. Uso de npm para la gestión de paquetes del frontend y Maven para el backend. Docker se usa para contenedores en despliegue, y Postman para probar la API REST. |
-| Control de calidad | - Tests unitarios, integración y sistema. JUnit, RestAssured, Karma/Jasmine, Selenium. SonarQube para análisis estático y GitHub Actions para CI/CD automatizado. |
-| Despliegue | - Docker |
-| Proceso | - Desarrollo iterativo e incremental, con control de versiones mediante Git Flow simplificado (ramas feature/ y main). Integración continua configurada en GitHub Actions. |
+| Type | - Web SPA + REST API (decoupled client-server architecture). |
+| Frontend | - Angular, developed in TypeScript and compiled to JavaScript. |
+| Backend | -Spring Boot (Java 21). Manages business logic, authentication, and the REST API. Maven is used for dependency management and project build. |
+| Database | - MySQL database where system entities are stored (Cheeses, Orders, Users, etc.). |
+| Development Tools | - Visual Studio Code for frontend and backend. npm is used for frontend package management and Maven for the backend. Docker is used for containerized deployment, and Postman for REST API testing. |
+| Quality Control | - Unit, integration, and system tests. JUnit, RestAssured, Karma/Jasmine, Selenium. SonarQube for static code analysis and GitHub Actions for automated CI/CD. |
+| Deployment | - Docker |
+| Process | -Iterative and incremental development with version control using a simplified Git Flow (feature/ and main branches). Continuous integration configured in GitHub Actions. |
 
-### Tecnologías
+### Technologies
 
-| Tecnologías | Descripción | Link |
+| Technology | Description | Link |
 |---------|-----------|----------|
-| Angular | - Framework de desarrollo web de tipo SPA (Single Page Application) mantenido por Google. | - https://angular.io |
-| Spring Boot | - Framework para el desarrollo de aplicaciones Java que simplifica la creación de servicios web y APIs REST. | - https://spring.io/projects/spring-boot |
-| TypeScript | - Lenguaje de programación que extiende JavaScript con tipado estático y características orientadas a objetos. | - https://www.typescriptlang.org |
-| Java 21 | -Lenguaje de programación empleado en el backend. | - https://www.oracle.com/java/ |
-| MySQL | - Sistema de gestión de bases de datos relacional usado para almacenar la información persistente de la aplicación (usuarios, productos, pedidos…). | - https://www.mysql.com |
-| MapStruct | - Biblioteca Java que automatiza el mapeo entre entidades y DTOs. | - https://mapstruct.org |
-| Karma + Jasmine | - Conjunto de herramientas de testing del frontend. Jasmine define la sintaxis de los tests unitarios y de integración, mientras que Karma actúa como ejecutor (test runner) en entornos reales de navegador (como Chrome Headless). | - https://karma-runner.github.io <br> - https://jasmine.github.io |
-| Rest Assured | - Librería Java para pruebas automatizadas de APIs REST. | - https://rest-assured.io |
-| Selenium | - Framework de automatización de pruebas E2E (end-to-end) para aplicaciones web. | - https://www.selenium.dev |
+| Angular | -Web development framework for building Single Page Applications (SPA), maintained by Google. | - https://angular.io |
+| Spring Boot | - Framework for developing Java applications that simplifies the creation of web services and REST APIs. | - https://spring.io/projects/spring-boot |
+| TypeScript | - Programming language that extends JavaScript with static typing and object-oriented features. | - https://www.typescriptlang.org |
+| Java 21 | - Programming language used in the backend. | - https://www.oracle.com/java/ |
+| MySQL | - Relational database management system used to store the application’s persistent information (users, products, orders, etc.). | - https://www.mysql.com |
+| MapStruct | - Java library that automates the mapping between entities and DTOs. | - https://mapstruct.org |
+| Karma + Jasmine | - Frontend testing tools. Jasmine defines the syntax for unit and integration tests, while Karma acts as a test runner in real browser environments (such as Chrome Headless). | - https://karma-runner.github.io <br> - https://jasmine.github.io |
+| Rest Assured | - Java library for automated REST API testing. | - https://rest-assured.io |
+| Selenium | - End-to-end (E2E) testing framework for web applications. | - https://www.selenium.dev |
 
-### Herramientas
+### Tools
 
-| Herramientas | Descripción | Link |
+| Tool | Description | Link |
 |---------|-----------|----------|
-| Visual Studio Code | - Entorno de desarrollo ligero y multiplataforma. | - https://code.visualstudio.com |
-| Maven | - Herramienta de gestión y automatización de proyectos Java. | - https://maven.apache.org |
-| npm (Node Package Manager) | - Permite instalar y administrar las dependencias del proyecto Angular. | - https://www.npmjs.com |
-| Postman | -Herramienta gráfica para el diseño, prueba de APIs REST. | - https://www.postman.com |
-| Git y GitHub | - Sistema de control de versiones distribuido (Git) y plataforma de colaboración (GitHub) empleados para el desarrollo coordinado del proyecto. | - https://git-scm.com <br> - https://github.com |
-| GitHub Actions | - Servicio de integración y entrega continua (CI/CD) integrado en GitHub. | -https://github.com/features/actions |
-| SonarQube | - Plataforma de análisis estático del código fuente. | - https://www.sonarsource.com/products/sonarqube/ |
-| Docker | - Plataforma de virtualización basada en contenedores. Permite empaquetar el frontend, backend y base de datos. | - https://www.docker.com |
+| Visual Studio Code | - Lightweight, cross-platform development environment. | - https://code.visualstudio.com |
+| Maven | - Tool for Java project management and automation. | - https://maven.apache.org |
+| npm (Node Package Manager) | - Allows installation and management of dependencies for the Angular project. | - https://www.npmjs.com |
+| Postman | - Graphical tool for designing and testing REST APIs. | - https://www.postman.com |
+| Git y GitHub | - Distributed version control system (Git) and collaboration platform (GitHub) used for coordinated project development. | - https://git-scm.com <br> - https://github.com |
+| GitHub Actions | - Continuous integration and delivery (CI/CD) service integrated into GitHub. | -https://github.com/features/actions |
+| SonarQube | - Platform for static code analysis. | - https://www.sonarsource.com/products/sonarqube/ |
+| Docker | - Container-based virtualization platform. Allows packaging of frontend, backend, and database. | - https://www.docker.com |
 
-### Arquitectura
+### Architecture
 
-#### Despliegue
-La aplicación Quesos Bartolomé tiene una arquitectura de despliege con procesos independientes que se comunican entre si.
+#### Deployment
+The Quesos Bartolomé application has a deployment architecture with independent processes that communicate with each other.
 
-- Frontend: Implementado en Angular se ejecuta como una SPA, contine la interfaz de usuario y se comunica con el servicio mediante la API REST.
-- Backend: Desarrollado en Spring Boot funciona como servicio de la aplicación proporcionando la API REST que usa el cliente.
+- Frontend: Implemented in Angular, it runs as an SPA, contains the user interface, and communicates with the service through the REST API.
+- Backend: Developed with Spring Boot, it functions as the application service, providing the REST API consumed by the client.
 
 #### API REST
-La api rest esta debidamente documentada usando OpenApi.
+The REST API is properly documented using OpenAPI.
 
-Documentación: [Doc APIREST](https://raw.githack.com/codeurjc-students/2025-QuesosBartolome/refs/heads/main/docs/OpenApi/openapi.html)
+Documentation: [DOC APIREST](https://raw.githack.com/codeurjc-students/2025-QuesosBartolome/refs/heads/main/docs/OpenApi/openapi.html)
 
-### Control de calidad
-Con el objetico de asegurar la calidad y fiabilidad del código de la aplicación Quesos Bartolome se han llevado a cabo una serie de pruebas automaticas tanto para el cliente como para el servidor, las pruebas son: sistema (E2E), unitarias e integración.
-Todas estas pruebas se ejecutan autimaticamente mediante los workflows en GitHub Actions, dependiendo del tipo de control de calidad (CI-Feature (Solo pruebas unitarias) CI-Full (Todas las pruebas y analisis estatico de Codigo)).
+### Quality Control
+To ensure the quality and reliability of the Quesos Bartolomé application, a series of automated tests have been conducted for both the client and the server. The tests include system (E2E), unit, and integration tests.
+All tests are executed automatically through GitHub Actions workflows, depending on the type of quality control: CI-Feature (unit tests only) and CI-Full (all tests and static code analysis).
 
-#### Pruebas de sistema (E2E)
+#### System Tests (E2E)
 
-- Pruebas servicio: Valida el correcto funcionamiento de la API REST desarrollada con Spring Boot, esta prueba se desarrolla utilizaco la libreria Rest Assured de Java.
-- Pruebas cliente: Se desarrolla con Selenium WebDriver para verificar el comportamiento del interfaz de usuario de Angular.
+- Service Tests: Validates the correct functioning of the REST API developed with Spring Boot. These tests are implemented using the Rest Assured Java library.
+- Client Tests: Implemented with Selenium WebDriver to verify the behavior of the Angular user interface.
 
-#### Pruebas unitarias
+#### Unit Tests
 
-- Pruebas servicio: Se han implementado pruebas unitarias con JUnit 5 para los servicios del backend. En este tipo de prubas se utiliza un doble de la base de datos para no hacer las pruebas con los datos reales.
-- Pruebas cliente: Se han implementado pruebas unitarias utilizando el framework Jasmine/Karma junto con el sistema de testing propio de Angular con el objetivo de comprobar la funcionalidad de cada componente.
+- Service Tests: Unit tests for backend services are implemented with JUnit 5. A database mock or double is used to avoid testing with real data.
+- Client Tests: Unit tests are implemented using Jasmine/Karma along with Angular’s built-in testing framework to verify the functionality of each component.
 
-#### Pruebas de integración
+#### Integration Tests
 
-- Pruebas servicio: Las pruebas de integración se ejecutan usando la base de datos real validando asi que el servicio se integra correctamente con esta.
-- Pruebas cliente: Se comprueba que el servicio obtiene los datos de la API real y los pasa correctamente al componente de presentación.
+- Service Tests: Integration tests are executed against the real database to validate that the service integrates correctly.
+- Client Tests: Ensures that the service fetches data from the real API and passes it correctly to the presentation component.
 
-#### Cobertura
+#### Coverage
+- Backend Coverage:
 
-#### Resultados Tests
+- Frontend Coverage:
 
-#### Analisís estático de código 
+#### Test Results
 
-### Proceso de desarrollo
+- Service: 7 tests executed:
 
-El desarrollo de la aplicación Queso Bartolome se ha realizado mediante un proceso iterativo e incremental siguiendo los principios del Manifiesto Ágil, tomando prácticas de Programación Extrema (XP) y una gestión visual basada en Kanban.
-Por lo que a lo largo del proceso se iran entregando versiones funcionales del sistema cada cierto tiempo, centradas en funcionalidades concretas y con una retroalimentación continua por parte del tutor de practicas.
+- Client: 2 tests executed:
 
-#### Gestión de tareas
+#### Static Code Analysis 
 
-Para la gestión de las tareas  se han utilizado las herramientas GitHub Issues y GitHub Projects:
+### Development Process
 
--Cada nueva funcionalidad o incidencia se registrara como una Issue y sera añadida al tablero con el reto de issues, el tablero se divide en diferentes apartados (Todo, In progress, Done) que muestran el estado de cada issue o tarea lo que facilita el seguimiento del flujo de trabajo.
+The development of the Quesos Bartolomé application has been carried out using an iterative and incremental process following the principles of the Agile Manifesto, incorporating practices from Extreme Programming (XP) and a visual management system based on Kanban.
+Throughout the process, functional versions of the system are delivered at regular intervals, focused on specific features and with continuous feedback from the project tutor.
+
+#### Task Management
+
+GitHub Issues and GitHub Projects have been used for task management:
+
+- Each new feature or issue is registered as an Issue and added to the project board. The board is divided into different sections (Todo, In Progress, Done) that show the status of each task or issue, facilitating workflow tracking.
 
 #### Git
 
-El código fuente se gestionó mediante el sistema de control de versiones Git, alojado en un repositorio remoto en GitHub.
-Se aplicó una estrategia de ramas ligera inspirada en Git Flow, adaptada a las necesidades del proyecto:
+The source code is managed using Git, hosted in a remote repository on GitHub.
 
-- main → rama principal.
-- feature/* → ramas destinadas al desarrollo de nuevas funcionalidades.
-- fix/* → ramas para correcciones puntuales.
+A lightweight branch strategy inspired by Git Flow was applied, adapted to the project’s needs:
+- main → main branch.
+- feature/ →* branches for the development of new features.
+- fix/ →* branches for specific bug fixes.
 
-Por cada funcinalidad se creara una rama feature/ y en ella se desarrolara su implementación al estar completa y si pasa el control (CI) se integrara en la rama main mediante un Pull Request.
+For each feature, a feature/ branch is created where the implementation is developed. Once complete and passing CI, it is merged into the main branch via a Pull Request.
 
-**Metricas del repositorio:**
+**Repository Metrics:**
 
-| Métrica | Valor |
+| Metric | Value |
 |---------|-------|
 | Commits | -  | 
-| Ramas | -  | 
+| Branches | -  | 
 | Issues | -  | 
 | Pull Requests | -  | 
 
-#### Integración continua
+#### Continuous Integration
 
-La aplicación Quesos Bartolomé tiene un sistema de Integración Continua (CI) con GitHub Actions, se han definido dos niveles de control de calidad:
+The Quesos Bartolomé application has a Continuous Integration (CI) system implemented with GitHub Actions, with two levels of quality control:
 
-| Control de calidad | Descripción |
+| Quality Control | Description |
 |---------|-------|
-| CI-feature | - Se ejecuta automáticamente en cada commit o push sobre una rama de funcionalidad. Se ejecutan los test unitarios.  | 
-| CI-Full | - Se ejecuta automáticamente cuando se abre una Pull Request hacia la rama main. Se ejecutan tanto el en cliente como en el servidor todos los test y ademas se hace el analisis estatico de código con SonarQube. Si no se pasa este control no se producira el Pull Request  | 
+| CI-Feature | - Runs automatically on every commit or push to a feature branch. Executes unit tests.  | 
+| CI-Full | - Runs automatically when a Pull Request is opened toward the main branch. Executes all tests on both client and server and performs static code analysis with SonarQube. If this control is not passed, the Pull Request cannot be completed.  | 
 
-### Ejecución y edición de código
-A continuación se indicaran los pasos para la ejecucción de la aplicación.
+### Running and Editing the Code
+Below are the steps to run the application.
 
-#### Clonado del repositorio
+#### Cloning the Repository
 
 ```bash
 git clone https://github.com/codeurjc-students/quesos-bartolome.git
 cd quesos-bartolome
 ```
-#### Ejecución
+#### Running the Application
 
-- **Configurar Base de datos (SQL)**
-Configurar variables de entorno:
+- **Configure the Database (SQL)**
 
+Set the environment variables:
 ```bash
 spring.datasource.url=
 spring.datasource.username=
@@ -394,51 +405,53 @@ spring.datasource.password=
 spring.jpa.hibernate.ddl-auto=create-drop
 ```
 
-- **Servidor (Backend)**
+- **Server (Backend)**
 
 ```bash
 cd backend
 mvn clean install
 mvn spring-boot:run
 ```
-Se levantara el Servidor en  http://localhost:8080
-- **Cliente (Frontend)**
+The server will start at http://localhost:8080
+
+- **Client (Frontend)**
 
 ```bash
 cd frontend
 npm install
 ng serve
 ```
-La aplicación se iniciara en http://localhost:4200 
+The application will run at http://localhost:4200 
 
-#### Uso de herramientas
+#### Using Tools
 
-- Visual Studio Code: Entorno principal para ver y editar el código fuente tanto del servidor como del cliente.
+- Visual Studio Code: Main environment for viewing and editing source code for both the server and client.
 
-- Postman: herramienta para interactuar con la API REST del servidor. (PostmanCollection)
-#### Ejecucción de Tests
-Ejecutar estes comandos en la terminal con el servicio ejecutandose.
+- Postman: Tool to interact with the server’s REST API. (Postman Collection).
+- 
+#### Running Tests
 
--Cliente: Con el servicio ejecutandose.
+-Cliente: 
 ```bash
 cd frontend
 ng test
 ```
--Servidor: Con el Cliente funcionando.
+-Servidor: 
 ```bash
 cd backend
-mvn test
+mvn clean test
 ```
-#### Crear una release
 
-Para generar una versión lista para despliegue:
+#### Creating a Release
+
+To generate a deployable version:
 
 - Backend (Spring Boot)
 ```bash
 cd backend
 mvn clean package
 ```
-Esto genera un archivo .jar ejecutable en target/quesosbartolome-0.0.1-SNAPSHOT.jar:
+This generates an executable .jar file in target/quesosbartolome-0.0.1-SNAPSHOT.jar:
 
 ```bash
 java -jar target/quesosbartolome-0.0.1-SNAPSHOT.jar
@@ -449,7 +462,7 @@ java -jar target/quesosbartolome-0.0.1-SNAPSHOT.jar
 cd frontend
 ng build --configuration production
 ```
-El resultado se genera en frontend/dist/, listo para ser desplegado en un servidor web o integrado con el backend.
+The output is generated in frontend/dist/, ready to be deployed to a web server or integrated with the backend.
 
 
 
