@@ -20,23 +20,23 @@ All tests are executed automatically through GitHub Actions workflows, depending
 #### Coverage
 - Backend Coverage:
   
-![Backend Coverage](Images/CoverageBackend.png)
+![Backend Coverage](../../Images/CoverageBackend.png)
 
 - Frontend Coverage:
   
-![Frontend Coverage](Images/CoverageFrontend.png)
+![Frontend Coverage](../../Images/CoverageFrontend.png)
 
 #### Test Results
 
 - Service: 7 tests executed:
   
-![TestBackend](Images/TestPassedBackend.png)
+![TestBackend](../../Images/TestPassedBackend.png)
 - Client: 2 tests executed:
   
-![TestFrontend](Images/TestPassedFrontend.png)
+![TestFrontend](../../Images/TestPassedFrontend.png)
 #### Static Code Analysis 
 
-![Sonar1](Images/SonarQube1.png)
+![Sonar1](../../Images/SonarQube1.png)
 
 
-![Sonar2](Images/SonarQube2.png)
+![Sonar2](../../Images/SonarQube2.png)
