@@ -1,0 +1,26 @@
+{
+	"info": {
+		"_postman_id": "f1499dd6-9a37-4d84-b1b0-d0bc4cfd30c7",
+		"name": "QuesosBartolome",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "43223390"
+	},
+	"item": [
+		{
+			"name": "GET Cheeses",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		},
+		{
+			"name": "GET Cheese {id}",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		}
+	]
+}
