@@ -306,7 +306,7 @@ La aplicación Quesos Bartolomé tiene una arquitectura de despliege con proceso
 #### API REST
 La api rest esta debidamente documentada usando OpenApi.
 
-URL API
+Documentación: [Doc APIREST](https://raw.githack.com/codeurjc-students/2025-QuesosBartolome/refs/heads/main/docs/OpenApi/openapi.html)
 
 ### Control de calidad
 Con el objetico de asegurar la calidad y fiabilidad del código de la aplicación Quesos Bartolome se han llevado a cabo una serie de pruebas automaticas tanto para el cliente como para el servidor, las pruebas son: sistema (E2E), unitarias e integración.
