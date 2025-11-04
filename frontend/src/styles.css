@@ -1,1 +1,19 @@
 /* You can add global styles to this file, and also import other style files */
+:root {
+  --rojo-vino: #a1252b;
+  --crema: #f5e9d4;
+  --blanco: #ffffff;
+  --gris-suave: #f0f0f0;
+  --texto: #2e2e2e;
+  --shadow: 0 2px 6px rgba(0,0,0,0.08);
+  --radius: 10px;
+}
+
+
+html, body {
+  height: 100%;
+  margin: 0;
+  background-color: var(--crema);
+  font-family: "Poppins", sans-serif;
+  color: var(--texto);
+}
