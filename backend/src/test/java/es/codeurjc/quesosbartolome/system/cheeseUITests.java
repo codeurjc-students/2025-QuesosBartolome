@@ -43,9 +43,10 @@ public class cheeseUITests {
         driver.get("http://localhost:4200/");
 
 
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".cheese-name")));
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".card-body p")));
 
-        List<WebElement> nombres = driver.findElements(By.cssSelector(".cheese-name"));
+        List<WebElement> nombres = driver.findElements(By.cssSelector(".card-body p"));
+
         assertFalse(nombres.isEmpty(), "No se encontraron nombres de queso en la página");
 
         boolean semicurado = nombres.stream()

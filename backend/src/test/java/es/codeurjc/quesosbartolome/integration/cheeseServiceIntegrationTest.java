@@ -29,37 +29,31 @@ public class cheeseServiceIntegrationTest {
     @Autowired
     private CheeseRepository cheeseRepository;
 
+    private Long curadoId;
 
     @BeforeEach
     void setup() {
-
-        cheeseRepository.save(new Cheese(1L, "Curado", 10.0, "desc1", "tipo1", "2024-01-01", "2025-01-01"));
-        cheeseRepository.save(new Cheese(2L, "Tierno", 12.0, "desc2", "tipo2", "2024-02-01", "2025-02-01"));
+        cheeseRepository.deleteAll();
+        Cheese curado = cheeseRepository.save(new Cheese(null, "Curado", 10.0, "desc1", "tipo1", "2024-01-01", "2025-01-01"));
+        cheeseRepository.save(new Cheese(null, "Tierno", 12.0, "desc2", "tipo2", "2024-02-01", "2025-02-01"));
+        curadoId = curado.getId(); 
     }
-    
+
     @AfterAll
     static void afterAll(@Autowired CheeseRepository cheeseRepository) {
         cheeseRepository.deleteAll();
     }
 
-
-
     @Test
     void shouldReturnAllCheeses() {
-        // Ejecuta el servicio real
         List<CheeseDTO> cheeses = cheeseService.findAll();
-
-        // Verifica los resultados
         assertThat(cheeses).hasSize(2);
         assertThat(cheeses).extracting(CheeseDTO::name).contains("Curado", "Tierno");
     }
 
     @Test
     void shouldReturnIdCheese() {
-        // Ejecuta el servicio real
-        Optional<CheeseDTO> cheese = cheeseService.findById(1L);
-
-        // Verifica los resultados
+        Optional<CheeseDTO> cheese = cheeseService.findById(curadoId); 
         assertThat(cheese).isPresent();
         assertThat(cheese.get().name()).isEqualTo("Curado");
     }
