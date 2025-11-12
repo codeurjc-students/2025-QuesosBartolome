@@ -1,54 +1,40 @@
 // @ts-nocheck
-import type { Config } from "karma";
-import * as path from "path";
-
-export default function(config: Config) {
+module.exports = function (config) {
   config.set({
-    basePath: "",
-    frameworks: ["jasmine", "@angular-devkit/build-angular"],
-
+    basePath: '',
+    frameworks: ['jasmine', '@angular-devkit/build-angular'],
     plugins: [
-      require("karma-jasmine"),
-      require("karma-chrome-launcher"),
-      require("karma-jasmine-html-reporter"),
-      require("karma-coverage"),
-      require("@angular-devkit/build-angular/plugins/karma")
+      require('karma-jasmine'),
+      require('karma-chrome-launcher'),
+      require('karma-jasmine-html-reporter'),
+      require('karma-coverage'),
+      require('@angular-devkit/build-angular/plugins/karma')
     ],
-
-    reporters: ["progress", "kjhtml"],
-
-    browsers: ["ChromeHeadlessNoSandbox"],
-
-    customLaunchers: {
-      ChromeHeadlessNoSandbox: {
-        base: "ChromeHeadless",
-        flags: [
-          "--headless=new",
-          "--no-sandbox",
-          "--disable-setuid-sandbox",
-          "--ignore-certificate-errors",
-          "--allow-insecure-localhost",
-          "--disable-web-security"
-        ]
-      }
-    },
-
     client: {
-      jasmine: {},
       clearContext: false
     },
-
     coverageReporter: {
-      dir: path.join(__dirname, "./coverage"),
-      subdir: ".",
-      reporters: [{ type: "html" }, { type: "text-summary" }]
+      dir: require('path').join(__dirname, './coverage'),
+      subdir: '.',
+      reporters: [{ type: 'html' }, { type: 'text-summary' }]
     },
-
-    port: 9876,
+    reporters: ['progress', 'kjhtml'],
+    port: 4200,
     colors: true,
     logLevel: config.LOG_INFO,
-    autoWatch: false,
-    singleRun: true,
-    restartOnFileChange: false
+    autoWatch: true,
+    browsers: ['ChromeHeadlessNoSandbox'],
+    customLaunchers: {
+    ChromeHeadlessNoSandbox: {
+        base: 'ChromeHeadless',
+        flags: [
+        '--no-sandbox',
+        '--disable-gpu',
+        '--ignore-certificate-errors',
+        ],
+    },
+    },
+    singleRun: false,
+    restartOnFileChange: true
   });
-}
+};
