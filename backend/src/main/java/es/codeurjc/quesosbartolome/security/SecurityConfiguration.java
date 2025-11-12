@@ -62,8 +62,7 @@ public class SecurityConfiguration {
                 .authenticationEntryPoint(unauthorizedHandlerJwt)
                 .accessDeniedHandler(customAccessDeniedHandler))
             .authorizeHttpRequests(auth -> auth
-                // TODO: cambiar cuando tengas login
-                .anyRequest().permitAll()
+                .requestMatchers("/api/**").permitAll()  // Permitir todas las API para test
             );
 
         http.csrf(csrf -> csrf.disable());
