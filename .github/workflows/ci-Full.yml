@@ -42,20 +42,15 @@ jobs:
           distribution: temurin
           java-version: '21'
 
-      - name: Allow Java to bind to low ports (for 443)
+      # 🔑 Dar capability al binario de Java para poder usar 443
+      - name: Allow Java to bind to privileged ports
         run: |
           sudo apt-get update
           sudo apt-get install -y libcap2-bin
           JAVA_BIN=$(readlink -f "$(which java)")
           echo "Java binary path: $JAVA_BIN"
           sudo setcap 'cap_net_bind_service=+ep' "$JAVA_BIN"
-
-      - name: Cache SonarQube packages
-        uses: actions/cache@v4
-        with:
-          path: ~/.sonar/cache
-          key: ${{ runner.os }}-sonar
-          restore-keys: ${{ runner.os }}-sonar
+          getcap "$JAVA_BIN"
 
       - name: Cache Maven packages
         uses: actions/cache@v4
@@ -71,20 +66,20 @@ jobs:
 
       - name: Set up Chrome for headless tests
         uses: browser-actions/setup-chrome@v1
-        
+
       - name: Set up ChromeDriver
         uses: nanasess/setup-chromedriver@v2
 
       # --- BACKEND BUILD ---
-      - name: Build backend 
+      - name: Build backend
         working-directory: ./backend
         run: mvn clean install -DskipTests -B
 
-      - name: Start Spring Boot backend
+      - name: Start Spring Boot backend on 443
         working-directory: ./backend
         run: |
           echo "Starting backend on port 443..."
-          nohup mvn spring-boot:run > backend.log 2>&1 &
+          nohup mvn spring-boot:run -Dspring-boot.run.arguments="--server.port=443" > backend.log 2>&1 &
           echo "Waiting for backend to start on port 443..."
           for i in {1..30}; do
             if nc -z localhost 443; then
@@ -121,6 +116,7 @@ jobs:
       - name: Run all backend tests
         working-directory: ./backend
         run: mvn test -B
+
 
       # --- SONARQUBE ---
       - name: Build and analyze
