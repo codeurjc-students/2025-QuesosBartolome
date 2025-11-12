@@ -41,7 +41,16 @@ jobs:
         with:
           distribution: temurin
           java-version: '21'
-          
+
+      # ✅ AÑADIDO PARA PERMITIR EL PUERTO 443 A JAVA (SIN SER ROOT)
+      - name: Allow Java to bind to low ports (for 443)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libcap2-bin
+          JAVA_BIN=$(readlink -f "$(which java)")
+          echo "Java binary path: $JAVA_BIN"
+          sudo setcap 'cap_net_bind_service=+ep' "$JAVA_BIN"
+
       - name: Cache SonarQube packages
         uses: actions/cache@v4
         with:
@@ -75,11 +84,12 @@ jobs:
       - name: Start Spring Boot backend
         working-directory: ./backend
         run: |
+          echo "Starting backend on port 443..."
           nohup mvn spring-boot:run > backend.log 2>&1 &
-          echo "Waiting for backend to start on port 8080..."
+          echo "Waiting for backend to start on port 443..."
           for i in {1..30}; do
-            if nc -z localhost 8080; then
-              echo "Backend is up on port 8080!"
+            if nc -z localhost 443; then
+              echo "✅ Backend is UP on port 443!"
               break
             fi
             echo "Waiting... ($i/30)"
@@ -107,7 +117,7 @@ jobs:
           CI: true
         run: |
           npm run test -- --no-watch --browsers=ChromeHeadless --source-map=false
-          
+
       # --- BACKEND TESTS ---
       - name: Run all backend tests
         working-directory: ./backend
@@ -118,7 +128,8 @@ jobs:
         working-directory: ./backend
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar
-                 -Dsonar.projectKey=codeurjc-students_2025-QuesosBartolome
+        run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
+                 -Dsonar.projectKey=codeurjc-students_2025-QuesosBartolome \
                  -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml
+
 
