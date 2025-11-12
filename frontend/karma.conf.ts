@@ -19,22 +19,25 @@ module.exports = function (config) {
       reporters: [{ type: 'html' }, { type: 'text-summary' }]
     },
     reporters: ['progress', 'kjhtml'],
-    port: 4200,
+    port: 9876, // puerto estándar de Karma
     colors: true,
     logLevel: config.LOG_INFO,
-    autoWatch: true,
+    autoWatch: false,
+    singleRun: true,
     browsers: ['ChromeHeadlessNoSandbox'],
     customLaunchers: {
-    ChromeHeadlessNoSandbox: {
+      ChromeHeadlessNoSandbox: {
         base: 'ChromeHeadless',
         flags: [
-        '--no-sandbox',
-        '--disable-gpu',
-        '--ignore-certificate-errors',
-        ],
+          '--headless=new', // para nuevas versiones de Chrome Headless
+          '--no-sandbox',
+          '--disable-setuid-sandbox',
+          '--disable-gpu',
+          '--ignore-certificate-errors', // ignora certificados autofirmados
+          '--allow-insecure-localhost'   // acepta HTTPS localhost
+        ]
+      }
     },
-    },
-    singleRun: false,
-    restartOnFileChange: true
+    restartOnFileChange: false
   });
 };
