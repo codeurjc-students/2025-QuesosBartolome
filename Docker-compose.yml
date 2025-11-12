@@ -1,0 +1,41 @@
+version: "3.9"
+
+services:
+  db:
+    image: mysql:8.0
+    container_name: mysql-db
+    restart: always
+    ports:
+      - "3307:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: password0]
+      MYSQL_DATABASE: quesosbartolome
+      MYSQL_USER: root
+      MYSQL_PASSWORD: password0]
+    volumes:
+      - db_data:/var/lib/mysql
+
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  app:
+    image: victorbartolome/quesosbartolome:latest
+    container_name: webapp
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "443:443"
+    environment:
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_NAME: quesosbartolome
+      DB_USER: root
+      DB_PASSWORD: password0]
+      SERVER_SSL_KEY_STORE_PASSWORD: password
+
+volumes:
+  db_data:
