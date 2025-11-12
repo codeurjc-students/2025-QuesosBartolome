@@ -1,9 +1,8 @@
-// @ts-nocheck   
-
-import type { Config, ConfigOptions } from 'karma';
+// @ts-nocheck
+import type { Config } from 'karma';
 
 export default function (config: Config) {
-  const options: ConfigOptions = {
+  config.set({
     basePath: '',
     frameworks: ['jasmine', '@angular-devkit/build-angular'],
 
@@ -15,19 +14,22 @@ export default function (config: Config) {
       ChromeHeadlessNoSandbox: {
         base: 'ChromeHeadless',
         flags: [
-          '--headless=new',              
+          '--headless=new',
           '--no-sandbox',
           '--disable-setuid-sandbox',
-          '--ignore-certificate-errors', // <-- permite HTTPS self-signed
-          '--allow-insecure-localhost',  // <-- HTTPS localhost
+          '--ignore-certificate-errors',
+          '--allow-insecure-localhost',
           '--disable-web-security'
         ],
       },
     },
 
+    client: {
+      jasmine: {},
+      clearContext: false
+    },
+
     singleRun: true,
     autoWatch: false,
-  };
-
-  config.set(options);
+  });
 }
