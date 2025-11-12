@@ -42,7 +42,6 @@ jobs:
           distribution: temurin
           java-version: '21'
 
-      # ✅ AÑADIDO PARA PERMITIR EL PUERTO 443 A JAVA (SIN SER ROOT)
       - name: Allow Java to bind to low ports (for 443)
         run: |
           sudo apt-get update
