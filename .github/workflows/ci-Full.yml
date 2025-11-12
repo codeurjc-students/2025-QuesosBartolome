@@ -110,7 +110,8 @@ jobs:
         env:
           CI: true
         run: |
-          npm run test -- --no-watch --browsers=ChromeHeadless --source-map=false
+          npm run test -- --karma-config=karma.conf.js --browsers=ChromeHeadlessNoSandbox --no-watch --source-map=false
+
 
       # --- BACKEND TESTS ---
       - name: Run all backend tests
