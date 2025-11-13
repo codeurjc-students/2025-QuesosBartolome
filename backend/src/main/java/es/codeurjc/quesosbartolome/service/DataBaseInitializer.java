@@ -45,7 +45,7 @@ public class DataBaseInitializer {
         azul.setExpirationDate(Date.valueOf(LocalDate.now().plusMonths(2)));
         azul.setType("Soft");
         azul.setImage(null);
-
+        /*
         // Create Cheese 3
         Cheese Curado = new Cheese();
         Curado.setName("Curado"); 
@@ -55,7 +55,7 @@ public class DataBaseInitializer {
         Curado.setExpirationDate(Date.valueOf(LocalDate.now().plusMonths(3)));
         Curado.setType("Semi-Hard"); 
         Curado.setImage(null);
-
+        
         // Create Cheese 4
         Cheese Chevrett = new Cheese();
         Chevrett.setName("Chevrett"); 
@@ -65,6 +65,7 @@ public class DataBaseInitializer {
         Chevrett.setExpirationDate(Date.valueOf(LocalDate.now().plusMonths(1).plusWeeks(1)));
         Chevrett.setType("Goat"); 
         Chevrett.setImage(null);
+        */
         
         // Create user 1
         User user1 = new User();
@@ -78,8 +79,8 @@ public class DataBaseInitializer {
         // Save cheeses to DB
         cheeseRepository.save(semicurado);
         cheeseRepository.save(azul);
-        cheeseRepository.save(Curado);
-        cheeseRepository.save(Chevrett);
+        //cheeseRepository.save(Curado);
+        //cheeseRepository.save(Chevrett);
 
         // Save users in DB
         userRepository.save(user1);
