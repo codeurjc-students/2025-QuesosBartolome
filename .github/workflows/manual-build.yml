@@ -1,0 +1,52 @@
+name: Manual Build 
+
+on:
+  workflow_dispatch:  
+
+jobs:
+  manual-build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Generate tag
+        id: tag
+        run: |
+          BRANCH_NAME=$(echo "${GITHUB_REF#refs/heads/}" | sed 's/\//-/g')
+          COMMIT_SHORT=$(git rev-parse --short HEAD)
+          TIMESTAMP=$(date +%Y%m%d-%H%M%S)
+          TAG="${BRANCH_NAME}-${TIMESTAMP}-${COMMIT_SHORT}"
+          echo "tag=${TAG}" >> $GITHUB_OUTPUT
+          echo "Generated tag: ${TAG}"
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build docker image
+        working-directory: ./docker
+        run: |
+          docker build \
+            -t ${{ secrets.DOCKERHUB_USERNAME }}/quesosbartolome:${{ steps.tag.outputs.tag }} -f Dockerfile ..
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/quesosbartolome:${{ steps.tag.outputs.tag }}
+
+      - name: Update docker-compose.yml with tag
+        working-directory: ./docker
+        run: |
+          sed -i "s|quesosbartolome:[^ ]*|quesosbartolome:${{ steps.tag.outputs.tag }}|g" docker-compose.yml
+          echo "Updated docker-compose.yml:"
+          cat docker-compose.yml
+
+      - name: Publish docker-compose bundle
+        working-directory: ./docker
+        run: |
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/quesosbartolome-compose:${{ steps.tag.outputs.tag }} --file - . <<DOCKERFILE
+          FROM scratch
+          COPY docker-compose.yml /docker-compose.yml
+          DOCKERFILE
+
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/quesosbartolome-compose:${{ steps.tag.outputs.tag }}
