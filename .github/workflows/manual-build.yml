@@ -28,9 +28,10 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Build docker image
+        working-directory: ./docker
         run: |
-          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/quesosbartolome:${{ steps.tag.outputs.tag }} \
-            -f docker/Dockerfile .
+          docker build \
+            -t ${{ secrets.DOCKERHUB_USERNAME }}/quesosbartolome:${{ steps.tag.outputs.tag }} -f Dockerfile ..
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/quesosbartolome:${{ steps.tag.outputs.tag }}
 
       - name: Update docker-compose.yml with tag
