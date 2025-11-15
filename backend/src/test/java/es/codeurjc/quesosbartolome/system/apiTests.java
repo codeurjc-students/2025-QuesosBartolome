@@ -9,16 +9,19 @@ import org.springframework.boot.test.web.server.LocalServerPort;
 import static io.restassured.RestAssured.*;
 import static org.hamcrest.Matchers.*;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(
+    webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
+    properties = "spring.profiles.active=test"
+)
 public class apiTests {
-
     @LocalServerPort
     int port;
 
     @BeforeEach
     void setup() {
         RestAssured.port = port;
-
+        RestAssured.baseURI = "https://localhost";
+        RestAssured.useRelaxedHTTPSValidation(); // ignorar certificados auto-firmados
     }
 
     @Test

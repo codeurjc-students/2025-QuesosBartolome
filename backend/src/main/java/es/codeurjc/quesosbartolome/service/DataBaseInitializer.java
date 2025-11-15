@@ -10,7 +10,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import es.codeurjc.quesosbartolome.model.Cheese;
+import es.codeurjc.quesosbartolome.model.User;
 import es.codeurjc.quesosbartolome.repository.CheeseRepository;
+import es.codeurjc.quesosbartolome.repository.UserRepository;
 import jakarta.annotation.PostConstruct;
 
 @Service 
@@ -18,6 +20,9 @@ public class DataBaseInitializer {
 
     @Autowired
     private CheeseRepository cheeseRepository;
+
+    @Autowired
+    private UserRepository userRepository;
 
     @PostConstruct
     public void init() throws IOException, URISyntaxException {
@@ -40,7 +45,7 @@ public class DataBaseInitializer {
         azul.setExpirationDate(Date.valueOf(LocalDate.now().plusMonths(2)));
         azul.setType("Soft");
         azul.setImage(null);
-
+        /*
         // Create Cheese 3
         Cheese Curado = new Cheese();
         Curado.setName("Curado"); 
@@ -50,9 +55,7 @@ public class DataBaseInitializer {
         Curado.setExpirationDate(Date.valueOf(LocalDate.now().plusMonths(3)));
         Curado.setType("Semi-Hard"); 
         Curado.setImage(null);
-
-
-
+        
         // Create Cheese 4
         Cheese Chevrett = new Cheese();
         Chevrett.setName("Chevrett"); 
@@ -62,11 +65,25 @@ public class DataBaseInitializer {
         Chevrett.setExpirationDate(Date.valueOf(LocalDate.now().plusMonths(1).plusWeeks(1)));
         Chevrett.setType("Goat"); 
         Chevrett.setImage(null);
+        */
+        
+        // Create user 1
+        User user1 = new User();
+        user1.setName("Victor");
+        user1.setPassword("password123");
+        user1.setGmail("victor@example.com");
+        user1.setDirection("123 Main St");
+        user1.setNif("12345678A");
+        user1.setImage(null);
 
-        // Save to DB
+        // Save cheeses to DB
         cheeseRepository.save(semicurado);
         cheeseRepository.save(azul);
-        cheeseRepository.save(Curado);
-        cheeseRepository.save(Chevrett);
+        //cheeseRepository.save(Curado);
+        //cheeseRepository.save(Chevrett);
+
+        // Save users in DB
+        userRepository.save(user1);
+        
     }
 }

@@ -28,8 +28,10 @@ public class cheeseUITests {
         options.addArguments("--disable-gpu");
         options.addArguments("--remote-allow-origins=*");
         options.addArguments("--user-data-dir=/tmp/chrome-user-data-" + System.currentTimeMillis());
+        options.addArguments("--ignore-certificate-errors");
+        options.setAcceptInsecureCerts(true);
         driver = new ChromeDriver(options);
-        wait = new WebDriverWait(driver, Duration.ofSeconds(15));
+        wait = new WebDriverWait(driver, Duration.ofSeconds(20)); // esperar un poco más
     }
 
     @AfterEach 
@@ -40,12 +42,18 @@ public class cheeseUITests {
     @Test
     public void testQuesosSemicuradoYAzulVisibles() {
 
+        // Abrimos la app
         driver.get("http://localhost:4200/");
 
+        // Esperamos a que el contenedor de las cards esté visible
+        WebElement cardGrid = wait.until(ExpectedConditions
+                .visibilityOfElementLocated(By.cssSelector(".card-grid")));
 
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".card-body p")));
+        // Esperamos explícitamente a que haya al menos 2 elementos <p> dentro de .card-body
+        wait.until(ExpectedConditions.numberOfElementsToBeMoreThan(By.cssSelector(".card-body p"), 1));
 
-        List<WebElement> nombres = driver.findElements(By.cssSelector(".card-body p"));
+        // Ahora sí buscamos todos los <p>
+        List<WebElement> nombres = cardGrid.findElements(By.cssSelector(".card-body p"));
 
         assertFalse(nombres.isEmpty(), "No se encontraron nombres de queso en la página");
 
@@ -56,9 +64,5 @@ public class cheeseUITests {
 
         assertTrue(semicurado, "El queso 'Semicurado' debería aparecer en la página");
         assertTrue(azul, "El queso 'Azul' debería aparecer en la página");
-
-
     }
 }
-
-

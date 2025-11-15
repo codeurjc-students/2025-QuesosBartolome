@@ -1,0 +1,22 @@
+version: '3.9'
+services:
+  mysql:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: "Password0]"
+      MYSQL_DATABASE: quesosbartolome
+
+  app:
+    image: victorbartolome/quesosbartolome:dev
+    depends_on:
+      mysql:
+        condition: service_healthy
+    ports:
+      - "8443:443"
+    environment:
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_NAME: quesosbartolome
+      DB_USER: root
+      DB_PASSWORD: "Password0]"
+

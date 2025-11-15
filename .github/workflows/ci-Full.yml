@@ -41,13 +41,16 @@ jobs:
         with:
           distribution: temurin
           java-version: '21'
-          
-      - name: Cache SonarQube packages
-        uses: actions/cache@v4
-        with:
-          path: ~/.sonar/cache
-          key: ${{ runner.os }}-sonar
-          restore-keys: ${{ runner.os }}-sonar
+
+      # 🔑 Dar capability al binario de Java para poder usar 443
+      - name: Allow Java to bind to privileged ports
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libcap2-bin
+          JAVA_BIN=$(readlink -f "$(which java)")
+          echo "Java binary path: $JAVA_BIN"
+          sudo setcap 'cap_net_bind_service=+ep' "$JAVA_BIN"
+          getcap "$JAVA_BIN"
 
       - name: Cache Maven packages
         uses: actions/cache@v4
@@ -63,23 +66,24 @@ jobs:
 
       - name: Set up Chrome for headless tests
         uses: browser-actions/setup-chrome@v1
-        
+
       - name: Set up ChromeDriver
         uses: nanasess/setup-chromedriver@v2
 
       # --- BACKEND BUILD ---
-      - name: Build backend 
+      - name: Build backend
         working-directory: ./backend
         run: mvn clean install -DskipTests -B
 
-      - name: Start Spring Boot backend
+      - name: Start Spring Boot backend on 443
         working-directory: ./backend
         run: |
-          nohup mvn spring-boot:run > backend.log 2>&1 &
-          echo "Waiting for backend to start on port 8080..."
+          echo "Starting backend on port 443..."
+          nohup mvn spring-boot:run -Dspring-boot.run.arguments="--server.port=443" > backend.log 2>&1 &
+          echo "Waiting for backend to start on port 443..."
           for i in {1..30}; do
-            if nc -z localhost 8080; then
-              echo "Backend is up on port 8080!"
+            if nc -z localhost 443; then
+              echo "✅ Backend is UP on port 443!"
               break
             fi
             echo "Waiting... ($i/30)"
@@ -106,14 +110,16 @@ jobs:
         env:
           CI: true
         run: |
-          npm run test -- --no-watch --browsers=ChromeHeadless --source-map=false
-          
+          npm run test -- --karma-config=karma.conf.js --browsers=ChromeHeadlessNoSandbox --no-watch --source-map=false
+
+
       # --- BACKEND TESTS ---
       - name: Run all backend tests
         working-directory: ./backend
         run: mvn test -B
 
-      # --- SONARQUBE ---
+
+     # --- SONARQUBE ---
       - name: Build and analyze
         working-directory: ./backend
         env:
@@ -121,4 +127,6 @@ jobs:
         run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar
                  -Dsonar.projectKey=codeurjc-students_2025-QuesosBartolome
                  -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml
+
+
 
