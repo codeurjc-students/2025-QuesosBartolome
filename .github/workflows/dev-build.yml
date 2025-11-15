@@ -24,7 +24,7 @@ jobs:
 
       - name: Build docker Image
         run: |
-          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/quesosbartolome:dev -f docker/Dockerfile docker
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/quesosbartolome:dev -f docker/Dockerfile .
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/quesosbartolome:dev
 
       - name: Publish docker-compose.yml
@@ -33,7 +33,11 @@ jobs:
           
           docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/quesosbartolome-compose:dev --file - . <<DOCKERFILE
           FROM scratch
-          COPY docker-compose-dev.yml /docker-compose-dev.yml
+          COPY docker/docker-compose-dev.yml /docker-compose-dev.yml
+          DOCKERFILE
+          
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/quesosbartolome-compose:dev
+
           DOCKERFILE
           
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/quesosbartolome-compose:dev
