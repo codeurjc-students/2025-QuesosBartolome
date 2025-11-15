@@ -1,4 +1,4 @@
-name: dev-build
+name: Publish dev on main
 
 on:
   push:
@@ -23,22 +23,20 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Build docker Image
+        working-directory: ./docker
         run: |
-          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/quesosbartolome:dev -f docker/Dockerfile .
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/quesosbartolome:dev -f Dockerfile ..
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/quesosbartolome:dev
 
-      - name: Publish docker-compose.yml
+      - name: Publish docker-compose-dev.yml
+        working-directory: ./docker
         run: |
-          sed -i "s|quesosbartolome:[^ ]*|quesosbartolome:dev|g" docker/docker-compose-dev.yml
+          sed -i "s|quesosbartolome:[^ ]*|quesosbartolome:dev|g" docker-compose-dev.yml
           
-          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/quesosbartolome-compose:dev --file - . <<DOCKERFILE
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/quesosbartolome-compose:dev --file - . <<EOF
           FROM scratch
-          COPY docker/docker-compose-dev.yml /docker-compose-dev.yml
-          DOCKERFILE
+          COPY docker-compose-dev.yml /docker-compose-dev.yml
+          EOF
           
+          # Push de la imagen compose
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/quesosbartolome-compose:dev
-
-          DOCKERFILE
-          
-          docker push ${{ secrets.DOCKERHUB_USERNAME }}/quesosbartolome-compose:dev
-
