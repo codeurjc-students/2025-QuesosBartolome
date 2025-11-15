@@ -35,4 +35,4 @@ services:
       SERVER_SSL_KEY_STORE_PASSWORD: password
 
 volumes:
-  db_data:
+  db_data: 

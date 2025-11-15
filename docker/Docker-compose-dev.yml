@@ -19,3 +19,4 @@ services:
       DB_NAME: quesosbartolome
       DB_USER: root
       DB_PASSWORD: "Password0]"
+
