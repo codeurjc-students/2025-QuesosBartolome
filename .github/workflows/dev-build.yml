@@ -1,4 +1,4 @@
-name: Publish dev on main
+name: dev-build
 
 on:
   push:
@@ -23,15 +23,13 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Build docker Image
-        working-directory: ./docker
         run: |
-          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/quesosbartolome:dev -f Dockerfile ..
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/quesosbartolome:dev -f docker/Dockerfile docker
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/quesosbartolome:dev
 
       - name: Publish docker-compose.yml
-        working-directory: ./docker
         run: |
-          sed -i "s|quesosbartolome:[^ ]*|quesosbartolome:dev|g" docker-compose-dev.yml
+          sed -i "s|quesosbartolome:[^ ]*|quesosbartolome:dev|g" docker/docker-compose-dev.yml
           
           docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/quesosbartolome-compose:dev --file - . <<DOCKERFILE
           FROM scratch
@@ -39,3 +37,4 @@ jobs:
           DOCKERFILE
           
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/quesosbartolome-compose:dev
+
