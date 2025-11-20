@@ -35,6 +35,7 @@ public class UserRestController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
         }
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("You must be authenticated");
+        
     }
 
     
