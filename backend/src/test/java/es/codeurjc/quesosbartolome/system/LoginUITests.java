@@ -46,12 +46,14 @@ public class LoginUITests {
 
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("nombre")));
 
-        driver.findElement(By.id("nombre")).sendKeys("JuanTest");
+        String unique = "User" + System.currentTimeMillis();
+
+        driver.findElement(By.id("nombre")).sendKeys(unique);
         driver.findElement(By.id("password")).sendKeys("password123");
         driver.findElement(By.id("confirm-password")).sendKeys("password123");
-        driver.findElement(By.id("email")).sendKeys("juan@test.com");
+        driver.findElement(By.id("email")).sendKeys(unique + "@test.com");
         driver.findElement(By.id("direccion")).sendKeys("Calle Falsa 123");
-        driver.findElement(By.id("nif")).sendKeys("12345678A");
+        driver.findElement(By.id("nif")).sendKeys("12945678A");
 
         WebElement button = driver.findElement(By.cssSelector("button.btn-login"));
 
