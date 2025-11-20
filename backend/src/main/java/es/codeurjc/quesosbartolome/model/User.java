@@ -1,9 +1,12 @@
 package es.codeurjc.quesosbartolome.model;
 
 import java.sql.Blob;
+import java.util.Collections;
+import java.util.List;
 
-
+import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -19,19 +22,22 @@ public class User {
     private String direction;
     private String nif;
     private Blob image;
-    // Review list 
+    // Review list
+    
+    @ElementCollection(fetch = FetchType.EAGER)
+	private List<String> rols; 
 
     // Constructor
     public User() {
     }
 
-    public User(Long id, String name, String password, String gmail, String direction, String nif) {
-        this.id = id;
+    public User( String name, String password, String gmail, String direction, String nif,String... rols) {
         this.name = name;
         this.password = password;
         this.gmail = gmail;
         this.direction = direction;
         this.nif = nif;
+        this.rols = rols != null ? List.of(rols) : Collections.emptyList();
     }
     // Getters y Setters
     public Long getId() {
@@ -88,6 +94,14 @@ public class User {
          
     public void setImage(Blob image) {
         this.image = image;
+    }
+
+    public List<String> getRols() {
+        return rols;
+    }
+
+    public void setRols(String... rols) {
+        this.rols = rols != null ? List.of(rols) : Collections.emptyList();
     }
 
     

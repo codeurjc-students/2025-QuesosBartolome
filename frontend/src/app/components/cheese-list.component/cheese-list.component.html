@@ -30,8 +30,18 @@
         </ul>
       </div>
 
-      <button class="btn btn-danger" ngbTooltip="Cerrar sesión actual">Cerrar Sesión</button>
-    </div>
+      <div class="auth-buttons">
+        <ng-container *ngIf="!isLoggedIn; else logoutTemplate">
+          <button class="btn btn-outline-rojo" (click)="goToLogin()">Iniciar Sesión</button>
+          <button class="btn btn-danger" (click)="goToRegister()">Registrarse</button>
+        </ng-container>
+
+        <ng-template #logoutTemplate>
+          <button class="btn btn-danger" (click)="logout()">Cerrar Sesión</button>
+        </ng-template>
+      </div>
+
+    </div> 
 
     <div class="card-grid">
       <div class="card shadow-sm" *ngFor="let cheese of cheeses">

@@ -1,5 +1,3 @@
-/*
-
 package es.codeurjc.quesosbartolome.security.jwt;
 
 import org.slf4j.Logger;
@@ -84,20 +82,24 @@ public class UserLoginService {
 	}
 
 	private Cookie buildTokenCookie(TokenType type, String token) {
-		Cookie cookie = new Cookie(type.cookieName, token);
-		cookie.setMaxAge((int) type.duration.getSeconds());
-		cookie.setHttpOnly(true);
-		cookie.setPath("/");
-		return cookie;
-	}
-
-	private Cookie removeTokenCookie(TokenType type){
-		Cookie cookie = new Cookie(type.cookieName, "");
-		cookie.setMaxAge(0);
-		cookie.setHttpOnly(true);
-		cookie.setPath("/");
-		return cookie;
-	}
+    Cookie cookie = new Cookie(type.cookieName, token);
+    cookie.setMaxAge((int) type.duration.getSeconds());
+    cookie.setHttpOnly(true);
+    cookie.setSecure(true);        
+    cookie.setPath("/");
+    cookie.setAttribute("SameSite", "None"); 
+    
+    return cookie;
 }
 
-*/
+	private Cookie removeTokenCookie(TokenType type) {
+    Cookie cookie = new Cookie(type.cookieName, "");
+    cookie.setMaxAge(0);
+    cookie.setHttpOnly(true);
+    cookie.setSecure(true);
+    cookie.setPath("/");
+    cookie.setAttribute("SameSite", "None");
+    return cookie;
+}
+}
+
