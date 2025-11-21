@@ -45,7 +45,6 @@ public class LoginUITests {
     public void testRegisterUser() {
         driver.get("http://localhost:4200/auth/register");
 
-        // Esperamos todos los campos visibles
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("nombre")));
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("password")));
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("confirm-password")));
@@ -62,15 +61,13 @@ public class LoginUITests {
         driver.findElement(By.id("direccion")).sendKeys("Calle Falsa 123");
         driver.findElement(By.id("nif")).sendKeys("12945678A");
 
-        // Pequeño delay para que Angular procese los bindings (evita overlay de validación)
         try { Thread.sleep(300); } catch (InterruptedException e) { /* ignore */ }
 
-        // Clic seguro mediante Javascript
+
         WebElement button = driver.findElement(By.cssSelector("button.btn-login"));
         ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", button);
         ((JavascriptExecutor) driver).executeScript("arguments[0].click();", button);
 
-        // Esperamos el alert
         Alert alert = new WebDriverWait(driver, Duration.ofSeconds(10))
                 .until(ExpectedConditions.alertIsPresent());
         assertEquals("Registro exitoso", alert.getText());
