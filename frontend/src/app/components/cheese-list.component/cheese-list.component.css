@@ -132,3 +132,24 @@
   font-size: 2.5rem;
   display: block;
 }
+
+.auth-buttons {
+  display: flex;
+  gap: 1rem;
+}
+
+.btn-outline-rojo {
+  background-color: var(--blanco);
+  color: var(--rojo-vino);
+  border: 2px solid var(--rojo-vino);
+  border-radius: var(--radius);
+  font-weight: 500;
+  padding: 0.4rem 1rem;
+  transition: all 0.2s ease-in-out;
+}
+
+.btn-outline-rojo:hover {
+  background-color: var(--rojo-vino);
+  color: var(--blanco);
+  transform: translateY(-2px);
+}

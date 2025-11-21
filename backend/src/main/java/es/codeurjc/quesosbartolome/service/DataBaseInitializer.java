@@ -7,6 +7,7 @@ import java.sql.Date;
 import java.time.LocalDate;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import es.codeurjc.quesosbartolome.model.Cheese;
@@ -23,6 +24,9 @@ public class DataBaseInitializer {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+	private PasswordEncoder passwordEncoder;
 
     @PostConstruct
     public void init() throws IOException, URISyntaxException {
@@ -45,7 +49,7 @@ public class DataBaseInitializer {
         azul.setExpirationDate(Date.valueOf(LocalDate.now().plusMonths(2)));
         azul.setType("Soft");
         azul.setImage(null);
-        /*
+        
         // Create Cheese 3
         Cheese Curado = new Cheese();
         Curado.setName("Curado"); 
@@ -65,22 +69,23 @@ public class DataBaseInitializer {
         Chevrett.setExpirationDate(Date.valueOf(LocalDate.now().plusMonths(1).plusWeeks(1)));
         Chevrett.setType("Goat"); 
         Chevrett.setImage(null);
-        */
+        
         
         // Create user 1
         User user1 = new User();
         user1.setName("Victor");
-        user1.setPassword("password123");
+        user1.setPassword(passwordEncoder.encode("password123"));
         user1.setGmail("victor@example.com");
         user1.setDirection("123 Main St");
         user1.setNif("12345678A");
+        user1.setRols("USER");
         user1.setImage(null);
 
         // Save cheeses to DB
         cheeseRepository.save(semicurado);
         cheeseRepository.save(azul);
-        //cheeseRepository.save(Curado);
-        //cheeseRepository.save(Chevrett);
+        cheeseRepository.save(Curado);
+        cheeseRepository.save(Chevrett);
 
         // Save users in DB
         userRepository.save(user1);

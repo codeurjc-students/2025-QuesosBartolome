@@ -14,7 +14,7 @@ import org.openqa.selenium.support.ui.*;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest(classes = es.codeurjc.quesosbartolome.QuesosbartolomeApplication.class)
-public class cheeseUITests {
+public class CheeseUITests {
 
     private WebDriver driver;
     private WebDriverWait wait;

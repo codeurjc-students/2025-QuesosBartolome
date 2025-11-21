@@ -1,13 +1,19 @@
 import { Component } from '@angular/core';
-import { CheeseListComponent } from './components/cheese-list.component';
+import { Router, RouterOutlet } from '@angular/router';
+import { CommonModule } from '@angular/common';
 
 
 @Component({
   selector: 'app-root',
-  imports: [CheeseListComponent],
+  standalone: true,
+  imports: [
+    CommonModule,     
+    RouterOutlet
+  ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
 })
 export class AppComponent {
   title = 'frontend';
+  constructor(public router: Router) { }
 }
