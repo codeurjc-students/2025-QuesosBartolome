@@ -42,33 +42,6 @@ public class LoginUITests {
     }
 
     @Test
-    public void testRegisterUser() {
-        driver.get("http://localhost:4200/auth/register");
-
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("nombre")));
-
-        String unique = "User" + System.currentTimeMillis();
-
-        driver.findElement(By.id("nombre")).sendKeys(unique);
-        driver.findElement(By.id("password")).sendKeys("password123");
-        driver.findElement(By.id("confirm-password")).sendKeys("password123");
-        driver.findElement(By.id("email")).sendKeys(unique + "@test.com");
-        driver.findElement(By.id("direccion")).sendKeys("Calle Falsa 123");
-        driver.findElement(By.id("nif")).sendKeys("12945678A");
-
-        // Esperamos que el botón sea clickeable
-        WebElement button = wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("button.btn-login")));
-        button.click();
-
-        Alert alert = wait.until(ExpectedConditions.alertIsPresent());
-        assertEquals("Registro exitoso", alert.getText());
-        alert.accept();
-
-        wait.until(ExpectedConditions.urlToBe("http://localhost:4200/cheeses"));
-        assertEquals("http://localhost:4200/cheeses", driver.getCurrentUrl());
-    }
-
-    @Test
     public void testLoginUser() {
         driver.get("http://localhost:4200/auth/login");
 

@@ -16,10 +16,9 @@
   padding: 2rem 1rem;     
 }
 
-
 .login-card {
   background-color: var(--blanco);
-  padding: 2rem;
+  padding: 1.5rem; /* menos padding para hacerlo más compacto */
   border-radius: 12px;
   width: 100%;
   max-width: 400px;
@@ -31,18 +30,18 @@
   color: var(--rojo-vino);
   font-weight: 800;
   font-size: 1.8rem;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.3rem; /* más compacto */
   letter-spacing: 0.5px;
 }
 
 .login-subtitle {
   color: var(--texto);
-  margin-bottom: 1.2rem;
-  font-size: 0.95rem;
+  margin-bottom: 0.8rem; /* más compacto */
+  font-size: 0.9rem;
 }
 
 .form-group {
-  margin-bottom: 0.8rem;
+  margin-bottom: 0.4rem; /* menos espacio entre campos */
 }
 
 .form-label {
@@ -57,19 +56,20 @@
 .form-control {
   border-radius: 6px;
   border: 1px solid var(--gris-suave);
-  padding: 0.6rem 0.8rem;
-  font-size: 0.9rem;
+  padding: 0.4rem 0.6rem; /* menos padding */
+  font-size: 0.88rem;
 }
 
 .btn-login {
   background-color: var(--rojo-vino);
   color: var(--blanco);
   border: none;
-  padding: 0.6rem;
+  padding: 0.5rem; /* más compacto */
   font-weight: 600;
   border-radius: 6px;
   transition: background-color 0.3s, transform 0.2s;
-  font-size: 0.95rem;
+  font-size: 0.9rem;
+  width: 100%;
 }
 
 .btn-login:hover {
