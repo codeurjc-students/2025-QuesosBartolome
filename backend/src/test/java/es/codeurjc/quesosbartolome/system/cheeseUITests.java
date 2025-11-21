@@ -14,7 +14,7 @@ import org.openqa.selenium.support.ui.*;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest(classes = es.codeurjc.quesosbartolome.QuesosbartolomeApplication.class)
-public class cheeseUITests {
+public class CheeseUITests {
 
     private WebDriver driver;
     private WebDriverWait wait;
@@ -43,7 +43,7 @@ public class cheeseUITests {
     public void testQuesosSemicuradoYAzulVisibles() {
 
         // Abrimos la app
-        driver.get("http://localhost:4200/");
+        driver.get("http://localhost:4200/cheeses");
 
         // Esperamos a que el contenedor de las cards esté visible
         WebElement cardGrid = wait.until(ExpectedConditions
