@@ -51,8 +51,8 @@ public class LoginController {
 	}
 
     
-    @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody UserDTO userDTO) {
+   @PostMapping("/register")
+    public ResponseEntity<UserDTO> register(@RequestBody UserDTO userDTO) {
 
         if (userDTO.name() == null || userDTO.name().isBlank() ||
             userDTO.gmail() == null || userDTO.gmail().isBlank() ||
@@ -60,32 +60,31 @@ public class LoginController {
             userDTO.direction() == null || userDTO.direction().isBlank() ||
             userDTO.nif() == null || userDTO.nif().isBlank()) {
 
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(Map.of("error", "Missing or blank fields"));
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
 
         if (userDTO.password().length() < 8) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(Map.of("error", "Password must be at least 8 characters long"));
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
 
         if (!userDTO.nif().matches("\\d{8}[A-Za-z]") || 
             !userDTO.gmail().matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$")) {
 
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(Map.of("error", "The NIF or email is not valid"));
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
 
         if (userService.findByName(userDTO.name()).isPresent()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(Map.of("error", "User already exists"));
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
 
-        userService.createUser(userDTO);
+        UserDTO createdUser = userService.createUser(userDTO);
 
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(Map.of("message", "User registered successfully"));
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .header("Location", "/api/v1/users/" + createdUser.id())
+                .body(createdUser);
     }
+
     
 
 

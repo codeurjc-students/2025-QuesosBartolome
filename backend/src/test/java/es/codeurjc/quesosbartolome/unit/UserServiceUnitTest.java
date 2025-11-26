@@ -16,6 +16,7 @@ import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.sql.Blob;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -93,4 +94,68 @@ class UserServiceTest {
         assertThat(result.get().direction()).isEqualTo("Calle 2");
         assertThat(result.get().nif()).isEqualTo("87654321B");
     }
+
+    @Test
+    void shouldReturnUserImageWhenExists() throws Exception {
+
+        // Mock blob
+        Blob blob = mock(Blob.class);
+
+        User user = new User(
+                "luis",
+                "pwd",
+                "luis@gmail.com",
+                "Calle 3",
+                "11223344C"
+        );
+        user.setId(5L);
+        user.setImage(blob);
+
+        when(userRepository.findById(5L)).thenReturn(Optional.of(user));
+
+        // When
+        Optional<Blob> result = userService.getUserImageById(5L);
+
+        // Then
+        assertThat(result).isPresent();
+        assertThat(result.get()).isEqualTo(blob);
+    }
+
+    @Test
+    void shouldReturnEmptyWhenUserDoesNotExist() {
+
+        when(userRepository.findById(99L)).thenReturn(Optional.empty());
+
+        Optional<Blob> result = userService.getUserImageById(99L);
+
+        assertThat(result).isEmpty();
+    }
+
+    @Test
+    void shouldFindUserById() {
+
+        // Given
+        User saved = new User(
+                "carlos",
+                "encodedPwd",
+                "carlos@gmail.com",
+                "Calle 3",
+                "99999999C"
+        );
+
+        when(userRepository.findById(1L)).thenReturn(Optional.of(saved));
+
+        // When
+        Optional<UserDTO> result = userService.findUserById(1L);
+
+        // Then
+        assertThat(result).isPresent();
+        assertThat(result.get().name()).isEqualTo("carlos");
+        assertThat(result.get().gmail()).isEqualTo("carlos@gmail.com");
+        assertThat(result.get().direction()).isEqualTo("Calle 3");
+        assertThat(result.get().nif()).isEqualTo("99999999C");
+    }
+
+
+
 }

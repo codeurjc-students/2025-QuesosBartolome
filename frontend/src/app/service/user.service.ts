@@ -15,5 +15,8 @@ export class UserService {
   getCurrentUser(): Observable<UserDTO> {
     return this.http.get<UserDTO>(`${this.apiUrl}` , { withCredentials: true });
   }
+  getUserImage(id: number): Observable<Blob> {
+    return this.http.get(`${this.apiUrl}/${id}/image`, { responseType: 'blob' , withCredentials: true });
+  }
 
 }

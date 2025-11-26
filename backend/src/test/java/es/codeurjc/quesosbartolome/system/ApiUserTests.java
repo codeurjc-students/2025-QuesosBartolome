@@ -35,8 +35,7 @@ public class ApiUserTests {
             .get("/api/v1/users")
             .then()
             .statusCode(401)
-            .body("error", equalTo("Unauthorized"))
-            .body("message", equalTo("Full authentication is required to access this resource"));
+            .body(is(emptyOrNullString()));
     }
 
     @Test
@@ -84,4 +83,90 @@ public class ApiUserTests {
             .body("id", notNullValue())
             .body("password", notNullValue());
     }
+
+    @Test
+    void testGetUserImageById() throws JSONException {
+        JSONObject registerBody = new JSONObject();
+        registerBody.put("name", "Ana");
+        registerBody.put("password", "clave456");
+        registerBody.put("gmail", "ana@example.com");
+        registerBody.put("direction", "Calle Luna 2");
+        registerBody.put("nif", "12345678C");
+        registerBody.put("image", JSONObject.NULL);
+
+        var registerResponse = given()
+            .contentType("application/json")
+            .body(registerBody.toString())
+            .post("/api/v1/auth/register")
+            .then()
+            .statusCode(201)
+            .extract()
+            .response();
+
+        Integer idInt = registerResponse.path("id");
+        Long userId = idInt.longValue();
+
+        given()
+            .when()
+            .get("/api/v1/users/" + userId + "/image")
+            .then()
+            .statusCode(204);
+    }
+
+    @Test
+    void testGetUserImageByIdNotFound() throws JSONException {
+        Long userId = 99999L; // Assuming this ID does not exist
+
+        given()
+            .when()
+            .get("/api/v1/users/" + userId + "/image")
+            .then()
+            .statusCode(404);
+    }
+
+    @Test
+    void testGetUserById() throws JSONException {
+        // Registrar un usuario
+        JSONObject registerBody = new JSONObject();
+        registerBody.put("name", "Luis");
+        registerBody.put("password", "password789");
+        registerBody.put("gmail", "luis@example.com");
+        registerBody.put("direction", "Calle Mayor 3");
+        registerBody.put("nif", "11223344D");
+        registerBody.put("image", JSONObject.NULL);
+
+        var registerResponse = given()
+            .contentType("application/json")
+            .body(registerBody.toString())
+            .post("/api/v1/auth/register")
+            .then()
+            .statusCode(201)
+            .extract()
+            .response();
+
+        Integer idInt = registerResponse.path("id");
+        Long userId = idInt.longValue();
+
+        given()
+            .when()
+            .get("/api/v1/users/" + userId)
+            .then()
+            .statusCode(200)
+            .body("name", equalTo("Luis"))
+            .body("gmail", equalTo("luis@example.com"))
+            .body("direction", equalTo("Calle Mayor 3"))
+            .body("nif", equalTo("11223344D"))
+            .body("id", equalTo(userId.intValue())); 
+    }
+
+    @Test
+    void testGetUserByIdNotFound() {
+        given()
+            .when()
+            .get("/api/v1/users/99999")
+            .then()
+            .statusCode(404);
+    }
+
+
 }

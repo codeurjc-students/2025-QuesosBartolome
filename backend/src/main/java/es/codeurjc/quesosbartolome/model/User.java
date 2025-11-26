@@ -10,6 +10,7 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 
 @Entity
 public class User {
@@ -22,7 +23,9 @@ public class User {
     private String direction;
     private String nif;
     private Blob image;
-    // Review list
+
+    @OneToMany(mappedBy = "user")
+    private List<Review> reviews;
     
     @ElementCollection(fetch = FetchType.EAGER)
 	private List<String> rols; 
@@ -94,6 +97,14 @@ public class User {
          
     public void setImage(Blob image) {
         this.image = image;
+    }
+    
+    public void setReviews(List<Review> reviews) {
+        this.reviews = reviews;
+    }
+    
+    public List<Review> getReviews() {
+        return reviews;
     }
 
     public List<String> getRols() {

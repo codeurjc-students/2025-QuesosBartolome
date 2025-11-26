@@ -1,5 +1,6 @@
 package es.codeurjc.quesosbartolome.service;
 
+import java.sql.Blob;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +34,7 @@ public class UserService {
         }
     }
 
-    public void createUser(UserDTO userDTO) {
+    public UserDTO createUser(UserDTO userDTO) {
     User user = new User(
         userDTO.name(),
         passwordEncoder.encode(userDTO.password()),
@@ -44,6 +45,30 @@ public class UserService {
     );
 
     repository.save(user);
+
+    return mapper.toDTO(user);
 }
+
+    public Optional<UserDTO> findUserById(Long id) {
+        Optional<User> user = repository.findById(id);
+        if (user.isPresent()){
+            return Optional.of(mapper.toDTO(user.get()));
+        } else {
+            return Optional.empty();
+        }
+    }
+
+    public Optional<Blob> getUserImageById(Long id) {
+        Optional<User> userOpt = repository.findById(id);
+
+        if (userOpt.isEmpty()) {
+            return Optional.empty();
+        }
+
+        return Optional.ofNullable(userOpt.get().getImage());
+    }
+
+
+
     
 }

@@ -2,11 +2,13 @@ package es.codeurjc.quesosbartolome.model;
 
 import java.sql.Blob;
 import java.sql.Date;
+import java.util.List;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 
 @Entity
 public class Cheese {
@@ -21,7 +23,9 @@ public class Cheese {
     private Date expirationDate;
     private String Type;
     private Blob image;
-    // Review list 
+    
+    @OneToMany(mappedBy = "cheese")
+    private List<Review> reviews;
     
 
 
@@ -103,5 +107,13 @@ public class Cheese {
 
     public void setImage(Blob image) {
         this.image = image;
+    }
+
+    public List<Review> getReviews() {
+        return reviews;
+    }
+    
+    public void setReviews(List<Review> reviews) {
+        this.reviews = reviews;
     }
 }

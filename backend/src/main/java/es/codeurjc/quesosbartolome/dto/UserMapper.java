@@ -16,8 +16,7 @@ public interface UserMapper {
         @Mapping(source = "password", target = "password"),
         @Mapping(source = "gmail", target = "gmail"),
         @Mapping(source = "direction", target = "direction"),
-        @Mapping(source = "nif", target = "nif"),
-        @Mapping(source = "image", target = "image")
+        @Mapping(source = "nif", target = "nif")
     })
     UserDTO toDTO(User user);
 
@@ -28,8 +27,7 @@ public interface UserMapper {
         @Mapping(source = "password", target = "password"),
         @Mapping(source = "gmail", target = "gmail"),
         @Mapping(source = "direction", target = "direction"),
-        @Mapping(source = "nif", target = "nif"),
-        @Mapping(source = "image", target = "image")
+        @Mapping(source = "nif", target = "nif")
     })
     User toDomain(UserDTO userDTO);
     

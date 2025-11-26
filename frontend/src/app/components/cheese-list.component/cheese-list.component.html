@@ -2,7 +2,7 @@
   <!-- SIDEBAR -->
   <aside class="sidebar">
     <div class="logo">
-      <img src="assets/logo.png" alt="Logo Quesos Bartolomé" />
+      <img src="assets/LogoQuesos1.png" alt="Logo Quesos Bartolomé" />
     </div>
 
     <h2 class="menu-title">Menú</h2>
@@ -38,6 +38,9 @@
 
         <ng-template #logoutTemplate>
           <button class="btn btn-danger" (click)="logout()">Cerrar Sesión</button>
+          <button class="btn btn-danger ms-2" (click)="goToProfile()" aria-label="Mi perfil">
+            <i class="bi bi-person-circle fs-5"></i>
+          </button>
         </ng-template>
       </div>
 

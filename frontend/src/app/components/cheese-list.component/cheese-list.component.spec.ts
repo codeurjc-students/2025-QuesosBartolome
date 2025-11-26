@@ -77,8 +77,7 @@ describe('CheeseListComponent (unit)', () => {
       password: '1234',
       gmail: 'pepito@gmail.com',
       direction: 'Calle Falsa 123',
-      nif: '12345678A',
-      image: new Blob()
+      nif: '12345678A'
     };
 
     mockUserService.getCurrentUser.and.returnValue(of(mockUser));

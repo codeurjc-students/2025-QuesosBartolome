@@ -16,6 +16,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.util.Optional;
+import java.sql.Blob;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -90,4 +91,108 @@ public class UserServiceIntegrationTest {
         assertThat(user.get().direction()).isEqualTo("Calle 2");
         assertThat(user.get().nif()).isEqualTo("87654321B");
     }
+
+    @Test
+    void shouldFindUserById() {
+
+        // Given
+        User saved = new User(
+                "carlos",
+                passwordEncoder.encode("pwd123"),
+                "carlos@gmail.com",
+                "Calle 3",
+                "99999999C",
+                "USER"
+        );
+
+        saved = userRepository.save(saved);
+
+        // When
+        Optional<UserDTO> result = userService.findUserById(saved.getId());
+
+        // Then
+        assertThat(result).isPresent();
+        assertThat(result.get().name()).isEqualTo("carlos");
+        assertThat(result.get().gmail()).isEqualTo("carlos@gmail.com");
+        assertThat(result.get().direction()).isEqualTo("Calle 3");
+        assertThat(result.get().nif()).isEqualTo("99999999C");
+    }
+
+    @Test
+    void shouldReturnEmptyWhenUserIdNotFound() {
+
+        // When
+        Optional<UserDTO> result = userService.findUserById(999L);
+
+        // Then
+        assertThat(result).isEmpty();
+    }
+
+    @Test
+    void shouldGetUserImageById() throws Exception {
+
+        // Given
+        byte[] imgData = "fakeImageData".getBytes();
+        Blob blob = new javax.sql.rowset.serial.SerialBlob(imgData);
+
+        User user = new User(
+                "ana",
+                passwordEncoder.encode("pwd123"),
+                "ana@gmail.com",
+                "Calle Falsa 123",
+                "12345678Z",
+                "USER"
+        );
+
+
+        user.setImage(blob);
+
+        user = userRepository.save(user);
+
+        // When
+        Optional<Blob> result = userService.getUserImageById(user.getId());
+
+        // Then
+        assertThat(result).isPresent();
+        assertThat(result.get().length()).isEqualTo(blob.length());
+
+        byte[] stored = result.get().getBytes(1, (int) result.get().length());
+        assertThat(stored).isEqualTo(imgData);
+    }
+
+    @Test
+    void shouldReturnEmptyWhenUserHasNoImage() {
+
+        // Given:
+        User user = new User(
+                "pepe",
+                passwordEncoder.encode("pwd"),
+                "pepe@gmail.com",
+                "Calle X",
+                "87654321Y",
+                "USER"
+        );
+
+        user = userRepository.save(user);
+
+        // When
+        Optional<Blob> result = userService.getUserImageById(user.getId());
+
+        // Then
+        assertThat(result).isEmpty();
+    }
+
+
+    @Test
+    void shouldReturnEmptyWhenUserNotFound() {
+
+        // When
+        Optional<Blob> result = userService.getUserImageById(9999L);
+
+        // Then
+        assertThat(result).isEmpty();
+    }
+
+
+
 }
