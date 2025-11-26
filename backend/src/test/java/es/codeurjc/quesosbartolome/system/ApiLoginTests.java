@@ -31,12 +31,12 @@ public class ApiLoginTests {
     @Test
     void testRegisterUserSuccessfully() throws JSONException {
         JSONObject requestBody = new JSONObject();
-        requestBody.put("name", "Juan");
+        requestBody.put("name", "JuanTest_" + System.currentTimeMillis()); 
         requestBody.put("password", "password123");
         requestBody.put("gmail", "juan@example.com");
         requestBody.put("direction", "Calle Falsa 123");
         requestBody.put("nif", "12345678A");
-        requestBody.put("image", JSONObject.NULL); 
+        requestBody.put("image", JSONObject.NULL);
 
         given()
             .contentType("application/json")
@@ -45,8 +45,13 @@ public class ApiLoginTests {
             .post("/api/v1/auth/register")
         .then()
             .statusCode(201)
-            .body("message", equalTo("User registered successfully"));
+            .body("id", notNullValue())
+            .body("name", equalTo(requestBody.getString("name")))
+            .body("gmail", equalTo("juan@example.com"))
+            .body("direction", equalTo("Calle Falsa 123"))
+            .body("nif", equalTo("12345678A"));
     }
+
 
     @Test
     void testRegisterUserBadRequest() throws JSONException {
@@ -64,7 +69,7 @@ public class ApiLoginTests {
             .post("/api/v1/auth/register")
         .then()
             .statusCode(400)
-            .body("error", equalTo("Missing or blank fields"));
+            .body(is(emptyOrNullString()));
     }
 
     @Test

@@ -1,6 +1,6 @@
 package es.codeurjc.quesosbartolome.dto;
 
-import java.sql.Blob;
+
 
 
 public record UserDTO(
@@ -9,6 +9,5 @@ public record UserDTO(
     String password,
     String gmail,
     String direction,
-    String nif,
-    Blob image
+    String nif
 ) {}

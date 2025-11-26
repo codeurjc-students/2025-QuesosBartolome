@@ -1,11 +1,14 @@
 package es.codeurjc.quesosbartolome.service;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URISyntaxException;
-
+import java.sql.Blob;
 import java.sql.Date;
 import java.time.LocalDate;
 
+import org.hibernate.engine.jdbc.BlobProxy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -27,6 +30,25 @@ public class DataBaseInitializer {
 
     @Autowired
 	private PasswordEncoder passwordEncoder;
+
+    public Blob saveImage(String resourcePath) throws IOException {
+        ClassLoader classLoader = getClass().getClassLoader();
+        try (InputStream inputStream = classLoader.getResourceAsStream(resourcePath)) {
+            if (inputStream == null) {
+                throw new IOException("File not found in classpath: " + resourcePath);
+            }
+
+            ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+            byte[] data = new byte[1024];
+            int bytesRead;
+            while ((bytesRead = inputStream.read(data, 0, data.length)) != -1) {
+                buffer.write(data, 0, bytesRead);
+            }
+            
+            return BlobProxy.generateProxy(buffer.toByteArray());
+        }
+    }
+
 
     @PostConstruct
     public void init() throws IOException, URISyntaxException {
@@ -79,7 +101,7 @@ public class DataBaseInitializer {
         user1.setDirection("123 Main St");
         user1.setNif("12345678A");
         user1.setRols("USER");
-        user1.setImage(null);
+        user1.setImage(saveImage("static/frontend/images/default-profile.jpg"));
 
         // Save cheeses to DB
         cheeseRepository.save(semicurado);

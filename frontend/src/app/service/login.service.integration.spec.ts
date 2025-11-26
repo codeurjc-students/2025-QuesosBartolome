@@ -1,6 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { HttpClientModule } from '@angular/common/http';
 import { LoginService } from './login.service';
+import { UserDTO } from '../dto/user.dto';
 
 describe('LoginService (integration)', () => {
   let service: LoginService;
@@ -17,7 +18,6 @@ describe('LoginService (integration)', () => {
   it('should login successfully with valid credentials', (done) => {
     service.login('Victor', 'password123').subscribe({
       next: (response) => {
-
         expect(response.status).toBe('SUCCESS');
         expect(response.message).toContain('Auth successful');
         done();
@@ -31,7 +31,8 @@ describe('LoginService (integration)', () => {
 
   it('should register a new user successfully', (done) => {
     const userData = {
-      name: 'JuanTest',
+      id: 0, 
+      name: 'JuanTest_' + Date.now(),
       password: 'password123',
       gmail: 'juantest@example.com',
       direction: 'Calle Falsa 123',
@@ -40,7 +41,10 @@ describe('LoginService (integration)', () => {
 
     service.register(userData).subscribe({
       next: (response) => {
-        expect(response.message).toContain('User registered successfully');
+        expect(response).toBeTruthy();
+        expect(response.name).toContain('JuanTest');
+        expect(response.gmail).toBe('juantest@example.com');
+        expect(response.id).toBeGreaterThan(0);
         done();
       },
       error: (err) => {
@@ -49,6 +53,7 @@ describe('LoginService (integration)', () => {
       }
     });
   });
+
 
   it('should fail login with invalid credentials', (done) => {
     service.login('usuario_incorrecto', 'wrongpass').subscribe({
@@ -64,24 +69,25 @@ describe('LoginService (integration)', () => {
   });
 
   it('should fail to register with missing fields', (done) => {
-    const invalidUserData = {
-        name: '', 
-        password: 'password123',
-        gmail: 'juanfail@example.com',
-        direction: 'Calle Falsa 123',
-        nif: '12345678A'
+    const invalidUserData: UserDTO = {
+      id: 0,
+      name: '', 
+      password: 'password123',
+      gmail: 'juanfail@example.com',
+      direction: 'Calle Falsa 123',
+      nif: '12345678A'
     };
 
     service.register(invalidUserData).subscribe({
-        next: () => {
+      next: () => {
         fail('Register should not succeed with missing fields');
         done();
-        },
-        error: (err) => {
+      },
+      error: (err) => {
         expect(err.status).toBe(400);
-        expect(err.error?.error).toBe('Missing or blank fields');
+        expect(err.error).toBeNull(); 
         done();
-        }
+      }
     });
-    });
+  });
 });

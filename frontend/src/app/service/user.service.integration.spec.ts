@@ -59,7 +59,6 @@ describe('UserService (integration with real login)', () => {
             expect(user.gmail).toContain('@');
             expect(user.direction).toBeDefined();
             expect(user.nif).toBeDefined();
-            expect(user.image).toBeDefined();
             done();
           },
           error: (err) => {
@@ -74,4 +73,35 @@ describe('UserService (integration with real login)', () => {
       }
     });
   });
+
+  it('should return user image as Blob after login', (done) => {
+    loginService.login('Victor', 'password123').subscribe({
+      next: () => {
+        service.getCurrentUser().subscribe({
+          next: (user: UserDTO) => {
+            service.getUserImage(user.id).subscribe({
+              next: (blob: Blob) => {
+                expect(blob).toBeTruthy();
+                expect(blob instanceof Blob).toBeTrue();
+                done();
+              },
+              error: (err) => {
+                fail('Failed to get user image: ' + err.message);
+                done();
+              }
+            });
+          },
+          error: (err) => {
+            fail('Failed to get current user: ' + err.message);
+            done();
+          }
+        });
+      },
+      error: (err) => {
+        fail('Login failed: ' + err.message);
+        done();
+      }
+    });
+  });
+
 });

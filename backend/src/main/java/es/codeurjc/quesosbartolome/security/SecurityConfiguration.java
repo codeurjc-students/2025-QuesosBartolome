@@ -88,6 +88,8 @@ public class SecurityConfiguration {
                     .requestMatchers(HttpMethod.POST, "/api/v1/auth/**").permitAll()
                     .requestMatchers(HttpMethod.GET, "/api/v1/cheeses/**").permitAll()
                     .requestMatchers(HttpMethod.GET, "/api/v1/cheeses").permitAll()
+                    .requestMatchers(HttpMethod.GET, "/api/v1/users/**").permitAll()
+                    .requestMatchers(HttpMethod.GET, "/api/v1/users/**/image").permitAll()
 
                     // Endpoint de perfil
                     .requestMatchers(HttpMethod.GET, "/api/v1/users").authenticated()

@@ -1,0 +1,54 @@
+<div class="profile-container">
+
+  <!-- FOTO + FORM -->
+  <div class="profile-header">
+    
+    <!-- AVATAR -->
+    <div class="avatar-box">
+      <img 
+        [src]="imageUrl || 'assets/avatar-default.png'" 
+        alt="Avatar del usuario"
+      />
+    </div>
+
+    <!-- FORMULARIO -->
+    <div class="profile-form card shadow-sm">
+
+      <div class="form-group">
+        <label>Nombre</label>
+        <input type="text" [(ngModel)]="user.name" class="form-control" disabled/>
+      </div>
+
+      <div class="form-group">
+        <label>Gmail</label>
+        <input type="email" [(ngModel)]="user.gmail" class="form-control" disabled/>
+      </div>
+
+      <div class="form-group">
+        <label>Dirección</label>
+        <input type="text" [(ngModel)]="user.direction" class="form-control" disabled/>
+      </div>
+
+      <div class="form-group">
+        <label>NIF</label>
+        <input type="text" [(ngModel)]="user.nif" class="form-control" disabled/>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-danger" (click)="changePassword()">Cambiar Contraseña</button>
+        <button class="btn btn-danger" (click)="editProfile()">Editar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MIS VALORACIONES -->
+  <h2 class="section-title">Mis valoraciones</h2>
+
+  <div class="ratings-grid">
+    <div class="rating-card card shadow-sm" *ngFor="let item of placeholderRatings">
+      <h3></h3>
+      <p class="placeholder-desc">Aquí irá la valoración del usuario…</p>
+    </div>
+  </div>
+
+</div>

@@ -2,18 +2,22 @@ package es.codeurjc.quesosbartolome.controller;
 
 
 import java.security.Principal;
+import java.sql.Blob;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import es.codeurjc.quesosbartolome.dto.UserDTO;
 import es.codeurjc.quesosbartolome.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
+
+
 
 
 @RestController
@@ -24,19 +28,62 @@ public class UserRestController {
     private UserService userService;
 
     @GetMapping("")
-    public ResponseEntity<?> me(HttpServletRequest request) { 
+    public ResponseEntity<UserDTO> me(HttpServletRequest request) { 
         Principal principal = request.getUserPrincipal();
-        if (principal != null) {
-            Optional<UserDTO> user = userService.findByName(principal.getName());
-            if (user.isPresent()) {
-                UserDTO loggedInUser = user.get();
-                return ResponseEntity.ok(loggedInUser);
-            }
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
-        }
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("You must be authenticated");
         
+        if (principal == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build(); //401
+        }
+
+        Optional<UserDTO> user = userService.findByName(principal.getName());
+
+        return user
+            .map(ResponseEntity::ok)                          // 200 + UserDTO
+            .orElseGet(() -> ResponseEntity                   // 404 
+                .status(HttpStatus.NOT_FOUND)
+                .build()
+            );
     }
+
+        
+
+    @GetMapping("/{id}/image")
+    public ResponseEntity<byte[]> getUserImage(@PathVariable Long id) throws Exception {
+
+        Optional<UserDTO> userOptional = userService.findUserById(id);
+
+        if (userOptional.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build(); // 404 
+        }
+
+        Optional<Blob> imageOpt = userService.getUserImageById(id);
+        if (imageOpt.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+
+        Blob blob = imageOpt.get();
+
+        byte[] bytes = blob.getBytes(1, (int) blob.length());
+
+        return ResponseEntity.ok()
+                .header("Content-Type", "image/png")
+                .body(bytes);
+    }
+
+
+
+    @GetMapping("/{id}")
+    public ResponseEntity<UserDTO> getUserById(@PathVariable Long id) {
+        Optional<UserDTO> userOpt = userService.findUserById(id);
+
+        return userOpt
+                .map(ResponseEntity::ok)                             // 200 + UserDTO
+                .orElseGet(() -> ResponseEntity.notFound().build()); // 404 
+    }
+
+
+
+
 
     
 }

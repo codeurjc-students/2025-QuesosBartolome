@@ -60,6 +60,9 @@ export class CheeseListComponent implements OnInit {
   goToRegister(): void {
     this.router.navigate(['/auth/register']);
   }
+  goToProfile(): void {
+    this.router.navigate(['/user']);
+  }
 
   logout(): void {
     this.loginService.logout().subscribe({
