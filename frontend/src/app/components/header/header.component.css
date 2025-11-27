@@ -1,0 +1,45 @@
+.app-header {
+  width: 100%;
+  background-color: var(--rojo-vino);
+  color: var(--blanco);
+  display: flex;
+  align-items: center;
+  padding: 6px 14px;
+  box-shadow: var(--shadow);
+}
+
+.header-left,
+.header-right {
+  width: 40px; 
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.home-icon {
+  font-size: 22px;
+  cursor: pointer;
+  transition: transform 0.15s ease, opacity 0.15s ease;
+}
+
+.home-icon:hover {
+  transform: scale(1.1);
+  opacity: 0.85;
+}
+
+.header-center {
+  flex-grow: 1;
+  text-align: center;
+}
+
+.brand-title {
+  font-size: 18px;
+  margin: 0;
+  font-weight: 600;
+}
+
+.brand-subtitle {
+  font-size: 12px;
+  margin: 0;
+  opacity: 0.9;
+}
