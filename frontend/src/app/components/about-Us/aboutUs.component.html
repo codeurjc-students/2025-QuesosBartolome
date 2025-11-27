@@ -1,0 +1,53 @@
+<div class="about-container background-image">
+
+  <div class="top-section side-by-side">
+    
+    <div class="big-image">
+      <img src="assets/LogoQuesos1.png" alt="Imagen empresa">
+    </div>
+
+    <div class="text-section">
+      <h1>Quesos Bartolomé</h1>
+
+      <p>
+        Quesos Bartolomé nace de la ilusión y el trabajo de dos hermanos, hoy con 23 y 21 años, que junto a nuestro padre hemos apostado por crear una quesería auténtica, joven y con carácter propio.
+      </p>
+
+      <p>
+        Nuestra quesería está ubicada en Aldeonte, un pequeño pueblo del Nordeste de Segovia. Allí elaboramos cada queso de forma artesanal, cuidando cada detalle y manteniendo vivas las tradiciones familiares.
+      </p>
+
+      <p>
+        Toda la leche que utilizamos proviene de nuestra propia explotación, garantizando frescura, trazabilidad y un sabor excepcional desde el origen.
+      </p>
+
+      <p>Ofrecemos una gama de quesos pensada para todos los gustos:</p>
+
+      <div class="cheese-grid">
+        <div><strong>Tierno</strong></div>
+        <div><strong>Semicurado</strong></div>
+        <div><strong>Curado</strong></div>
+        <div><strong>Azul</strong></div>
+        <div><strong>Cremoso</strong></div>
+      </div>
+
+      <p>
+        Nuestro compromiso es ofrecer un producto honesto, artesanal y con identidad propia.  
+        Porque cada queso que sale de Quesos Bartolomé cuenta una historia: la nuestra.
+      </p>
+    </div>
+
+  </div>
+
+  <!-- Map -->
+  <div class="map-section">
+    <iframe 
+        *ngIf="safeMapUrl"
+        [src]="safeMapUrl"
+        class="map-frame"
+        loading="lazy"
+        referrerpolicy="no-referrer-when-downgrade">
+    </iframe>
+  </div>
+
+</div>
