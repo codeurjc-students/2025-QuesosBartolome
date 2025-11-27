@@ -65,4 +65,38 @@ public class CheeseUITests {
         assertTrue(semicurado, "El queso 'Semicurado' debería aparecer en la página");
         assertTrue(azul, "El queso 'Azul' debería aparecer en la página");
     }
+
+    @Test
+    public void testNavigateToAboutUs() {
+
+        // Open the app
+        driver.get("http://localhost:4200/");
+
+        // Wait for the sidebar to be visible
+        WebElement sidebar = wait.until(ExpectedConditions
+                .visibilityOfElementLocated(By.cssSelector(".sidebar")));
+
+        // Find the "About Us" button inside the sidebar
+        WebElement aboutBtn = sidebar.findElement(
+                By.xpath("//li[contains(., 'Acerca de nosotros')]")
+        );
+
+        // Click the menu option
+        aboutBtn.click();
+
+        // Wait for navigation to /about-us
+        wait.until(ExpectedConditions.urlContains("/about-us"));
+
+        // Verify that the About Us title is visible
+        WebElement title = wait.until(ExpectedConditions
+                .visibilityOfElementLocated(By.cssSelector(".text-section h1"))
+        );
+
+        assertEquals(
+                "Quesos Bartolomé",
+                title.getText(),
+                "The About Us page should load correctly"
+        );
+    }
+
 }
