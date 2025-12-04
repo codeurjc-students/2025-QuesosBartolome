@@ -75,7 +75,8 @@ describe('LoginService (integration)', () => {
       password: 'password123',
       gmail: 'juanfail@example.com',
       direction: 'Calle Falsa 123',
-      nif: '12345678A'
+      nif: '12345678A',
+      rols: ['USER']
     };
 
     service.register(invalidUserData).subscribe({

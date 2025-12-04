@@ -34,4 +34,42 @@ public class ApiCheeseTests {
             .body("[0].name", equalTo("Semicurado"))
             .body("[1].name", equalTo("Azul"));
     }
+
+    @Test
+    void testGetCheeseById() {
+        when()
+            .get("/api/v1/cheeses/1")
+        .then()
+            .statusCode(200)
+            .body("id", equalTo(1))
+            .body("name", equalTo("Semicurado"));
+    }
+
+    @Test
+    void testGetCheeseById_NotFound() {
+        when()
+            .get("/api/v1/cheeses/999")
+        .then()
+            .statusCode(404);
+    }
+
+    @Test
+    void testGetCheeseImage_Ok() {
+        when()
+            .get("/api/v1/cheeses/1/image")
+        .then()
+            .statusCode(200)
+            .header("Content-Type", equalTo("image/png"))
+            .body(not(empty()));
+    }
+
+    // Added test for image 204 when i created the controller method POST
+
+    @Test
+    void testGetCheeseImage_NotFound() {
+        when()
+            .get("/api/v1/cheeses/999/image")
+        .then()
+            .statusCode(404);
+    }
 }

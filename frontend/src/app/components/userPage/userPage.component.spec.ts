@@ -33,7 +33,8 @@ describe('UserPageComponent (unit)', () => {
       password: '12345678',
       gmail: 'juan@example.com',
       direction: 'Calle Falsa 123',
-      nif: '12345678A'
+      nif: '12345678A',
+      rols: ['USER']
     };
 
     const mockBlob = new Blob(['fake'], { type: 'image/png' });
@@ -56,7 +57,8 @@ describe('UserPageComponent (unit)', () => {
       password: '12345678',
       gmail: 'ana@example.com',
       direction: 'Calle Luna 2',
-      nif: '87654321B'
+      nif: '87654321B',
+      rols: ['USER']
     };
 
     const emptyBlob = new Blob([], { type: 'image/png' });
@@ -76,7 +78,8 @@ describe('UserPageComponent (unit)', () => {
       password: '12345678',
       gmail: 'luis@example.com',
       direction: 'Calle Mayor 3',
-      nif: '11223344C'
+      nif: '11223344C',
+      rols: ['USER']
     };
 
     mockUserService.getCurrentUser.and.returnValue(of(mockUser));

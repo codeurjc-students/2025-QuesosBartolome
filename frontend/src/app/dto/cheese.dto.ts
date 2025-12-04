@@ -6,4 +6,5 @@ export interface CheeseDTO {
   manufactureDate: string;
   expirationDate: string;
   type: string;
+  boxes: number[];
 }
