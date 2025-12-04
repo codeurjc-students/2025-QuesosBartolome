@@ -9,4 +9,5 @@ import es.codeurjc.quesosbartolome.model.Cheese;
 public interface CheeseRepository extends JpaRepository<Cheese, Long> {
 
     
+    
 }
