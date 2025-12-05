@@ -1,0 +1,146 @@
+[33m0973afa[m[33m ([m[1;36mHEAD -> [m[1;32mfeature/Cheese-Page[m[33m, [m[1;31morigin/feature/Cheese-Page[m[33m)[m .
+[33mba1fc9a[m Merge branch 'feature/Cheese-Page' of https://github.com/codeurjc-students/2025-QuesosBartolome into feature/Cheese-Page
+[33md8b8dc3[m misc keystore
+[33m1e4a44b[m Enable SSL for Spring Boot backend and update health check
+[33me4a7781[m misc
+[33mfaf196a[m ...
+[33mc981aa2[m ..
+[33m4fd3693[m .
+[33m22203e5[m add Cheese details page
+[33m405e6e7[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mmain[m[33m)[m Merge pull request #34 from codeurjc-students/feature/header
+[33m9fed8d2[m[33m ([m[1;31morigin/feature/header[m[33m, [m[1;32mfeature/header[m[33m)[m Add Header
+[33mabba150[m Merge pull request #31 from codeurjc-students/feature/About-us
+[33m3040d42[m[33m ([m[1;31morigin/feature/About-us[m[33m, [m[1;32mfeature/About-us[m[33m)[m add About Us page
+[33m46b1f5c[m Merge pull request #30 from codeurjc-students/feature/UserPage
+[33m65cc57e[m[33m ([m[1;31morigin/feature/UserPage[m[33m, [m[1;32mfeature/UserPage[m[33m)[m misc
+[33m6312921[m Add UserPage and tests
+[33m3abb038[m Merge pull request #29 from codeurjc-students/feature/Log-in-register
+[33me734172[m[33m ([m[1;31morigin/feature/Log-in-register[m[33m, [m[1;32mfeature/Log-in-register[m[33m)[m misc register test
+[33md8f3b58[m ...
+[33m38c72ed[m ...
+[33m48addee[m ..
+[33m45efc36[m .
+[33mb5779a9[m Rename CheeseUITests to ZCheeseUITests
+[33m1ef5d54[m Rename CheeseUITests to ZCheeseUITests
+[33m15aca6a[m Rename cheeseUITests.java to CheeseUITests.java
+[33meccf1e3[m misc
+[33mea1e199[m mix tests
+[33mc5bb7f3[m .
+[33mc275584[m Add Login and Register
+[33med95e19[m Merge pull request #20 from codeurjc-students/victorino2324-patch-1
+[33m5f0ecd2[m Rename workflow and update Docker build paths
+[33m3a9ce69[m Merge pull request #15 from codeurjc-students/feature/docker-and-Security
+[33mde6c134[m Merge branch 'main' into feature/docker-and-Security
+[33mb4e7c7e[m Merge pull request #19 from codeurjc-students/victorino2324-patch-6
+[33m566eed6[m[33m ([m[1;31morigin/victorino2324-patch-6[m[33m)[m Fix Docker build context and file paths in workflow
+[33m7854c17[m Merge pull request #18 from codeurjc-students/victorino2324-patch-5
+[33m8b890bd[m[33m ([m[1;31morigin/victorino2324-patch-5[m[33m)[m Update dev-build.yml
+[33m1a9eb52[m Merge pull request #17 from codeurjc-students/victorino2324-patch-4
+[33maaf9d14[m[33m ([m[1;31morigin/victorino2324-patch-4[m[33m)[m Add GitHub Actions workflow for dev build and publish
+[33m184a6b3[m Merge pull request #16 from codeurjc-students/victorino2324-patch-3
+[33mfadd0e5[m[33m ([m[1;31morigin/victorino2324-patch-3[m[33m)[m Add GitHub Actions workflow for release publishing
+[33mdab6ca1[m[33m ([m[1;31morigin/feature/docker-and-Security[m[33m, [m[1;32mfeature/docker-and-Security[m[33m)[m Rename Docker-compose.yml to docker-compose.yml
+[33mab5be35[m Rename Docker-compose-dev.yml to docker-compose-dev.yml
+[33ma1f3a81[m .
+[33mfd0abd0[m[33m ([m[1;31morigin/feature/Login-+-Security[m[33m)[m Merge branch 'main' into feature/Login-+-Security
+[33m0113cf6[m add docker for workflow
+[33meed8b3f[m Merge pull request #14 from codeurjc-students/victorino2324-patch-2
+[33md758ae9[m[33m ([m[1;31morigin/victorino2324-patch-2[m[33m)[m Fix docker build context and working directory
+[33m477069d[m Merge pull request #13 from codeurjc-students/victorino2324-patch-1
+[33mc0431f7[m[33m ([m[1;31morigin/victorino2324-patch-1[m[33m)[m Add manual build workflow for Docker images
+[33ma87dba4[m Merge branch 'feature/Login-+-Security' of https://github.com/codeurjc-students/2025-QuesosBartolome into feature/Login-+-Security
+[33mfc9a7dd[m .
+[33m5ff5b81[m Fix formatting in CI workflow for SonarQube analysis
+[33m2298f77[m .
+[33m76b796a[m .
+[33md4ceb60[m .
+[33m4506cdd[m Merge branch 'feature/Login-+-Security' of https://github.com/codeurjc-students/2025-QuesosBartolome into feature/Login-+-Security
+[33mf8ec6c4[m fix
+[33m9afaa3e[m Modify frontend test command in CI workflow
+[33m57bd1e8[m Modify CI workflow for Java and backend startup
+[33mf6c62b8[m Update ci-Full.yml
+[33m8bd6068[m fix4
+[33m205dde2[m fix3
+[33m7807e12[m fix2
+[33m5b12cec[m fix
+[33m1910bc2[m fix
+[33m174ad2a[m Merge branch 'feature/Login-+-Security' of https://github.com/codeurjc-students/2025-QuesosBartolome into feature/Login-+-Security
+[33m2791502[m add karma configuration
+[33m209cf0a[m .
+[33mb0fc099[m Configure Java to bind to port 443 in CI workflow
+[33mb9d3587[m add docker and security https
+[33mad23cdf[m Merge pull request #9 from codeurjc-students/feature/add-Styles-main-page
+[33m48a09ec[m[33m ([m[1;31morigin/feature/add-Styles-main-page[m[33m, [m[1;32mfeature/add-Styles-main-page[m[33m)[m fix tests
+[33m0e041de[m modify tests
+[33maa65d0d[m add styles
+[33m1622c1c[m Set dates for Phase 2: Repository, testing, and CI
+[33m10b3f67[m Update README.md
+[33m8ecf354[m Update image paths in Quality_Control.md
+[33m315f5fe[m Update README.md
+[33md8afea9[m update readme
+[33m8c35d3d[m Update links in README for documentation structure
+[33m11f3c86[m Update README with coverage and test results images
+[33m057ac9a[m Update README with coverage and test results images
+[33m555c819[m .
+[33m1be18e1[m Improve README formatting and Postman collection reference
+[33m2a03477[m .
+[33m6f0bad2[m Merge pull request #8 from codeurjc-students/victorino2324-patch-2
+[33m719af67[m Update CI workflow to remove push trigger
+[33m128b3d5[m Merge pull request #7 from codeurjc-students/victorino2324-patch-1
+[33m0224513[m Revise README for clarity and bilingual support
+[33m812e067[m Fix API documentation link in README
+[33m97bccbc[m add OpenApi doc
+[33m4d68a3e[m add docs
+[33m98ad52a[m Enhance formatting of README section headers
+[33mcaeada2[m Update readme
+[33m2ba73b0[m Add push trigger for main branch to CI workflow
+[33meb4477a[m Merge pull request #6 from codeurjc-students/feature/2
+[33m8bed586[m[33m ([m[1;31morigin/feature/2[m[33m, [m[1;32mfeature/2[m[33m)[m ...
+[33m2335feb[m Merge branch 'main' of https://github.com/codeurjc-students/2025-QuesosBartolome
+[33m1e63383[m .
+[33m2f173bb[m Merge pull request #5 from codeurjc-students/feature/2
+[33m8cda8ac[m ..
+[33md4a7eae[m .
+[33m8c6f2c8[m .
+[33mf23d7ea[m Merge pull request #4 from codeurjc-students/feature/2
+[33mcb97c3d[m Add caching for SonarQube and Maven packages
+[33mbebad69[m Update CI workflow to remove push trigger
+[33mf124b81[m Update README.md
+[33mfd93411[m Merge branch 'main' of https://github.com/codeurjc-students/2025-QuesosBartolome
+[33m23b0c56[m .
+[33mdf5db18[m Update ci-Full.yml
+[33m9b86d64[m ..
+[33mb00e0f5[m .
+[33med5ee03[m .
+[33md6f8be3[m .
+[33m0dcc945[m Update ci-Full.yml
+[33m7dff16a[m .
+[33m833b02f[m Update and rename ci-main.yml to ci-Full.yml
+[33m6bb7e7f[m .
+[33m07084b5[m Update ci-feature.yml
+[33m5029554[m Merge pull request #3 from codeurjc-students/feature/test1
+[33m7c18e17[m Update ci-feature.yml
+[33mb5439f2[m Update ci-main.yml
+[33mf40ae4c[m[33m ([m[1;31morigin/feature/test1[m[33m, [m[1;32mfeature/test1[m[33m)[m ..
+[33m422282e[m Update ci-feature.yml
+[33m7a099b7[m Update ci-feature.yml
+[33mf81192a[m fixtest
+[33m639d9a3[m Create ci-main.yml
+[33m99c4a2a[m Update ci-feature.yml
+[33ma103904[m Update ci-feature.yml
+[33m82c90fb[m Create ci-feature.yml
+[33m1b6d7de[m add integration tests
+[33m5ba4dde[m Base website and implementation of automated system and server tests, plus system and server unit tests.
+[33m05f52a1[m add backend and frontend
+[33mbce9cb5[m Update README.md
+[33mec2d35a[m Update README.md
+[33m0f79eb2[m .
+[33m8f00f3d[m Update README.md
+[33me73525b[m Update README.md
+[33m07cd218[m .
+[33m4ed3613[m images
+[33m09dd2c2[m Update README.md
+[33m7b956a0[m Images
+[33m6c11dbb[m Update README.md
+[33mb64f972[m Update README.md
+[33m10275e6[m Update README

@@ -54,7 +54,7 @@ public class SecurityConfiguration {
         config.setAllowCredentials(true);
         config.setAllowedOrigins(List.of("http://localhost:4200","http://localhost:9876"));
         config.setAllowedHeaders(List.of("*"));
-        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE"));
         source.registerCorsConfiguration("/**", config);
         return new CorsFilter(source);
     }
