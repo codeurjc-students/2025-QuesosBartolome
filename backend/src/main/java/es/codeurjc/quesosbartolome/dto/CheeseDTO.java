@@ -1,7 +1,8 @@
 package es.codeurjc.quesosbartolome.dto;
 
-import java.sql.Blob;
+
 import java.sql.Date;
+import java.util.List;
 
 public record CheeseDTO(
     Long id,
@@ -11,5 +12,5 @@ public record CheeseDTO(
     Date manufactureDate,
     Date expirationDate,
     String Type,
-    Blob image
+    List<Double> boxes
 ) {}

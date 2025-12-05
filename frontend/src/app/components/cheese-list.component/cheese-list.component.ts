@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NgbDropdownModule, NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
 import { CheeseService } from '../../service/cheese.service';
@@ -20,6 +20,7 @@ import { UserDTO } from '../../dto/user.dto';
   styleUrls: ['./cheese-list.component.css']
 })
 export class CheeseListComponent implements OnInit {
+
   cheeses: CheeseDTO[] = [];
 
   isLoggedIn: boolean = false;
@@ -33,26 +34,29 @@ export class CheeseListComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    // Load cheeses
+
+    // Load all cheeses from backend
     this.cheeseService.getAllCheeses().subscribe({
-      next: (data) => this.cheeses = data,
-      error: (err) => console.error('Error loading cheeses', err)
+      next: (list) => {
+        this.cheeses = list;
+      }
     });
 
-    // Check login status and get current user
+    // Check if user is logged in
     this.userService.getCurrentUser().subscribe({
       next: (user) => {
         this.currentUser = user;
         this.isLoggedIn = true;
       },
-      error: (err) => {
-        // If there is no valid token or an error occurs, consider that no user is logged in
+      error: () => {
+        // If token is invalid or request fails, consider user as logged out
         this.currentUser = null;
         this.isLoggedIn = false;
       }
     });
   }
 
+  // Navigation methods
   goToLogin(): void {
     this.router.navigate(['/auth/login']);
   }
@@ -60,13 +64,20 @@ export class CheeseListComponent implements OnInit {
   goToRegister(): void {
     this.router.navigate(['/auth/register']);
   }
+
   goToProfile(): void {
     this.router.navigate(['/user']);
   }
+
   goToAbout(): void {
     this.router.navigate(['/about-us']);
   }
 
+  goToDetails(id: number): void {
+    this.router.navigate(['/cheeses', id]);
+  }
+
+  // Logout user and redirect to home
   logout(): void {
     this.loginService.logout().subscribe({
       next: () => {
@@ -75,11 +86,22 @@ export class CheeseListComponent implements OnInit {
         console.log('Logged out successfully');
         this.router.navigate(['/']);
       },
-      error: (err) => console.error('Error cerrando sesión', err)
+      error: (err) => console.error('Error during logout', err)
     });
   }
 
+  // Placeholder for future modal implementation
   openNewCheeseModal(): void {
-    alert('Abrir modal para nuevo queso');
+    alert('Open modal for creating a new cheese');
   }
+
+  isAdmin(): boolean {
+    return this.currentUser?.rols?.includes("ADMIN") ?? false;
+  }
+
+  isUser(): boolean {
+    return this.currentUser?.rols?.includes("USER") ?? false;
+  }
+
+
 }

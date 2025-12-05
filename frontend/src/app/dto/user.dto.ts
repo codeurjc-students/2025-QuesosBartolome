@@ -5,4 +5,5 @@ export interface UserDTO {
     gmail: string;
     direction: string;
     nif: string;
+    rols: string[];
 }

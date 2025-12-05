@@ -19,7 +19,8 @@ export class UserPageComponent implements OnInit {
     password: '',
     gmail: '',
     direction: '',
-    nif: ''
+    nif: '',
+    rols: []
   };
 
   imageUrl: string | null = null;

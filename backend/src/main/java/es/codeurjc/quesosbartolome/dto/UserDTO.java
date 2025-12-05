@@ -1,7 +1,6 @@
 package es.codeurjc.quesosbartolome.dto;
 
-
-
+import java.util.List;
 
 public record UserDTO(
     Long id,
@@ -9,5 +8,6 @@ public record UserDTO(
     String password,
     String gmail,
     String direction,
-    String nif
+    String nif,
+    List<String> rols 
 ) {}

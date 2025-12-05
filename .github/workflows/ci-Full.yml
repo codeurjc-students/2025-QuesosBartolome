@@ -42,7 +42,6 @@ jobs:
           distribution: temurin
           java-version: '21'
 
-      # 🔑 Dar capability al binario de Java para poder usar 443
       - name: Allow Java to bind to privileged ports
         run: |
           sudo apt-get update
@@ -70,25 +69,30 @@ jobs:
       - name: Set up ChromeDriver
         uses: nanasess/setup-chromedriver@v2
 
-      # --- BACKEND BUILD ---
+     # --- BACKEND BUILD ---
       - name: Build backend
         working-directory: ./backend
         run: mvn clean install -DskipTests -B
-
-      - name: Start Spring Boot backend on 443
+      
+      - name: Start Spring Boot backend on 443 (HTTPS)
         working-directory: ./backend
         run: |
-          echo "Starting backend on port 443..."
-          nohup mvn spring-boot:run -Dspring-boot.run.arguments="--server.port=443" > backend.log 2>&1 &
-          echo "Waiting for backend to start on port 443..."
-          for i in {1..30}; do
-            if nc -z localhost 443; then
-              echo "✅ Backend is UP on port 443!"
+          echo "Starting backend on port 443 (HTTPS)..."
+          nohup mvn spring-boot:run -Dspring-boot.run.arguments="--server.port=443 --server.ssl.enabled=true --server.ssl.key-store=classpath:keystore.p12 --server.ssl.key-store-password=changeit --server.ssl.key-store-type=PKCS12" > backend.log 2>&1 &
+          
+          echo "Waiting for backend to be healthy..."
+          for i in {1..60}; do
+            # Saltar verificación de certificado auto-firmado
+            if curl -k -s https://localhost:443/actuator/health | grep -q UP; then
+              echo "✅ Backend is healthy!"
               break
             fi
-            echo "Waiting... ($i/30)"
-            sleep 3
+            echo "Waiting for backend... ($i/60)"
+            sleep 5
           done
+      
+          echo "Last backend logs:"
+          tail -n 20 backend.log
 
       # --- FRONTEND BUILD ---
       - name: Build frontend
