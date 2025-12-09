@@ -74,22 +74,23 @@ jobs:
         working-directory: ./backend
         run: mvn clean install -DskipTests -B
       
-      - name: Start Spring Boot backend on 443 (HTTPS)
+      - name: Start Spring Boot backend on 443
         working-directory: ./backend
         run: |
-          echo "Starting backend on port 443..."
+          echo "🚀 Starting backend on port 443..."
           nohup java -jar target/*.jar > backend.log 2>&1 &
-          echo "Waiting for backend to listen on 443..."
+          echo "⏳ Waiting for backend to listen on 443..."
           for i in {1..30}; do
             if ss -ltn 'sport = :443' >/dev/null 2>&1 || nc -z localhost 443; then
               echo "✅ Backend is up on 443"
-              exit 0
+              break
             fi
+            echo "⌛ Waiting ($i/30)..."
             sleep 2
           done
-          echo "Backend failed to start on 443"
+      
+          echo "📄 ===== BACKEND LOG ====="
           cat backend.log
-          exit 1
 
       # --- FRONTEND BUILD ---
       - name: Build frontend
