@@ -69,16 +69,18 @@ jobs:
       - name: Set up ChromeDriver
         uses: nanasess/setup-chromedriver@v2
 
-     # --- BACKEND BUILD ---
+      # --- BACKEND BUILD ---
       - name: Build backend
         working-directory: ./backend
         run: mvn clean install -DskipTests -B
       
+      # -------- START BACKEND WITH LOG CAPTURE --------
       - name: Start Spring Boot backend on 443
         working-directory: ./backend
         run: |
           echo "🚀 Starting backend on port 443..."
           nohup java -jar target/*.jar > backend.log 2>&1 &
+          
           echo "⏳ Waiting for backend to listen on 443..."
           for i in {1..30}; do
             if ss -ltn 'sport = :443' >/dev/null 2>&1 || nc -z localhost 443; then
@@ -88,9 +90,17 @@ jobs:
             echo "⌛ Waiting ($i/30)..."
             sleep 2
           done
-      
-          echo "📄 ===== BACKEND LOG ====="
-          cat backend.log
+
+          echo "📄 ===== BACKEND LOG (captured during CI) ====="
+          cat backend.log || true
+
+      # Check what process is using port 443
+      - name: Check process on port 443
+        run: |
+          echo "🔍 Checking what is using port 443..."
+          sudo lsof -i :443 || true
+
+      # -------------------------------------------------
 
       # --- FRONTEND BUILD ---
       - name: Build frontend
@@ -114,21 +124,17 @@ jobs:
         run: |
           npm run test -- --karma-config=karma.conf.js --browsers=ChromeHeadlessNoSandbox --no-watch --source-map=false
 
-
       # --- BACKEND TESTS ---
       - name: Run all backend tests
         working-directory: ./backend
         run: mvn test -B
 
-
-     # --- SONARQUBE ---
+      # --- SONARQUBE ---
       - name: Build and analyze
         working-directory: ./backend
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar
-                 -Dsonar.projectKey=codeurjc-students_2025-QuesosBartolome
-                 -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml
-
-
-
+        run: |
+          mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
+            -Dsonar.projectKey=codeurjc-students_2025-QuesosBartolome \
+            -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml
