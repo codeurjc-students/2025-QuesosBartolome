@@ -79,18 +79,16 @@ jobs:
         working-directory: ./backend
         run: |
           echo "Starting backend on port 443..."
-          nohup java -jar target/*.jar > backend.log 2>&1 &
-          echo "Waiting for backend to listen on 443..."
+          nohup mvn spring-boot:run -Dspring-boot.run.arguments="--server.port=443" > backend.log 2>&1 &
+          echo "Waiting for backend to start on port 443..."
           for i in {1..30}; do
-            if ss -ltn 'sport = :443' >/dev/null 2>&1 || nc -z localhost 443; then
-              echo "✅ Backend is up on 443"
-              exit 0
+            if nc -z localhost 443; then
+              echo "✅ Backend is UP on port 443!"
+              break
             fi
-            sleep 2
+            echo "Waiting... ($i/30)"
+            sleep 3
           done
-          echo "Backend failed to start on 443"
-          cat backend.log
-          exit 1
 
       # --- FRONTEND BUILD ---
       - name: Build frontend
