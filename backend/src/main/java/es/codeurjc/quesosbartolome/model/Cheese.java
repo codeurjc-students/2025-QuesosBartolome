@@ -4,10 +4,13 @@ import java.sql.Blob;
 import java.sql.Date;
 import java.util.List;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Lob;
 import jakarta.persistence.OneToMany;
 
 @Entity
@@ -18,10 +21,16 @@ public class Cheese {
     private Long id;
     private String name;
     private double price;
+
+    @Column(length = 1000)
     private String description;
     private Date manufactureDate;
     private Date expirationDate;
     private String Type;
+    @ElementCollection
+    private List<Double> boxes;
+
+    @Lob
     private Blob image;
     
     @OneToMany(mappedBy = "cheese")
@@ -99,6 +108,14 @@ public class Cheese {
 
     public void setType(String type) {
         Type = type;
+    }
+    
+    public List<Double> getBoxes() {
+        return boxes;
+    }
+
+    public void setBoxes(List<Double> boxes) {
+        this.boxes = boxes;
     }
 
     public Blob getImage() {
