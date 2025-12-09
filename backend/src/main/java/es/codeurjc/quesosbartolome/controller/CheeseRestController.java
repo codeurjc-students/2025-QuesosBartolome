@@ -28,5 +28,6 @@ public class CheeseRestController {
     @GetMapping("/{id}")
     public Optional<CheeseDTO> getCheeseById(@PathVariable Long id) {
         return cheeseService.findById(id);
+        
     }
 }
