@@ -77,22 +77,19 @@ jobs:
       - name: Start Spring Boot backend on 443 (HTTPS)
         working-directory: ./backend
         run: |
-          echo "Starting backend on port 443 (HTTPS)..."
-          nohup mvn spring-boot:run -Dspring-boot.run.arguments="--server.port=443 --server.ssl.enabled=true --server.ssl.key-store=classpath:keystore.p12 --server.ssl.key-store-password=changeit --server.ssl.key-store-type=PKCS12" > backend.log 2>&1 &
-          
-          echo "Waiting for backend to be healthy..."
-          for i in {1..60}; do
-            # Saltar verificación de certificado auto-firmado
-            if curl -k -s https://localhost:443/actuator/health | grep -q UP; then
-              echo "✅ Backend is healthy!"
-              break
+          echo "Starting backend on port 443..."
+          nohup java -jar target/*.jar > backend.log 2>&1 &
+          echo "Waiting for backend to listen on 443..."
+          for i in {1..30}; do
+            if ss -ltn 'sport = :443' >/dev/null 2>&1 || nc -z localhost 443; then
+              echo "✅ Backend is up on 443"
+              exit 0
             fi
-            echo "Waiting for backend... ($i/60)"
-            sleep 5
+            sleep 2
           done
-      
-          echo "Last backend logs:"
-          tail -n 20 backend.log
+          echo "Backend failed to start on 443"
+          cat backend.log
+          exit 1
 
       # --- FRONTEND BUILD ---
       - name: Build frontend
