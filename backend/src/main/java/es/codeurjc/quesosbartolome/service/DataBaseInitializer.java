@@ -62,7 +62,7 @@ public class DataBaseInitializer {
         semicurado.setExpirationDate(Date.valueOf(LocalDate.now().plusMonths(10)));
         semicurado.setType("Hard");
         semicurado.setBoxes(List.of(6.32, 5.87, 5.82, 6.56, 5.98, 6.34, 6.41, 6.03, 5.79, 6.22));
-        semicurado.setImage(saveImage("static/frontend/images/Semicurado.jpg"));
+        semicurado.setImage(saveImage("images/Semicurado.jpg"));
         
 
 
@@ -75,7 +75,7 @@ public class DataBaseInitializer {
         azul.setExpirationDate(Date.valueOf(LocalDate.now().plusMonths(2)));
         azul.setType("Soft");
         azul.setBoxes(List.of(4.32, 4.87, 5.12, 4.56, 4.98, 5.34, 4.41, 5.03, 4.79, 5.22));
-        azul.setImage(saveImage("static/frontend/images/Azul.jpg"));
+        azul.setImage(saveImage("images/Azul.jpg"));
         
         
         // Create Cheese 3
@@ -87,7 +87,7 @@ public class DataBaseInitializer {
         Curado.setExpirationDate(Date.valueOf(LocalDate.now().plusMonths(3)));
         Curado.setType("Semi-Hard");
         Curado.setBoxes(List.of(6.32, 5.87, 5.82, 6.56, 5.98, 6.34, 6.41, 6.03, 5.79, 6.22));
-        Curado.setImage(saveImage("static/frontend/images/Curado.jpg"));
+        Curado.setImage(saveImage("images/Curado.jpg"));
         
 
         // Create Cheese 4
@@ -99,7 +99,7 @@ public class DataBaseInitializer {
         Chevrett.setExpirationDate(Date.valueOf(LocalDate.now().plusMonths(1).plusWeeks(1)));
         Chevrett.setType("Goat"); 
         Chevrett.setBoxes(List.of());
-        Chevrett.setImage(saveImage("static/frontend/images/Chevrett.jpg"));
+        Chevrett.setImage(saveImage("images/Chevrett.jpg"));
         
 
 
@@ -112,7 +112,7 @@ public class DataBaseInitializer {
         Tierno.setExpirationDate(Date.valueOf(LocalDate.now().plusMonths(1).plusWeeks(1)));
         Tierno.setType("Goat"); 
         Tierno.setBoxes(List.of(6.32, 5.87, 5.82, 6.56, 5.98, 6.34, 6.41, 6.03, 5.79, 6.22));
-        Tierno.setImage(saveImage("static/frontend/images/Tierno.jpg"));
+        Tierno.setImage(saveImage("images/Tierno.jpg"));
         
         
         
@@ -124,7 +124,7 @@ public class DataBaseInitializer {
         user1.setDirection("123 Main St");
         user1.setNif("12345678A");
         user1.setRols("USER");
-        user1.setImage(saveImage("static/frontend/images/default-profile.jpg"));
+        user1.setImage(saveImage("images/default-profile.jpg"));
 
         // Create Admin 1
         User userAdmin = new User();
@@ -134,7 +134,7 @@ public class DataBaseInitializer {
         userAdmin.setDirection("123 Main St");
         userAdmin.setNif("12345678A");
         userAdmin.setRols("ADMIN");
-        userAdmin.setImage(saveImage("static/frontend/images/default-profile.jpg"));
+        userAdmin.setImage(saveImage("images/default-profile.jpg"));
 
         // Save cheeses to DB
         cheeseRepository.save(semicurado);
