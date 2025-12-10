@@ -19,7 +19,7 @@ public interface CheeseMapper {
         @Mapping(source = "manufactureDate", target = "manufactureDate"),
         @Mapping(source = "expirationDate", target = "expirationDate"),
         @Mapping(source = "type", target = "Type"),
-        @Mapping(source = "image", target = "image")
+        @Mapping(source = "boxes", target = "boxes")
     })
     CheeseDTO toDTO(Cheese cheese);
 
@@ -32,7 +32,7 @@ public interface CheeseMapper {
         @Mapping(source = "manufactureDate", target = "manufactureDate"),
         @Mapping(source = "expirationDate", target = "expirationDate"),
         @Mapping(source = "Type", target = "type"),
-        @Mapping(source = "image", target = "image")
+        @Mapping(source = "boxes", target = "boxes")
     })
     Cheese toDomain(CheeseDTO cheeseDTO);
 }

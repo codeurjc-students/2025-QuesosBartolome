@@ -68,4 +68,54 @@ class cheeseServiceUnitTest {
 
         verify(cheeseRepository, times(1)).findById(1L);
     }
+
+    @Test
+    void getCheeseImageByIdReturnsEmptyWhenCheeseNotFound() {
+        // GIVEN
+        when(cheeseRepository.findById(99L)).thenReturn(Optional.empty());
+
+        // WHEN
+        Optional<java.sql.Blob> result = cheeseService.getCheeseImageById(99L);
+
+        // THEN
+        assertThat(result).isEmpty();
+        verify(cheeseRepository, times(1)).findById(99L);
+    }
+
+    @Test
+    void getCheeseImageByIdReturnsEmptyWhenImageIsNull() {
+        // GIVEN
+        Cheese c1 = new Cheese(1L, "SinImagen", 10.0, "desc", "type", "2024-01-01", "2025-01-01");
+        c1.setImage(null);
+        when(cheeseRepository.findById(1L)).thenReturn(Optional.of(c1));
+
+        // WHEN
+        Optional<java.sql.Blob> result = cheeseService.getCheeseImageById(1L);
+
+        // THEN
+        assertThat(result).isEmpty();
+        verify(cheeseRepository, times(1)).findById(1L);
+    }
+
+    @Test
+    void getCheeseImageByIdReturnsBlobWhenPresent() throws Exception {
+        // GIVEN
+        Cheese c1 = new Cheese(1L, "ConImagen", 10.0, "desc", "type", "2024-01-01", "2025-01-01");
+
+        // Creating a fake Blob for testing
+        java.sql.Blob blob = new javax.sql.rowset.serial.SerialBlob("fakeimage".getBytes());
+        c1.setImage(blob);
+
+        when(cheeseRepository.findById(1L)).thenReturn(Optional.of(c1));
+
+        // WHEN
+        Optional<java.sql.Blob> result = cheeseService.getCheeseImageById(1L);
+
+        // THEN
+        assertThat(result).isPresent();
+        assertThat(result.get().length()).isEqualTo(blob.length());
+        verify(cheeseRepository, times(1)).findById(1L);
+    }
+
+
 }

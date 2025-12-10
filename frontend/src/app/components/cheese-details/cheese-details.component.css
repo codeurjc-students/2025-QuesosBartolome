@@ -1,0 +1,184 @@
+.details-container {
+  width: 100%;
+  padding: 2rem;
+  background-color: var(--crema);
+  color: var(--texto);
+  position: relative;
+}
+
+.valorar-btn {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: var(--texto);
+  color: var(--blanco);
+  padding: 0.4rem 1rem;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+}
+
+.top-section {
+  display: flex;
+  gap: 2rem;
+  margin-top: 2rem;
+}
+
+.image-box {
+  width: 40%;
+  max-width: 350px;
+  height: auto;
+  background-color: var(--gris-suave);
+  border-radius: 10px;
+  padding: 0.5rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.image-box img {
+  width: 100%;
+  height: 100%;
+  max-height: 250px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.cheese-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.cheese-title {
+  font-size: 1.6rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.cheese-price {
+  font-size: 2rem;
+  font-weight: bold;
+  margin: 0.4rem 0;
+  color: var(--texto);
+}
+
+.cajas-container {
+  margin-top: 1rem;
+  display: flex;
+  flex-direction: column; 
+  gap: 0.2rem;           
+}
+
+.cajas-row {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem; 
+}
+
+.cajas-input {
+  border: 1px solid #ccc;
+  padding: 0.1rem;
+  border-radius: 6px;
+  width: 180px;
+}
+
+.add-btn {
+  width: 235px;
+  background: var(--texto);
+  color: var(--blanco);
+  padding: 0.3rem;
+  margin-top: 0.8rem;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+}
+
+.reviews-section {
+  margin-top: 3rem;
+}
+
+.reviews-grid {
+  display: flex;
+  gap: 1.5rem;
+  margin-top: 1rem;
+}
+
+.review-card {
+  width: 250px;
+  background: var(--blanco);
+  padding: 1.2rem;
+  border-radius: 10px;
+  box-shadow: var(--shadow);
+}
+
+.review-user {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  margin-top: 0.5rem;
+}
+
+.avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+}
+
+.user-name {
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.user-desc {
+  margin: 0;
+  opacity: 0.7;
+  font-size: 0.85rem;
+}
+
+.stars {
+  margin-top: 0.8rem;
+  font-size: 1.1rem;
+  color: gold;
+}
+
+.pagination {
+  margin-top: 2rem;
+  text-align: center;
+  opacity: 0.7;
+}
+
+.stock-info {
+  font-size: 0.9rem;
+  color: #777;
+  background: #eee;
+  padding: 0.2rem 0.6rem;
+  border-radius: 6px;
+}
+
+.stock-info-out {
+  font-size: 0.9rem;
+  color: white;
+  background: #c45;
+  padding: 0.2rem 0.6rem;
+  border-radius: 6px;
+  font-weight: bold;
+}
+
+.edit-btn {
+  width: 150px;              
+  background-color: #a1252b; 
+  color: #fff;              
+  padding: 0.5rem 1rem;
+  margin-top: 0.8rem;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 0.3s;
+}
+
+.edit-btn:hover {
+  background-color: #a00030; 
+}

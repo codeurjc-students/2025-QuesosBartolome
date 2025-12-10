@@ -25,8 +25,8 @@ describe('CheeseListComponent (unit)', () => {
     mockRouter = jasmine.createSpyObj('Router', ['navigate']);
 
     mockCheeseService.getAllCheeses.and.returnValue(of([
-      { id: 1, name: 'Semicurado', price: 10, description: '', type: '', manufactureDate: '', expirationDate: '' },
-      { id: 2, name: 'Azul', price: 12, description: '', type: '', manufactureDate: '', expirationDate: '' }
+     { id: 1, name: 'Semicurado', price: 10, description: '', type: '', manufactureDate: '', expirationDate: '', boxes: [] },
+      { id: 2, name: 'Azul', price: 12, description: '', type: '', manufactureDate: '', expirationDate: '', boxes: [] }
     ]));
 
     // Default: not logged in
@@ -77,7 +77,8 @@ describe('CheeseListComponent (unit)', () => {
       password: '1234',
       gmail: 'pepito@gmail.com',
       direction: 'Calle Falsa 123',
-      nif: '12345678A'
+      nif: '12345678A',
+      rols: ['USER']
     };
 
     mockUserService.getCurrentUser.and.returnValue(of(mockUser));

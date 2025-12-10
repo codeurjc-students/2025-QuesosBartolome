@@ -8,16 +8,41 @@
     <h2 class="menu-title">Menú</h2>
     <nav class="menu">
       <ul>
-        <li (click)="goToAbout()">
-          <i class="fa-solid fa-info-circle"></i> Acerca de nosotros
-        </li>
-        <li><i class="fa-solid fa-box"></i> Pedidos</li>
-        <li><i class="fa-solid fa-file-invoice"></i> Facturas</li>
-        <li><i class="fa-solid fa-chart-line"></i> Gráficos</li>
-        <li><i class="fa-solid fa-cubes"></i> Stock</li>
-        <li><i class="fa-solid fa-users"></i> Clientes</li>
-      </ul>
-    </nav>
+
+          <li (click)="goToAbout()">
+            <i class="fa-solid fa-info-circle"></i> Acerca de nosotros
+          </li>
+
+          <li *ngIf="isLoggedIn && isUser()">
+            <i class="fa-solid fa-box"></i> Mi pedido
+          </li>
+
+          <ng-container *ngIf="isLoggedIn && isAdmin()">
+
+            <li>
+              <i class="fa-solid fa-box"></i> Pedidos
+            </li>
+
+            <li>
+              <i class="fa-solid fa-file-invoice"></i> Facturas
+            </li>
+
+            <li>
+              <i class="fa-solid fa-chart-line"></i> Gráficos
+            </li>
+
+            <li>
+              <i class="fa-solid fa-cubes"></i> Stock
+            </li>
+
+            <li>
+              <i class="fa-solid fa-users"></i> Clientes
+            </li>
+
+          </ng-container>
+
+        </ul>
+      </nav>
   </aside>
 
   <!-- MAIN -->
@@ -49,8 +74,10 @@
     </div> 
 
     <div class="card-grid">
-      <div class="card shadow-sm" *ngFor="let cheese of cheeses">
-        <div class="image-placeholder"></div>
+      <div class="card shadow-sm" *ngFor="let cheese of cheeses" (click)="goToDetails(cheese.id)">
+        <div class="image-placeholder">
+          <img [src]="'https://localhost:443/api/v1/cheeses/' + cheese.id + '/image'" alt="Imagen de {{ cheese.name }}" />
+        </div>
         <div class="card-body">
           <p>{{ cheese.name }}</p>
           <p class="price">{{ cheese.price | currency }}</p>
