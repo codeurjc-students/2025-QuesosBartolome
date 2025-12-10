@@ -1,0 +1,65 @@
+<div class="details-container" *ngIf="cheese">
+
+  <!-- HEADER SECTION -->
+  <div class="top-section">
+
+    <!-- IMAGE BOX -->
+    <div class="image-box">
+      <img 
+        [src]="imageUrl || 'assets/cheese-default.png'" 
+        alt="Imagen del queso"
+      />
+    </div>
+
+    <!-- CHEESE INFO -->
+    <div class="cheese-info">
+      <h1 class="cheese-title">{{ cheese.name }}</h1>
+      <p class="cheese-price">{{ cheese.price | currency }}</p>
+      <p class="cheese-description">{{ cheese.description }}</p>
+      <p>Queso Graso E.S. 50 % M.G./ E.S. 45 %</p>
+      <p>Se venden por cajas de 6 quesos cada una</p>
+
+      <!-- Boxes input and add button: only for logged-in USERS -->
+      <div *ngIf="isLoggedIn && isUser" class="cajas-container">
+        
+        <!-- fila del input y stock -->
+        <div class="cajas-row">
+          <label>Cajas:</label>
+          <input type="text" class="cajas-input" placeholder="Cantidad..." />
+
+          <span class="stock-info" *ngIf="cajasDisponibles > 0">
+            {{ cajasDisponibles }} disponibles
+          </span>
+
+          <span class="stock-info-out" *ngIf="cajasDisponibles === 0">
+            Sin stock
+          </span>
+        </div>
+
+        <!-- botón debajo -->
+        <button class="btn add-btn" [disabled]="cajasDisponibles === 0">
+          Añadir
+        </button>
+
+      </div>
+
+      <!-- Admin edit button -->
+      <div *ngIf="isLoggedIn && isAdmin" class="admin-actions">
+        <button class="btn edit-btn">Editar</button>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- REVIEWS SECTION -->
+  <section class="reviews-section">
+    <h2>Reseñas</h2>
+  </section>
+
+</div>
+
+<!-- LOADING STATE -->
+<div *ngIf="!cheese" class="loading">
+  Cargando queso...
+</div>

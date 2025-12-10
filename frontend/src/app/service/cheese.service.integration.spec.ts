@@ -34,4 +34,33 @@ describe('CheeseService (integration)', () => {
       }
     });
   });
+  it('should fetch cheese by id from real API', (done) => {
+    service.getCheeseById(1).subscribe({
+      next: (cheese: CheeseDTO) => {
+        expect(cheese).toBeTruthy();
+        expect(cheese.id).toEqual(1);
+        expect(cheese.name).toEqual('Semicurado');
+        done();
+      },
+      error: (err) => {
+        fail(err.message);
+        done();
+      }
+    });
+  });
+
+  it('should fetch cheese image from real API', (done) => {
+    service.getCheeseImage(1).subscribe({
+      next: (blob: Blob) => {
+        expect(blob).toBeTruthy();
+        expect(blob.size).toBeGreaterThan(0);
+        expect(blob.type).toEqual('image/png');
+        done();
+      },
+      error: (err) => {
+        fail(err.message);
+        done();
+      }
+    });
+  });
 });

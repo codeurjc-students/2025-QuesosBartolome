@@ -19,4 +19,8 @@ export class CheeseService {
   getCheeseById(id: number): Observable<CheeseDTO> {
     return this.http.get<CheeseDTO>(`${this.apiUrl}/${id}`);
   }
+
+  getCheeseImage(id: number): Observable<Blob> {
+    return this.http.get(`${this.apiUrl}/${id}/image`, { responseType: 'blob' , withCredentials: true });
+  }
 }

@@ -35,7 +35,9 @@ export class CheeseListComponent implements OnInit {
   ngOnInit(): void {
     // Load cheeses
     this.cheeseService.getAllCheeses().subscribe({
-      next: (data) => this.cheeses = data,
+      next: (list) => {
+        this.cheeses = list;
+      },
       error: (err) => console.error('Error loading cheeses', err)
     });
 
@@ -66,6 +68,9 @@ export class CheeseListComponent implements OnInit {
   goToAbout(): void {
     this.router.navigate(['/about-us']);
   }
+  goToDetails(id: number): void {
+    this.router.navigate(['/cheeses', id]);
+  }
 
   logout(): void {
     this.loginService.logout().subscribe({
@@ -75,11 +80,22 @@ export class CheeseListComponent implements OnInit {
         console.log('Logged out successfully');
         this.router.navigate(['/']);
       },
-      error: (err) => console.error('Error cerrando sesión', err)
+      error: (err) => console.error('Error during logout', err)
     });
   }
 
   openNewCheeseModal(): void {
-    alert('Abrir modal para nuevo queso');
+    alert('Open modal for creating a new cheese (not implemented)');
   }
+  
+  isAdmin(): boolean {
+    return this.currentUser?.rols?.includes("ADMIN") ?? false;
+  }
+
+  isUser(): boolean {
+    return this.currentUser?.rols?.includes("USER") ?? false;
+  }
+
+
+
 }
