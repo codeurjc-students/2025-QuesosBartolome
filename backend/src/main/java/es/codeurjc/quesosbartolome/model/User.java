@@ -4,6 +4,7 @@ import java.sql.Blob;
 import java.util.Collections;
 import java.util.List;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -11,6 +12,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 
 @Entity
 public class User {
@@ -30,6 +32,12 @@ public class User {
     @ElementCollection(fetch = FetchType.EAGER)
 	private List<String> rols; 
 
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    private Order currentOrder;
+
+    @OneToMany(mappedBy = "user")   
+    private List<Order> orders;     
+
     // Constructor
     public User() {
     }
@@ -40,6 +48,7 @@ public class User {
         this.gmail = gmail;
         this.direction = direction;
         this.nif = nif;
+        this.currentOrder = new Order();
         this.rols = rols != null ? List.of(rols) : Collections.emptyList();
     }
     // Getters y Setters
@@ -113,6 +122,22 @@ public class User {
 
     public void setRols(String... rols) {
         this.rols = rols != null ? List.of(rols) : Collections.emptyList();
+    }
+
+    public Order getCurrentOrder() {
+        return currentOrder;    
+    }
+
+    public void setCurrentOrder(Order currentOrder) {
+        this.currentOrder = currentOrder;
+    }
+
+    public List<Order> getOrders() {
+        return orders;
+    }
+
+    public void setOrders(List<Order> orders) {
+        this.orders = orders;
     }
 
     

@@ -1,15 +1,14 @@
 package es.codeurjc.quesosbartolome.dto;
 
+import es.codeurjc.quesosbartolome.model.User;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
 
-import es.codeurjc.quesosbartolome.model.User;
-
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = {OrderMapper.class})
 public interface UserMapper {
 
-     // Entity -> DTO
+    // Entity -> DTO
     @Mappings({
         @Mapping(source = "id", target = "id"),
         @Mapping(source = "name", target = "name"),
@@ -17,7 +16,9 @@ public interface UserMapper {
         @Mapping(source = "gmail", target = "gmail"),
         @Mapping(source = "direction", target = "direction"),
         @Mapping(source = "nif", target = "nif"),
-        @Mapping(source = "rols", target = "rols")
+        @Mapping(source = "rols", target = "rols"),
+        @Mapping(source = "currentOrder", target = "currentOrder"),
+        @Mapping(source = "orders", target = "orders") 
     })
     UserDTO toDTO(User user);
 
@@ -29,8 +30,9 @@ public interface UserMapper {
         @Mapping(source = "gmail", target = "gmail"),
         @Mapping(source = "direction", target = "direction"),
         @Mapping(source = "nif", target = "nif"),
-        @Mapping(source = "rols", target = "rols")
+        @Mapping(source = "rols", target = "rols"),
+        @Mapping(source = "currentOrder", target = "currentOrder"),
+        @Mapping(source = "orders", target = "orders")  
     })
     User toDomain(UserDTO userDTO);
-    
 }
