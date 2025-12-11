@@ -9,6 +9,5 @@ public record UserDTO(
     String gmail,
     String direction,
     String nif,
-    List<String> rols,
-    OrderDTO currentOrder
+    List<String> rols
 ) {}

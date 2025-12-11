@@ -5,7 +5,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
 
-@Mapper(componentModel = "spring", uses = {OrderMapper.class})
+@Mapper(componentModel = "spring")
 public interface UserMapper {
 
     // Entity -> DTO
@@ -16,8 +16,7 @@ public interface UserMapper {
         @Mapping(source = "gmail", target = "gmail"),
         @Mapping(source = "direction", target = "direction"),
         @Mapping(source = "nif", target = "nif"),
-        @Mapping(source = "rols", target = "rols"),
-        @Mapping(source = "currentOrder", target = "currentOrder")
+        @Mapping(source = "rols", target = "rols")
     })
     UserDTO toDTO(User user);
 
@@ -29,8 +28,7 @@ public interface UserMapper {
         @Mapping(source = "gmail", target = "gmail"),
         @Mapping(source = "direction", target = "direction"),
         @Mapping(source = "nif", target = "nif"),
-        @Mapping(source = "rols", target = "rols"),
-        @Mapping(source = "currentOrder", target = "currentOrder")
+        @Mapping(source = "rols", target = "rols")
     })
     User toDomain(UserDTO userDTO);
 }
