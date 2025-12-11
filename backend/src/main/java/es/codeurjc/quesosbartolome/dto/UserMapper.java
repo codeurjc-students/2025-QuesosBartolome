@@ -1,15 +1,14 @@
 package es.codeurjc.quesosbartolome.dto;
 
+import es.codeurjc.quesosbartolome.model.User;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
 
-import es.codeurjc.quesosbartolome.model.User;
-
 @Mapper(componentModel = "spring")
 public interface UserMapper {
 
-     // Entity -> DTO
+    // Entity -> DTO
     @Mappings({
         @Mapping(source = "id", target = "id"),
         @Mapping(source = "name", target = "name"),
@@ -32,5 +31,4 @@ public interface UserMapper {
         @Mapping(source = "rols", target = "rols")
     })
     User toDomain(UserDTO userDTO);
-    
 }

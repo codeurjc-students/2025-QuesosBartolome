@@ -15,8 +15,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import es.codeurjc.quesosbartolome.model.Cheese;
+import es.codeurjc.quesosbartolome.model.Order;
+import es.codeurjc.quesosbartolome.model.OrderItem;
 import es.codeurjc.quesosbartolome.model.User;
 import es.codeurjc.quesosbartolome.repository.CheeseRepository;
+import es.codeurjc.quesosbartolome.repository.OrderRepository;
 import es.codeurjc.quesosbartolome.repository.UserRepository;
 import jakarta.annotation.PostConstruct;
 
@@ -28,6 +31,9 @@ public class DataBaseInitializer {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private OrderRepository orderRepository;
 
     @Autowired
 	private PasswordEncoder passwordEncoder;
@@ -124,7 +130,9 @@ public class DataBaseInitializer {
         user1.setDirection("123 Main St");
         user1.setNif("12345678A");
         user1.setRols("USER");
+        user1.setCurrentOrder(new Order(user1));
         user1.setImage(saveImage("images/default-profile.jpg"));
+
 
         // Create Admin 1
         User userAdmin = new User();
@@ -146,6 +154,8 @@ public class DataBaseInitializer {
         // Save users in DB
         userRepository.save(user1);
         userRepository.save(userAdmin);
+
+
         
     }
 }

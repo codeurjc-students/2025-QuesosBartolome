@@ -31,6 +31,7 @@ class UserServiceTest {
     @Spy
     private UserMapper userMapper = Mappers.getMapper(UserMapper.class);
 
+
     @Mock
     private PasswordEncoder passwordEncoder;
 
