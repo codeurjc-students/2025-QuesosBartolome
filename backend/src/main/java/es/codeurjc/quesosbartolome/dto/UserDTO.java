@@ -10,6 +10,5 @@ public record UserDTO(
     String direction,
     String nif,
     List<String> rols,
-    OrderDTO currentOrder,
-    List<OrderDTO> orders
+    OrderDTO currentOrder
 ) {}

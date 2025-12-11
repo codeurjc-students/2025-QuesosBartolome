@@ -35,9 +35,6 @@ public class User {
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     private Order currentOrder;
 
-    @OneToMany(mappedBy = "user")   
-    private List<Order> orders;     
-
     // Constructor
     public User() {
     }
@@ -48,7 +45,6 @@ public class User {
         this.gmail = gmail;
         this.direction = direction;
         this.nif = nif;
-        this.currentOrder = new Order();
         this.rols = rols != null ? List.of(rols) : Collections.emptyList();
     }
     // Getters y Setters
@@ -132,13 +128,6 @@ public class User {
         this.currentOrder = currentOrder;
     }
 
-    public List<Order> getOrders() {
-        return orders;
-    }
-
-    public void setOrders(List<Order> orders) {
-        this.orders = orders;
-    }
 
     
 }

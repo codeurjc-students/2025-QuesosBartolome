@@ -15,8 +15,8 @@ public class Order {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "user")
+    @OneToOne
+    @JoinColumn(name = "user_id")
     private User user;
 
     private Double totalWeight;  
@@ -26,6 +26,18 @@ public class Order {
     // MAP: cheese → kg
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OrderItem> items = new ArrayList<>();
+
+    // --- Constructors ---
+    public Order() {}
+
+
+    public Order(User user) {
+        this.user = user;
+        this.totalWeight = 0.0;
+        this.totalPrice = 0.0;
+        this.orderDate = null;
+        this.items = new ArrayList<>();
+    }
 
     // --- Getters & Setters ---
 

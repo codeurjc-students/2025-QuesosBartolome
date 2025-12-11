@@ -130,6 +130,7 @@ public class DataBaseInitializer {
         user1.setDirection("123 Main St");
         user1.setNif("12345678A");
         user1.setRols("USER");
+        user1.setCurrentOrder(new Order(user1));
         user1.setImage(saveImage("images/default-profile.jpg"));
 
 
@@ -153,56 +154,6 @@ public class DataBaseInitializer {
         // Save users in DB
         userRepository.save(user1);
         userRepository.save(userAdmin);
-
-                // Create Order 1 for user 1
-        Order order1 = new Order();
-        order1.setUser(user1);
-        orderRepository.save(order1);
-
-        OrderItem item1 = new OrderItem();
-        item1.setOrder(order1);
-        item1.setCheese(semicurado);
-        item1.setWeight(1.5);
-        item1.setPrice(item1.getWeight() * semicurado.getPrice());
-
-        OrderItem item2 = new OrderItem();
-        item2.setOrder(order1);
-        item2.setCheese(azul);
-        item2.setWeight(2.0);
-        item2.setPrice(item2.getWeight() * azul.getPrice());
-
-        order1.getItems().add(item1);
-        order1.getItems().add(item2);
-
-        order1.setTotalWeight(item1.getWeight() + item2.getWeight());
-        order1.setTotalPrice(item1.getPrice() + item2.getPrice());
-
-
-        // Create Order 2 for user 1
-        Order order2 = new Order();
-        order2.setUser(user1);
-        orderRepository.save(order2);
-
-        OrderItem item3 = new OrderItem();
-        item3.setOrder(order2);
-        item3.setCheese(semicurado);
-        item3.setWeight(1.5);
-        item3.setPrice(item3.getWeight() * semicurado.getPrice());
-
-        OrderItem item4 = new OrderItem();
-        item4.setOrder(order2);
-        item4.setCheese(azul);
-        item4.setWeight(2.0);
-        item4.setPrice(item4.getWeight() * azul.getPrice());
-
-        order1.getItems().add(item3);
-        order1.getItems().add(item4);
-
-        order1.setTotalWeight(item3.getWeight() + item4.getWeight());
-        order1.setTotalPrice(item3.getPrice() + item4.getPrice());
-
-        orderRepository.save(order1);
-        orderRepository.save(order2);
 
 
         

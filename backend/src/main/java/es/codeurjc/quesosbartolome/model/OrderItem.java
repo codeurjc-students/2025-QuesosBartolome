@@ -18,6 +18,16 @@ public class OrderItem {
     private Double weight;       // kg
     private Double price;     // weight * cheese.price
 
+    // CONSTRUCTORS
+    public OrderItem() {}
+
+    public OrderItem(Order order, Cheese cheese, Double weight, Double price) {
+        this.order = order;
+        this.cheese = cheese;
+        this.weight = weight;
+        this.price = price;
+    }
+
     // GETTERS & SETTERS
     public Long getId() {
         return id;

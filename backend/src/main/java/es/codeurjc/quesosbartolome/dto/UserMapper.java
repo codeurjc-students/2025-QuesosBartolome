@@ -17,8 +17,7 @@ public interface UserMapper {
         @Mapping(source = "direction", target = "direction"),
         @Mapping(source = "nif", target = "nif"),
         @Mapping(source = "rols", target = "rols"),
-        @Mapping(source = "currentOrder", target = "currentOrder"),
-        @Mapping(source = "orders", target = "orders") 
+        @Mapping(source = "currentOrder", target = "currentOrder")
     })
     UserDTO toDTO(User user);
 
@@ -31,8 +30,7 @@ public interface UserMapper {
         @Mapping(source = "direction", target = "direction"),
         @Mapping(source = "nif", target = "nif"),
         @Mapping(source = "rols", target = "rols"),
-        @Mapping(source = "currentOrder", target = "currentOrder"),
-        @Mapping(source = "orders", target = "orders")  
+        @Mapping(source = "currentOrder", target = "currentOrder")
     })
     User toDomain(UserDTO userDTO);
 }
