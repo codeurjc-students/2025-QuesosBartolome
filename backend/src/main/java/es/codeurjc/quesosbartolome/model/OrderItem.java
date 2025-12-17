@@ -6,21 +6,35 @@ import jakarta.persistence.*;
 public class OrderItem {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
     @ManyToOne
+    @JoinColumn(name = "cart_id")
+    private Cart cart;
+
+    @ManyToOne
+    @JoinColumn(name = "order_id")
     private Order order;
 
     @ManyToOne
     private Cheese cheese;
 
-    private Double weight;       // kg
-    private Double price;     // weight * cheese.price
+    private Double weight; // kg
+    private Double price; // weight * cheese.price
 
     // CONSTRUCTORS
     public OrderItem() {}
 
+    // To Cart
+    public OrderItem(Cart cart, Cheese cheese, Double weight, Double price) {
+        this.cart = cart;
+        this.cheese = cheese;
+        this.weight = weight;
+        this.price = price;
+    }
+
+    // To Order
     public OrderItem(Order order, Cheese cheese, Double weight, Double price) {
         this.order = order;
         this.cheese = cheese;
@@ -35,6 +49,14 @@ public class OrderItem {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public Cart getCart() {
+        return cart;
+    }
+
+    public void setCart(Cart cart) {
+        this.cart = cart;
     }
 
     public Order getOrder() {

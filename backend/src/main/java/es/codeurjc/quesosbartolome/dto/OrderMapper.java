@@ -65,6 +65,7 @@ public interface OrderMapper {
 
     // ORDER ITEM → DTO
     @Mappings({
+        @Mapping(source = "id", target = "id"),
         @Mapping(source = "cheese", target = "cheese"),
         @Mapping(source = "weight", target = "weight"),
         @Mapping(source = "price", target = "price")
@@ -73,6 +74,7 @@ public interface OrderMapper {
 
     // DTO → ORDER ITEM
     @Mappings({
+        @Mapping(source = "id", target = "id"),
         @Mapping(source = "cheese", target = "cheese"),
         @Mapping(source = "weight", target = "weight"),
         @Mapping(source = "price", target = "price")

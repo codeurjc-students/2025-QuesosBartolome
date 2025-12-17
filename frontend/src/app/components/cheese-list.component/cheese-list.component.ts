@@ -71,6 +71,9 @@ export class CheeseListComponent implements OnInit {
   goToDetails(id: number): void {
     this.router.navigate(['/cheeses', id]);
   }
+  goToMyOrder(): void {
+    this.router.navigate(['/myorder']);
+  }
 
   logout(): void {
     this.loginService.logout().subscribe({

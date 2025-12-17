@@ -8,6 +8,7 @@ import { DebugElement } from '@angular/core';
 import { By } from '@angular/platform-browser';
 import { CheeseDTO } from '../../dto/cheese.dto';
 import { UserDTO } from '../../dto/user.dto';
+import { CartService } from '../../service/cart.service';
 
 describe('CheeseDetailsComponent (unit)', () => {
   let component: CheeseDetailsComponent;
@@ -15,11 +16,13 @@ describe('CheeseDetailsComponent (unit)', () => {
 
   let mockCheeseService: jasmine.SpyObj<CheeseService>;
   let mockUserService: jasmine.SpyObj<UserService>;
+  let mockCartService: jasmine.SpyObj<CartService>;
   let mockRoute: any;
 
   beforeEach(async () => {
     mockCheeseService = jasmine.createSpyObj('CheeseService', ['getCheeseById', 'getCheeseImage']);
     mockUserService = jasmine.createSpyObj('UserService', ['getCurrentUser']);
+    mockCartService = jasmine.createSpyObj('CartService', ['addCheeseToOrder']);
     mockRoute = { snapshot: { paramMap: new Map([['id', '1']]) } };
 
     const mockCheese: CheeseDTO = {
@@ -44,6 +47,7 @@ describe('CheeseDetailsComponent (unit)', () => {
       providers: [
         { provide: CheeseService, useValue: mockCheeseService },
         { provide: UserService, useValue: mockUserService },
+        { provide: CartService, useValue: mockCartService },
         { provide: ActivatedRoute, useValue: mockRoute }
       ]
     }).compileComponents();

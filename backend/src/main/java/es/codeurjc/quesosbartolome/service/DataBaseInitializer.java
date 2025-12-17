@@ -7,6 +7,7 @@ import java.net.URISyntaxException;
 import java.sql.Blob;
 import java.sql.Date;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.engine.jdbc.BlobProxy;
@@ -14,12 +15,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import es.codeurjc.quesosbartolome.model.Cart;
 import es.codeurjc.quesosbartolome.model.Cheese;
-import es.codeurjc.quesosbartolome.model.Order;
-import es.codeurjc.quesosbartolome.model.OrderItem;
 import es.codeurjc.quesosbartolome.model.User;
 import es.codeurjc.quesosbartolome.repository.CheeseRepository;
-import es.codeurjc.quesosbartolome.repository.OrderRepository;
 import es.codeurjc.quesosbartolome.repository.UserRepository;
 import jakarta.annotation.PostConstruct;
 
@@ -31,9 +30,6 @@ public class DataBaseInitializer {
 
     @Autowired
     private UserRepository userRepository;
-
-    @Autowired
-    private OrderRepository orderRepository;
 
     @Autowired
 	private PasswordEncoder passwordEncoder;
@@ -67,7 +63,7 @@ public class DataBaseInitializer {
         semicurado.setManufactureDate(Date.valueOf(LocalDate.now().minusMonths(2)));
         semicurado.setExpirationDate(Date.valueOf(LocalDate.now().plusMonths(10)));
         semicurado.setType("Hard");
-        semicurado.setBoxes(List.of(6.32, 5.87, 5.82, 6.56, 5.98, 6.34, 6.41, 6.03, 5.79, 6.22));
+        semicurado.setBoxes(new ArrayList<>(List.of(6.32, 5.87, 5.82, 6.56, 5.98, 6.34, 6.41, 6.03, 5.79, 6.22)));
         semicurado.setImage(saveImage("images/queso-default.jpg"));
         
 
@@ -80,7 +76,7 @@ public class DataBaseInitializer {
         azul.setManufactureDate(Date.valueOf(LocalDate.now().minusWeeks(3)));
         azul.setExpirationDate(Date.valueOf(LocalDate.now().plusMonths(2)));
         azul.setType("Soft");
-        azul.setBoxes(List.of(4.32, 4.87, 5.12, 4.56, 4.98, 5.34, 4.41, 5.03, 4.79, 5.22));
+        azul.setBoxes(new ArrayList<>(List.of(4.32, 4.87, 5.12, 4.56, 4.98, 5.34, 4.41, 5.03, 4.79, 5.22)));
         azul.setImage(saveImage("images/queso-default.jpg"));
         
         
@@ -92,7 +88,7 @@ public class DataBaseInitializer {
         Curado.setManufactureDate(Date.valueOf(LocalDate.now().minusWeeks(5))); 
         Curado.setExpirationDate(Date.valueOf(LocalDate.now().plusMonths(3)));
         Curado.setType("Semi-Hard");
-        Curado.setBoxes(List.of(6.32, 5.87, 5.82, 6.56, 5.98, 6.34, 6.41, 6.03, 5.79, 6.22));
+        Curado.setBoxes(new ArrayList<>(List.of(6.32, 5.87, 5.82, 6.56, 5.98, 6.34, 6.41, 6.03, 5.79, 6.22)));
         Curado.setImage(saveImage("images/queso-default.jpg"));
         
 
@@ -104,7 +100,7 @@ public class DataBaseInitializer {
         Chevrett.setManufactureDate(Date.valueOf(LocalDate.now().minusWeeks(2)));
         Chevrett.setExpirationDate(Date.valueOf(LocalDate.now().plusMonths(1).plusWeeks(1)));
         Chevrett.setType("Goat"); 
-        Chevrett.setBoxes(List.of());
+        Chevrett.setBoxes(new ArrayList<>());
         Chevrett.setImage(saveImage("images/queso-default.jpg"));
         
 
@@ -117,7 +113,7 @@ public class DataBaseInitializer {
         Tierno.setManufactureDate(Date.valueOf(LocalDate.now().minusWeeks(2)));
         Tierno.setExpirationDate(Date.valueOf(LocalDate.now().plusMonths(1).plusWeeks(1)));
         Tierno.setType("Goat"); 
-        Tierno.setBoxes(List.of(6.32, 5.87, 5.82, 6.56, 5.98, 6.34, 6.41, 6.03, 5.79, 6.22));
+        Tierno.setBoxes(new ArrayList<>(List.of(6.32, 5.87, 5.82, 6.56, 5.98, 6.34, 6.41, 6.03, 5.79, 6.22)));
         Tierno.setImage(saveImage("images/queso-default.jpg"));
         
         
@@ -130,7 +126,7 @@ public class DataBaseInitializer {
         user1.setDirection("123 Main St");
         user1.setNif("12345678A");
         user1.setRols("USER");
-        user1.setCurrentOrder(new Order(user1));
+        user1.setCart(new Cart(user1));
         user1.setImage(saveImage("images/default-profile.jpg"));
 
 

@@ -2,41 +2,32 @@ package es.codeurjc.quesosbartolome.model;
 
 import jakarta.persistence.*;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-
 @Entity
-@Table(name = "orders")
-public class Order {
+public class Cart {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id")
+    @OneToOne
+    @JoinColumn(name = "user_id", unique = true)
     private User user;
 
-    private Double totalWeight;  
+    private Double totalWeight;
     private Double totalPrice;
-    private LocalDateTime orderDate;   
 
-    // MAP: cheese → kg
-    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OrderItem> items = new ArrayList<>();
 
-    // --- Constructors ---
-    public Order() {}
+    public Cart() {}
 
-
-    public Order(User user) {
+    public Cart(User user) {
         this.user = user;
         this.totalWeight = 0.0;
         this.totalPrice = 0.0;
-         this.orderDate = LocalDateTime.now();
-        this.items = new ArrayList<>();
     }
 
     // --- Getters & Setters ---
@@ -65,7 +56,6 @@ public class Order {
         this.totalWeight = totalWeight;
     }
 
-
     public Double getTotalPrice() {
         return totalPrice;
     }
@@ -74,19 +64,12 @@ public class Order {
         this.totalPrice = totalPrice;
     }
 
-    public LocalDateTime getOrderDate() {
-        return orderDate;
-    }
-
-    public void setOrderDate(LocalDateTime orderDate) {
-        this.orderDate = orderDate;
-    }
-
     public List<OrderItem> getItems() {
         return items;
-    }   
+    }
 
     public void setItems(List<OrderItem> items) {
         this.items = items;
     }
+
 }

@@ -25,7 +25,13 @@
         <!-- fila del input y stock -->
         <div class="cajas-row">
           <label>Cajas:</label>
-          <input type="text" class="cajas-input" placeholder="Cantidad..." />
+              <input
+                #boxesInput
+                type="number"
+                class="cajas-input"
+                placeholder="Cantidad..."
+                min="1"
+              />
 
           <span class="stock-info" *ngIf="cajasDisponibles > 0">
             {{ cajasDisponibles }} disponibles
@@ -37,7 +43,7 @@
         </div>
 
         <!-- botón debajo -->
-        <button class="btn add-btn" [disabled]="cajasDisponibles === 0">
+        <button class="btn add-btn" [disabled]="cajasDisponibles === 0" (click)="addToOrder(boxesInput.value)">
           Añadir
         </button>
 
