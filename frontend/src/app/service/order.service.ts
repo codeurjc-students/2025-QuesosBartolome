@@ -13,9 +13,6 @@ export class OrderService {
 
   constructor(private http: HttpClient) { }
 
-  getMyOrder(): Observable<OrderDTO> {
-    return this.http.get<OrderDTO>(`${this.apiUrl}/myorder`, { withCredentials: true });
-  }
 
   confirmOrder(): Observable<OrderDTO> {
     return this.http.post<OrderDTO>(

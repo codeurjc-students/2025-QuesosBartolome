@@ -55,7 +55,10 @@ export class MyOrderComponent implements OnInit {
         alert('Pedido realizado correctamente');
         this.ngOnInit();
       },
-      error: err => console.error('Error al hacer pedido', err)
+      error: err => {
+        console.error('Error al hacer pedido', err)
+        alert('Error al hacer el pedido');
+      }
     });
   }
 }

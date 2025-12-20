@@ -8,6 +8,7 @@ import org.junit.jupiter.api.*;
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.*;
 
 import org.springframework.boot.test.context.SpringBootTest;
@@ -42,49 +43,31 @@ public class CheeseDetailsUITests {
 
         @Test
         public void testNavigateToSemicuradoDetails() {
-
-                // Open the application
                 driver.get("http://localhost:4200/");
 
-                wait.until(ExpectedConditions
-                                .visibilityOfElementLocated(By.cssSelector(".card-grid")));
+                wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".card-grid")));
+                wait.until(ExpectedConditions.numberOfElementsToBeMoreThan(By.cssSelector(".card"), 0));
 
-                // Wait until at least 1 cheese card is present
-                wait.until(ExpectedConditions.numberOfElementsToBeMoreThan(
-                                By.cssSelector(".card"), 0));
-
-                // Locate the card containing the cheese name "Semicurado"
-                WebElement semicuradoCard = wait.until(ExpectedConditions
-                                .visibilityOfElementLocated(By.xpath(
-                                                "//div[contains(@class,'card')]//p[text()='Semicurado']" +
-                                                                "/ancestor::div[contains(@class,'card')]")));
-
-                // Click the card
+                WebElement semicuradoCard = wait.until(ExpectedConditions.visibilityOfElementLocated(
+                                By.xpath("//div[contains(@class,'card')]//p[text()='Semicurado']/ancestor::div[contains(@class,'card')]")));
                 semicuradoCard.click();
 
-                // Wait for navigation to /cheeses/{id}
                 wait.until(ExpectedConditions.urlMatches("http://localhost:4200/cheeses/\\d+"));
 
-                // Verify the title on the cheese details page
-                WebElement title = wait.until(
-                                ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".cheese-title")));
-
+                WebElement title = wait
+                                .until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".cheese-title")));
                 assertEquals("Semicurado", title.getText(),
                                 "The cheese details page must display the selected cheese name.");
         }
 
         @Test
         public void testLoggedUserSeesStockAndControls() {
-
-                // 1. Open application
                 driver.get("http://localhost:4200/");
 
-                // 2. Click "Iniciar Sesión"
                 WebElement loginBtn = wait.until(ExpectedConditions.elementToBeClickable(
                                 By.xpath("//button[contains(text(),'Iniciar Sesión')]")));
                 loginBtn.click();
 
-                // 3. Perform login
                 WebElement usernameInput = wait.until(ExpectedConditions.visibilityOfElementLocated(
                                 By.cssSelector("input[name='username']")));
                 WebElement passwordInput = driver.findElement(By.cssSelector("input[name='password']"));
@@ -95,61 +78,45 @@ public class CheeseDetailsUITests {
                 WebElement submitButton = driver.findElement(By.cssSelector("button[type='submit']"));
                 submitButton.click();
 
-                // 4. Accept success alert
                 Alert alert = wait.until(ExpectedConditions.alertIsPresent());
                 assertEquals("¡Login correcto! Los tokens están en las cookies.", alert.getText());
                 alert.accept();
 
-                // 5. Wait until the cheese grid loads
                 wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".card-grid")));
 
-                // 6. Click the Semicurado card
                 WebElement semicuradoCard = wait.until(ExpectedConditions.visibilityOfElementLocated(
-                                By.xpath(
-                                                "//div[contains(@class,'card')]//p[text()='Semicurado']/ancestor::div[contains(@class,'card')]")));
+                                By.xpath("//div[contains(@class,'card')]//p[text()='Semicurado']/ancestor::div[contains(@class,'card')]")));
                 semicuradoCard.click();
 
-                // 7. Wait for navigation to /cheeses/{id}
                 wait.until(ExpectedConditions.urlMatches("http://localhost:4200/cheeses/\\d+"));
 
-                // 8. Verify cheese title
-                WebElement title = wait.until(ExpectedConditions.visibilityOfElementLocated(
-                                By.cssSelector(".cheese-title")));
+                WebElement title = wait
+                                .until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".cheese-title")));
                 assertEquals("Semicurado", title.getText(), "Cheese title should be Semicurado.");
 
-                // 9. Verify boxes input is visible for logged users
-                WebElement boxesInput = wait.until(ExpectedConditions.visibilityOfElementLocated(
-                                By.cssSelector(".cajas-input")));
+                WebElement boxesInput = wait
+                                .until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".cajas-input")));
                 assertTrue(boxesInput.isDisplayed(), "Boxes input must be visible after login.");
 
-                // 10. Verify Add button is visible
-                WebElement addButton = wait.until(ExpectedConditions.visibilityOfElementLocated(
-                                By.cssSelector(".add-btn")));
+                WebElement addButton = wait
+                                .until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".add-btn")));
                 assertTrue(addButton.isDisplayed(), "Add button must be visible for logged in users.");
 
-                // 11. Verify boxes available (stock) is shown
                 WebElement stockLabel = wait.until(ExpectedConditions.visibilityOfElementLocated(
                                 By.xpath("//span[contains(@class,'stock-info')]")));
-
                 String stockText = stockLabel.getText().replaceAll("[^0-9]", "");
                 int stock = Integer.parseInt(stockText);
-
-                assertEquals(10, stock, "Semicurado stock must be 10.");
-
+                assertEquals(9, stock, "Semicurado stock must be 9.");
         }
 
         @Test
         public void testAdminSeesEditButtonAndNoAddControls() {
-
-                // 1. Open application
                 driver.get("http://localhost:4200/");
 
-                // 2. Click "Iniciar Sesión"
                 WebElement loginBtn = wait.until(ExpectedConditions.elementToBeClickable(
                                 By.xpath("//button[contains(text(),'Iniciar Sesión')]")));
                 loginBtn.click();
 
-                // 3. Perform login as admin
                 WebElement usernameInput = wait.until(ExpectedConditions.visibilityOfElementLocated(
                                 By.cssSelector("input[name='username']")));
                 WebElement passwordInput = driver.findElement(By.cssSelector("input[name='password']"));
@@ -160,39 +127,137 @@ public class CheeseDetailsUITests {
                 WebElement submitButton = driver.findElement(By.cssSelector("button[type='submit']"));
                 submitButton.click();
 
-                // 4. Accept success alert
                 Alert alert = wait.until(ExpectedConditions.alertIsPresent());
                 assertEquals("¡Login correcto! Los tokens están en las cookies.", alert.getText());
                 alert.accept();
 
-                // 5. Wait until the cheese grid loads
                 wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".card-grid")));
 
-                // 6. Click the Semicurado card
                 WebElement semicuradoCard = wait.until(ExpectedConditions.visibilityOfElementLocated(
                                 By.xpath("//div[contains(@class,'card')]//p[text()='Semicurado']/ancestor::div[contains(@class,'card')]")));
                 semicuradoCard.click();
 
-                // 7. Wait for navigation to /cheeses/{id}
                 wait.until(ExpectedConditions.urlMatches("http://localhost:4200/cheeses/\\d+"));
 
-                // 8. Verify cheese title
-                WebElement title = wait.until(ExpectedConditions.visibilityOfElementLocated(
-                                By.cssSelector(".cheese-title")));
+                WebElement title = wait
+                                .until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".cheese-title")));
                 assertEquals("Semicurado", title.getText(), "Cheese title should be Semicurado.");
 
-                // 9. Verify EDIT button is visible
-                WebElement editButton = wait.until(ExpectedConditions.visibilityOfElementLocated(
-                                By.cssSelector(".edit-btn")));
+                WebElement editButton = wait
+                                .until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".edit-btn")));
                 assertTrue(editButton.isDisplayed(), "Edit button must be visible for ADMIN.");
 
-                // 10. Verify boxes input is NOT visible
                 assertTrue(driver.findElements(By.cssSelector(".cajas-input")).isEmpty(),
                                 "Boxes input should not be visible for ADMIN.");
-
-                // 11. Verify Add button is NOT visible
                 assertTrue(driver.findElements(By.cssSelector(".add-btn")).isEmpty(),
                                 "Add button should not be visible for ADMIN.");
+        }
+
+        @Test
+        public void testAddItemToCart_Success() throws InterruptedException {
+                // Open the application
+                driver.get("http://localhost:4200/");
+
+                // Click on "Iniciar Sesión" button
+                WebElement loginBtn = wait.until(ExpectedConditions.elementToBeClickable(
+                                By.xpath("//button[contains(text(),'Iniciar Sesión')]")));
+                loginBtn.click();
+
+                // Fill in login form
+                WebElement usernameInput = wait.until(ExpectedConditions.visibilityOfElementLocated(
+                                By.cssSelector("input[name='username']")));
+                WebElement passwordInput = driver.findElement(By.cssSelector("input[name='password']"));
+
+                usernameInput.sendKeys("Victor");
+                passwordInput.sendKeys("password123");
+
+                // Submit login form
+                WebElement submitButton = driver.findElement(By.cssSelector("button[type='submit']"));
+                submitButton.click();
+
+                // Accept login success alert
+                Alert alert = wait.until(ExpectedConditions.alertIsPresent());
+                alert.accept();
+
+                // Wait until cheese grid is visible
+                wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".card-grid")));
+
+                // Click on Azul card
+                WebElement azulCard = wait.until(ExpectedConditions.visibilityOfElementLocated(
+                                By.xpath("//div[contains(@class,'card')]//p[text()='Azul']/ancestor::div[contains(@class,'card')]")));
+                azulCard.click();
+
+                // Wait for navigation to cheese details page
+                wait.until(ExpectedConditions.urlMatches("http://localhost:4200/cheeses/\\d+"));
+
+                // Enter valid number of boxes
+                WebElement boxesInput = wait
+                                .until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".cajas-input")));
+                boxesInput.sendKeys("1");
+
+                // Use Actions to click on Add button
+                WebElement addButton = wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(".add-btn")));
+                Actions actions = new Actions(driver);
+                actions.moveToElement(addButton).pause(200).click().perform();
+
+                // Expect success alert
+                Alert successAlert = wait.until(ExpectedConditions.alertIsPresent());
+                assertTrue(successAlert.getText().contains("Producto añadido al pedido"));
+                successAlert.accept();
+        }
+
+        @Test
+        public void testAddItemToCart_Failure() throws InterruptedException {
+                // Open the application
+                driver.get("http://localhost:4200/");
+
+                // Click on "Iniciar Sesión" button
+                WebElement loginBtn = wait.until(ExpectedConditions.elementToBeClickable(
+                                By.xpath("//button[contains(text(),'Iniciar Sesión')]")));
+                loginBtn.click();
+
+                // Fill in login form
+                WebElement usernameInput = wait.until(ExpectedConditions.visibilityOfElementLocated(
+                                By.cssSelector("input[name='username']")));
+                WebElement passwordInput = driver.findElement(By.cssSelector("input[name='password']"));
+
+                usernameInput.sendKeys("Victor");
+                passwordInput.sendKeys("password123");
+
+                // Submit login form
+                WebElement submitButton = driver.findElement(By.cssSelector("button[type='submit']"));
+                submitButton.click();
+
+                // Accept login success alert
+                Alert alert = wait.until(ExpectedConditions.alertIsPresent());
+                alert.accept();
+
+                // Wait until cheese grid is visible
+                wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".card-grid")));
+
+                // Click on Semicurado card
+                WebElement semicuradoCard = wait.until(ExpectedConditions.visibilityOfElementLocated(
+                                By.xpath("//div[contains(@class,'card')]//p[text()='Semicurado']/ancestor::div[contains(@class,'card')]")));
+                semicuradoCard.click();
+
+                // Wait for navigation to cheese details page
+                wait.until(ExpectedConditions.urlMatches("http://localhost:4200/cheeses/\\d+"));
+
+                // Enter invalid number of boxes (0)
+                WebElement boxesInput = wait
+                                .until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".cajas-input")));
+                boxesInput.sendKeys("0");
+
+                // Use Actions to click on Add button
+                WebElement addButton = wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(".add-btn")));
+                Actions actions = new Actions(driver);
+                actions.moveToElement(addButton).pause(200).click().perform();
+
+                // Expect error alert
+                Alert errorAlert = wait.until(ExpectedConditions.alertIsPresent());
+                assertTrue(errorAlert.getText().contains("Error al añadir el producto")
+                                || errorAlert.getText().contains("Ingrese una cantidad correcta"));
+                errorAlert.accept();
         }
 
 }

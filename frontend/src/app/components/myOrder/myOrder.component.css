@@ -55,7 +55,6 @@
 .buttons-row {
   width: 70%;
   display: flex;
-  justify-content: space-between;
   margin-top: 25px;
 }
 
@@ -75,6 +74,7 @@
 }
 
 .confirm {
+  margin-left: auto;
   background: #222;
   color: white;
 }

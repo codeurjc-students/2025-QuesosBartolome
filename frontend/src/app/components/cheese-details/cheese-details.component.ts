@@ -103,11 +103,9 @@ export class CheeseDetailsComponent implements OnInit {
           this.loadCheese(cheeseId); 
         },
         error: (err) => {
-          console.error('STATUS:', err.status);
-          console.error('ERROR BODY:', err.error);
           console.error('FULL ERROR:', err);
 
-          alert(`Error ${err.status}: ${err.error?.message || 'Error al añadir el producto'}`);
+          alert('Error al añadir el producto');
         }
       });
   }
