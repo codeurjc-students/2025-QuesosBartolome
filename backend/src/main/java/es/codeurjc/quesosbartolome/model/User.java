@@ -1,9 +1,11 @@
 package es.codeurjc.quesosbartolome.model;
 
 import java.sql.Blob;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -11,12 +13,15 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 
 @Entity
 public class User {
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
+
     private String name;
     private String password;
     private String gmail;
@@ -26,26 +31,34 @@ public class User {
 
     @OneToMany(mappedBy = "user")
     private List<Review> reviews;
-    
-    @ElementCollection(fetch = FetchType.EAGER)
-	private List<String> rols; 
 
-    // Constructor
+    @ElementCollection(fetch = FetchType.EAGER)
+    private List<String> rols;
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Cart cart;
+
+    @OneToMany(mappedBy = "user")
+    private List<Order> orders = new ArrayList<>();
+
     public User() {
     }
 
-    public User( String name, String password, String gmail, String direction, String nif,String... rols) {
+    public User(String name, String password, String gmail, String direction, String nif, String... rols) {
+
         this.name = name;
         this.password = password;
         this.gmail = gmail;
         this.direction = direction;
         this.nif = nif;
         this.rols = rols != null ? List.of(rols) : Collections.emptyList();
+        this.cart = new Cart(this);
     }
+
     // Getters y Setters
     public Long getId() {
         return id;
-    } 
+    }
 
     public void setId(Long id) {
         this.id = id;
@@ -93,16 +106,16 @@ public class User {
 
     public Blob getImage() {
         return image;
-    }  
-         
+    }
+
     public void setImage(Blob image) {
         this.image = image;
     }
-    
+
     public void setReviews(List<Review> reviews) {
         this.reviews = reviews;
     }
-    
+
     public List<Review> getReviews() {
         return reviews;
     }
@@ -115,5 +128,20 @@ public class User {
         this.rols = rols != null ? List.of(rols) : Collections.emptyList();
     }
 
-    
+    public Cart getCart() {
+        return cart;
+    }
+
+    public void setCart(Cart cart) {
+        this.cart = cart;
+    }
+
+    public List<Order> getOrders() {
+        return orders;
+    }
+
+    public void setOrders(List<Order> orders) {
+        this.orders = orders;
+    }
+
 }

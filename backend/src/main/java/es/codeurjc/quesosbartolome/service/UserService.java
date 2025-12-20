@@ -26,6 +26,7 @@ public class UserService {
 
 
     public Optional<UserDTO> findByName(String name) {
+        
         Optional<User> user = repository.findByName(name);
         if (user.isPresent()){
             return Optional.of(mapper.toDTO(user.get()));

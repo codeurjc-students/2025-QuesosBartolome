@@ -90,9 +90,13 @@ public class SecurityConfiguration {
                     .requestMatchers(HttpMethod.GET, "/api/v1/cheeses").permitAll()
                     .requestMatchers(HttpMethod.GET, "/api/v1/users/**").permitAll()
                     .requestMatchers(HttpMethod.GET, "/api/v1/users/**/image").permitAll()
+                    .requestMatchers(HttpMethod.GET, "/api/v1/orders").permitAll()
 
                     // Endpoint de perfil
                     .requestMatchers(HttpMethod.GET, "/api/v1/users").authenticated()
+                    .requestMatchers(HttpMethod.GET, "/api/v1/cart").hasAnyRole("USER")
+                    .requestMatchers(HttpMethod.PUT, "/api/v1/cart/**").hasAnyRole("USER")
+                    .requestMatchers(HttpMethod.POST, "/api/v1/orders/confirm").hasAnyRole("USER")
             );
         http.cors(cors -> {});
         http.csrf(csrf -> csrf.disable());

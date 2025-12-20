@@ -13,7 +13,7 @@
             <i class="fa-solid fa-info-circle"></i> Acerca de nosotros
           </li>
 
-          <li *ngIf="isLoggedIn && isUser()">
+          <li (click)="goToMyOrder()" *ngIf="isLoggedIn && isUser()">
             <i class="fa-solid fa-box"></i> Mi pedido
           </li>
 

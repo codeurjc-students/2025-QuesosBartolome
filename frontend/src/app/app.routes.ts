@@ -5,6 +5,7 @@ import { RegisterComponent } from './components/register/register.component';
 import { UserPageComponent } from './components/userPage/userPage.component';
 import { AboutUsComponent } from './components/about-Us/aboutUs.component';
 import { CheeseDetailsComponent } from './components/cheese-details/cheese-details.component';
+import { MyOrderComponent } from './components/myOrder/myOrder.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: '/cheeses', pathMatch: 'full' },
@@ -13,5 +14,6 @@ export const routes: Routes = [
   { path: 'auth/register', component: RegisterComponent },
   { path: 'user', component: UserPageComponent },
   { path: 'about-us', component: AboutUsComponent },
-  { path: 'cheeses/:id', component: CheeseDetailsComponent }
+  { path: 'cheeses/:id', component: CheeseDetailsComponent },
+  { path: 'myorder', component: MyOrderComponent }
 ];

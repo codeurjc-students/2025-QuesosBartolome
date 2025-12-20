@@ -7,6 +7,9 @@ import { CheeseDTO } from '../dto/cheese.dto';
   providedIn: 'root'
 })
 export class CheeseService {
+  addCheeseToOrder(userId: number, cheeseId: number, boxes: number) {
+    throw new Error('Method not implemented.');
+  }
 
   private apiUrl = 'https://localhost:443/api/v1/cheeses';
 

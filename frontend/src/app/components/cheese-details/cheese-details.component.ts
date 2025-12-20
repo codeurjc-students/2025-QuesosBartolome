@@ -5,6 +5,7 @@ import { CheeseService } from '../../service/cheese.service';
 import { CheeseDTO } from '../../dto/cheese.dto';
 import { UserDTO } from '../../dto/user.dto';
 import { UserService } from '../../service/user.service';
+import { CartService } from '../../service/cart.service';
 
 @Component({
   selector: 'app-cheese-details',
@@ -24,19 +25,14 @@ export class CheeseDetailsComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private cheeseService: CheeseService,
-    private userService: UserService
-  ) {}
+    private userService: UserService,
+    private cartService: CartService
+  ) { }
 
   ngOnInit(): void {
     const id = Number(this.route.snapshot.paramMap.get('id'));
 
-    this.cheeseService.getCheeseById(id).subscribe({
-      next: (data)=>{ 
-        this.cheese = data; 
-        this.loadCheeseImage(data.id);
-      },
-      error: err => console.error('Error obteniendo queso', err)
-    });
+    this.loadCheese(id);
 
     // Check if user is logged in
     this.userService.getCurrentUser().subscribe({
@@ -51,6 +47,16 @@ export class CheeseDetailsComponent implements OnInit {
       }
     });
   }
+
+  loadCheese(id: number): void {
+  this.cheeseService.getCheeseById(id).subscribe({
+    next: (data) => {
+      this.cheese = data;
+      this.loadCheeseImage(data.id);
+    },
+    error: err => console.error('Error obteniendo queso', err)
+  });
+}
 
   loadCheeseImage(id: number) {
     this.cheeseService.getCheeseImage(id).subscribe({
@@ -67,12 +73,49 @@ export class CheeseDetailsComponent implements OnInit {
     });
   }
 
+  addToOrder(boxesValue: string) {
+
+    // Validaciones
+    if (!boxesValue) {
+      alert('Debes introducir una cantidad');
+      return;
+    }
+
+    const boxes = Number(boxesValue);
+
+    if (isNaN(boxes) || boxes <= 0 || boxes > this.cajasDisponibles) {
+      alert('Ingrese una cantidad correcta');
+      return;
+    }
+
+    if (!this.currentUser) {
+      alert('Debes estar logueado');
+      return;
+    }
+
+    const userId = this.currentUser.id;
+    const cheeseId = this.cheese.id;
+
+    this.cartService.addCheeseToOrder(userId, cheeseId, boxes)
+      .subscribe({
+        next: () => {
+          alert('Producto añadido al pedido');
+          this.loadCheese(cheeseId); 
+        },
+        error: (err) => {
+          console.error('FULL ERROR:', err);
+
+          alert('Error al añadir el producto');
+        }
+      });
+  }
+
   get cajasDisponibles(): number {
     return this.cheese?.boxes?.length ?? 0;
   }
 
   get isUser(): boolean {
-  return this.currentUser?.rols?.includes('USER') ?? false;
+    return this.currentUser?.rols?.includes('USER') ?? false;
   }
 
   get isAdmin(): boolean {

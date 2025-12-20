@@ -8,6 +8,7 @@ import { DebugElement } from '@angular/core';
 import { By } from '@angular/platform-browser';
 import { CheeseDTO } from '../../dto/cheese.dto';
 import { UserDTO } from '../../dto/user.dto';
+import { CartService } from '../../service/cart.service';
 
 describe('CheeseDetailsComponent (unit)', () => {
   let component: CheeseDetailsComponent;
@@ -15,11 +16,13 @@ describe('CheeseDetailsComponent (unit)', () => {
 
   let mockCheeseService: jasmine.SpyObj<CheeseService>;
   let mockUserService: jasmine.SpyObj<UserService>;
+  let mockCartService: jasmine.SpyObj<CartService>;
   let mockRoute: any;
 
   beforeEach(async () => {
     mockCheeseService = jasmine.createSpyObj('CheeseService', ['getCheeseById', 'getCheeseImage']);
     mockUserService = jasmine.createSpyObj('UserService', ['getCurrentUser']);
+    mockCartService = jasmine.createSpyObj('CartService', ['addCheeseToOrder']);
     mockRoute = { snapshot: { paramMap: new Map([['id', '1']]) } };
 
     const mockCheese: CheeseDTO = {
@@ -30,7 +33,7 @@ describe('CheeseDetailsComponent (unit)', () => {
       type: 'Curado',
       manufactureDate: '2024-01-01',
       expirationDate: '2025-01-01',
-      boxes: [6.01, 7.02] 
+      boxes: [6.01, 7.02]
     };
 
     mockCheeseService.getCheeseById.and.returnValue(of(mockCheese));
@@ -44,6 +47,7 @@ describe('CheeseDetailsComponent (unit)', () => {
       providers: [
         { provide: CheeseService, useValue: mockCheeseService },
         { provide: UserService, useValue: mockUserService },
+        { provide: CartService, useValue: mockCartService },
         { provide: ActivatedRoute, useValue: mockRoute }
       ]
     }).compileComponents();
@@ -60,7 +64,7 @@ describe('CheeseDetailsComponent (unit)', () => {
     expect(title).toBe('Semicurado');
 
     const price = debug.query(By.css('.cheese-price')).nativeElement.textContent.trim();
-    expect(price).toContain('10'); 
+    expect(price).toContain('10');
 
     const description = debug.query(By.css('.cheese-description')).nativeElement.textContent.trim();
     expect(description).toBe('Queso delicioso');
@@ -68,7 +72,7 @@ describe('CheeseDetailsComponent (unit)', () => {
 
   it('should load cheese image from service', () => {
     expect(mockCheeseService.getCheeseImage).toHaveBeenCalledWith(1);
-    expect(component.imageUrl).toContain('blob:'); 
+    expect(component.imageUrl).toContain('blob:');
   });
 
   it('should fallback to default image when blob is empty', () => {
@@ -115,25 +119,25 @@ describe('CheeseDetailsComponent (unit)', () => {
 
   it('should show stock info when cajasDisponibles > 0', () => {
     const mockUser: UserDTO = {
-        id: 1,
-        name: 'Pepito',
-        password: '1234',
-        gmail: 'pepito@gmail.com',
-        direction: 'Calle Falsa 123',
-        nif: '12345678A',
-        rols: ['USER']
+      id: 1,
+      name: 'Pepito',
+      password: '1234',
+      gmail: 'pepito@gmail.com',
+      direction: 'Calle Falsa 123',
+      nif: '12345678A',
+      rols: ['USER']
     };
     mockUserService.getCurrentUser.and.returnValue(of(mockUser));
 
     const mockCheese: CheeseDTO = {
-        id: 1,
-        name: 'Semicurado',
-        price: 10,
-        description: 'Queso delicioso',
-        type: 'Curado',
-        manufactureDate: '2024-01-01',
-        expirationDate: '2025-01-01',
-        boxes: [6.01, 6.02] 
+      id: 1,
+      name: 'Semicurado',
+      price: 10,
+      description: 'Queso delicioso',
+      type: 'Curado',
+      manufactureDate: '2024-01-01',
+      expirationDate: '2025-01-01',
+      boxes: [6.01, 6.02]
     };
     mockCheeseService.getCheeseById.and.returnValue(of(mockCheese));
 
@@ -144,29 +148,29 @@ describe('CheeseDetailsComponent (unit)', () => {
     const debug: DebugElement = fixture.debugElement;
     const stockInfo = debug.query(By.css('.stock-info')).nativeElement.textContent.trim();
     expect(stockInfo).toContain('2 disponibles');
-    });
+  });
 
-    it('should show "Sin stock" when cajasDisponibles === 0', () => {
+  it('should show "Sin stock" when cajasDisponibles === 0', () => {
     const mockUser: UserDTO = {
-        id: 1,
-        name: 'Pepito',
-        password: '1234',
-        gmail: 'pepito@gmail.com',
-        direction: 'Calle Falsa 123',
-        nif: '12345678A',
-        rols: ['USER']
+      id: 1,
+      name: 'Pepito',
+      password: '1234',
+      gmail: 'pepito@gmail.com',
+      direction: 'Calle Falsa 123',
+      nif: '12345678A',
+      rols: ['USER']
     };
     mockUserService.getCurrentUser.and.returnValue(of(mockUser));
 
     const mockCheese: CheeseDTO = {
-        id: 2,
-        name: 'Azul',
-        price: 12,
-        description: 'Otro queso',
-        type: 'Azul',
-        manufactureDate: '2024-02-01',
-        expirationDate: '2025-02-01',
-        boxes: [] // out of stock
+      id: 2,
+      name: 'Azul',
+      price: 12,
+      description: 'Otro queso',
+      type: 'Azul',
+      manufactureDate: '2024-02-01',
+      expirationDate: '2025-02-01',
+      boxes: [] // out of stock
     };
     mockCheeseService.getCheeseById.and.returnValue(of(mockCheese));
 
@@ -177,7 +181,7 @@ describe('CheeseDetailsComponent (unit)', () => {
     const debug: DebugElement = fixture.debugElement;
     const stockInfo = debug.query(By.css('.stock-info-out')).nativeElement.textContent.trim();
     expect(stockInfo).toBe('Sin stock');
-    });
+  });
 
   it('should show loading state when cheese is not yet loaded', () => {
     // Simulate getCheeseById failure
@@ -222,6 +226,54 @@ describe('CheeseDetailsComponent (unit)', () => {
     // Stock info NO debe existir
     const stockInfo = debug.query(By.css('.stock-info'));
     expect(stockInfo).toBeNull();
+  });
+
+  it('should add item to order when valid boxes are provided', () => {
+    // Mock logged user
+    const mockUser: UserDTO = {
+      id: 1,
+      name: 'Pepito',
+      password: '1234',
+      gmail: 'pepito@gmail.com',
+      direction: 'Calle Falsa 123',
+      nif: '12345678A',
+      rols: ['USER']
+    };
+    mockUserService.getCurrentUser.and.returnValue(of(mockUser));
+
+    // Mock cheese with stock
+    const mockCheese: CheeseDTO = {
+      id: 1,
+      name: 'Semicurado',
+      price: 10,
+      description: 'Queso delicioso',
+      type: 'Curado',
+      manufactureDate: '2024-01-01',
+      expirationDate: '2025-01-01',
+      boxes: [6.01, 7.02]
+    };
+    mockCheeseService.getCheeseById.and.returnValue(of(mockCheese));
+
+    // Mock addCheeseToOrder success
+    mockCartService.addCheeseToOrder.and.returnValue(of({} as any));
+
+    // Spy alert
+    spyOn(window, 'alert');
+
+    // Recreate component with new mocks
+    fixture = TestBed.createComponent(CheeseDetailsComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+
+    // Call addToOrder with valid value
+    component.addToOrder("1");
+
+    // Expect service to be called correctly
+    expect(mockCartService.addCheeseToOrder)
+      .toHaveBeenCalledWith(1, 1, 1);
+
+    // Expect success alert
+    expect(window.alert).toHaveBeenCalledWith('Producto añadido al pedido');
   });
 
 });
