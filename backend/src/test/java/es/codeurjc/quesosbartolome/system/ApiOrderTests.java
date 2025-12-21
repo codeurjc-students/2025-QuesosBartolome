@@ -11,10 +11,7 @@ import org.springframework.boot.test.web.server.LocalServerPort;
 import static io.restassured.RestAssured.*;
 import static org.hamcrest.Matchers.*;
 
-@SpringBootTest(
-    webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
-    properties = "spring.profiles.active=test"
-)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, properties = "spring.profiles.active=test")
 public class ApiOrderTests {
 
     @LocalServerPort
@@ -42,46 +39,50 @@ public class ApiOrderTests {
         registerBody.put("image", JSONObject.NULL);
 
         given()
-            .contentType("application/json")
-            .body(registerBody.toString())
-            .post("/api/v1/auth/register")
-            .then()
-            .statusCode(anyOf(is(200), is(201)));
+                .contentType("application/json")
+                .body(registerBody.toString())
+                .post("/api/v1/auth/register")
+                .then()
+                .statusCode(anyOf(is(200), is(201)));
 
-        // Login
+        // login()
+        return login(name, password);
+    }
+
+    private io.restassured.http.Cookies login(String username, String password) throws JSONException {
         JSONObject loginBody = new JSONObject();
-        loginBody.put("username", name);
+        loginBody.put("username", username);
         loginBody.put("password", password);
 
         return given()
-            .contentType("application/json")
-            .body(loginBody.toString())
-            .post("/api/v1/auth/login")
-            .then()
-            .statusCode(200)
-            .extract()
-            .detailedCookies();
+                .contentType("application/json")
+                .body(loginBody.toString())
+                .post("/api/v1/auth/login")
+                .then()
+                .statusCode(200)
+                .extract()
+                .detailedCookies();
     }
 
     @Test
     void testGetAllOrders_Ok() throws JSONException {
-        var cookies = registerAndLoginTestUser("OrderUser", "password123");
+        var cookies = login("German", "password123");
 
         given()
-            .cookies(cookies)
-        .when()
-            .get("/api/v1/orders?page=0&size=10")
-        .then()
-            .statusCode(200)
-            .body("content", notNullValue());
+                .cookies(cookies)
+                .when()
+                .get("/api/v1/orders?page=0&size=10")
+                .then()
+                .statusCode(200)
+                .body("content", notNullValue());
     }
 
     @Test
     void testConfirmOrder_Unauthorized() {
         when()
-            .post("/api/v1/orders/confirm")
-        .then()
-            .statusCode(401);
+                .post("/api/v1/orders/confirm")
+                .then()
+                .statusCode(401);
     }
 
     @Test
@@ -91,11 +92,11 @@ public class ApiOrderTests {
 
         // Simulate user not found by calling confirm directly (depends on DB state)
         given()
-            .cookies(cookies)
-        .when()
-            .post("/api/v1/orders/confirm")
-        .then()
-            .statusCode(anyOf(is(404), is(400))); // depending on how service handles missing user/cart
+                .cookies(cookies)
+                .when()
+                .post("/api/v1/orders/confirm")
+                .then()
+                .statusCode(anyOf(is(404), is(400))); // depending on how service handles missing user/cart
     }
 
     @Test
@@ -103,11 +104,11 @@ public class ApiOrderTests {
         var cookies = registerAndLoginTestUser("EmptyCartUser", "password123");
 
         given()
-            .cookies(cookies)
-        .when()
-            .post("/api/v1/orders/confirm")
-        .then()
-            .statusCode(400);
+                .cookies(cookies)
+                .when()
+                .post("/api/v1/orders/confirm")
+                .then()
+                .statusCode(400);
     }
 
     @Test
@@ -116,24 +117,24 @@ public class ApiOrderTests {
 
         // First add an item to the cart
         given()
-            .cookies(cookies)
-            .queryParam("cheeseId", 1)
-            .queryParam("boxes", 1)
-        .when()
-            .put("/api/v1/cart/addItem")
-        .then()
-            .statusCode(200);
+                .cookies(cookies)
+                .queryParam("cheeseId", 1)
+                .queryParam("boxes", 1)
+                .when()
+                .put("/api/v1/cart/addItem")
+                .then()
+                .statusCode(200);
 
         // Now confirm the order
         given()
-            .cookies(cookies)
-        .when()
-            .post("/api/v1/orders/confirm")
-        .then()
-            .statusCode(201) // created
-            .header("Location", containsString("/api/v1/orders/confirm/"))
-            .body("id", notNullValue())
-            .body("totalPrice", greaterThan(0.0f))
-            .body("totalWeight", greaterThan(0.0f));
+                .cookies(cookies)
+                .when()
+                .post("/api/v1/orders/confirm")
+                .then()
+                .statusCode(201) // created
+                .header("Location", containsString("/api/v1/orders/confirm/"))
+                .body("id", notNullValue())
+                .body("totalPrice", greaterThan(0.0f))
+                .body("totalWeight", greaterThan(0.0f));
     }
 }
