@@ -19,7 +19,7 @@
 
           <ng-container *ngIf="isLoggedIn && isAdmin()">
 
-            <li>
+            <li (click)="goToOrders()">
               <i class="fa-solid fa-box"></i> Pedidos
             </li>
 

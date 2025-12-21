@@ -4,6 +4,7 @@ import { OrderService } from './order.service';
 import { CartService } from './cart.service';
 import { LoginService } from './login.service';
 import { OrderDTO } from '../dto/order.dto';
+import { Page } from '../dto/page.dto';
 
 describe('OrderService (integration with real login)', () => {
 
@@ -68,6 +69,32 @@ describe('OrderService (integration with real login)', () => {
           },
           error: (err) => {
             expect(err.status).toBe(400);
+            done();
+          }
+        });
+
+      },
+      error: (err) => {
+        fail('Login failed: ' + err.message);
+        done();
+      }
+    });
+  });
+
+  it('should retrieve paginated orders after login', (done) => {
+    loginService.login('German', 'password123').subscribe({ //Admin Login
+      next: () => {
+
+        service.getAllOrders(0, 10).subscribe({
+          next: (page: Page<OrderDTO>) => {
+            expect(page).toBeTruthy();
+            expect(Array.isArray(page.content)).toBeTrue();
+            expect(page.size).toBe(10);
+            expect(page.number).toBe(0);
+            done();
+          },
+          error: (err) => {
+            fail('Failed to fetch orders: ' + err.message);
             done();
           }
         });

@@ -1,0 +1,40 @@
+<div class="orders-container">
+
+  <h1>Pedidos</h1>
+
+  <div class="orders-card">
+
+    <!-- HEADER -->
+    <div class="orders-header header-highlight">
+      <span>#</span>
+      <span>Usuario</span>
+      <span>Fecha</span>
+      <span>Items</span>
+      <span>Peso</span>
+      <span>Total</span>
+      <span></span>
+    </div>
+
+    <!-- ROWS -->
+    <div class="orders-row" *ngFor="let order of orders">
+      <span>{{ order.id }}</span>
+      <span>{{ order.user.name }}</span>
+      <span>{{ order.orderDate | date:'dd/MM/yyyy' }}</span>
+      <span class="badge">{{ order.items.length }}</span>
+      <span class="badge">{{ order.totalWeight | number:'1.2-2' }} Kg</span>
+      <span class="badge">€{{ order.totalPrice | number:'1.2-2' }}</span>
+      <button class="btn-process" (click)="processOrder(order.id)">
+        Procesar
+      </button>
+    </div>
+
+  </div>
+
+  <!-- PAGINACIÓN -->
+  <div class="pagination">
+    <button class="arrow" (click)="prevPage()">‹</button>
+    <span class="page-number">{{ currentPage + 1 }}</span>
+    <button class="arrow" (click)="nextPage()">›</button>
+  </div>
+
+</div>

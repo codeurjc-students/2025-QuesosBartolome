@@ -80,9 +80,9 @@ public class OrderServiceIntegrationTest {
 
     @AfterAll
     static void afterAll(@Autowired OrderRepository orderRepository,
-                         @Autowired UserRepository userRepository,
-                         @Autowired CartRepository cartRepository,
-                         @Autowired CheeseRepository cheeseRepository) {
+            @Autowired UserRepository userRepository,
+            @Autowired CartRepository cartRepository,
+            @Autowired CheeseRepository cheeseRepository) {
         orderRepository.deleteAll();
         userRepository.deleteAll();
         cartRepository.deleteAll();
@@ -99,6 +99,25 @@ public class OrderServiceIntegrationTest {
         Page<OrderDTO> page = orderService.getAllOrders(Pageable.unpaged());
         assertThat(page).isNotEmpty();
         assertThat(page.getContent().get(0).totalPrice()).isEqualTo(10.0);
+    }
+
+    @Test
+    void shouldReturnPagedOrders() {
+        // Crear 15 pedidos
+        for (int i = 0; i < 15; i++) {
+            Order order = new Order(user);
+            order.setTotalPrice(10.0 + i);
+            order.setTotalWeight(1.0);
+            orderRepository.save(order);
+        }
+
+        Pageable pageable = Pageable.ofSize(10).withPage(0);
+
+        Page<OrderDTO> page = orderService.getAllOrders(pageable);
+
+        assertThat(page.getContent()).hasSize(10);
+        assertThat(page.getTotalElements()).isEqualTo(15);
+        assertThat(page.getTotalPages()).isEqualTo(2);
     }
 
     @Test

@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { CheeseDTO } from '../dto/cheese.dto';
+import { Page } from '../dto/page.dto';
 import { OrderDTO } from '../dto/order.dto';
 
 @Injectable({
@@ -18,6 +18,13 @@ export class OrderService {
     return this.http.post<OrderDTO>(
       `${this.apiUrl}/confirm`,
       null,
+      { withCredentials: true }
+    );
+  }
+
+  getAllOrders(page: number = 0, size: number = 10): Observable<Page<OrderDTO>> {
+    return this.http.get<Page<OrderDTO>>(
+      `${this.apiUrl}?page=${page}&size=${size}`,
       { withCredentials: true }
     );
   }
