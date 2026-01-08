@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { UserService } from '../../service/user.service';
 import { UserDTO } from '../../dto/user.dto';
+import { Router } from '@angular/router';
 
 @Component({
     selector: 'app-clients',
@@ -19,7 +20,7 @@ export class ClientsComponent implements OnInit {
     currentPage = 0;
     pageSize = 10;
 
-    constructor(private userService: UserService) { }
+    constructor(private userService: UserService, private router: Router) { }
 
     ngOnInit(): void {
         this.loadUsers();
@@ -33,6 +34,9 @@ export class ClientsComponent implements OnInit {
             },
             error: (err) => {
                 console.error('Error cargando usuarios', err);
+                if (err.status >= 500) {
+                    this.router.navigate(['/error']);
+                }
             }
         });
     }

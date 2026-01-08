@@ -8,6 +8,7 @@ import { CheeseDetailsComponent } from './components/cheese-details/cheese-detai
 import { MyOrderComponent } from './components/myOrder/myOrder.component';
 import { OrdersComponent } from './components/orders/orders.component';
 import { ClientsComponent } from './components/clients/clients.component';
+import { ErrorPageComponent } from './components/errorPage/errorPage.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: '/cheeses', pathMatch: 'full' },
@@ -19,5 +20,7 @@ export const routes: Routes = [
   { path: 'cheeses/:id', component: CheeseDetailsComponent },
   { path: 'myorder', component: MyOrderComponent },
   { path: 'orders', component: OrdersComponent },
-  { path: 'users', component: ClientsComponent }
+  { path: 'users', component: ClientsComponent },
+  { path: 'error', component: ErrorPageComponent },
+  { path: '**', component: ErrorPageComponent }
 ];

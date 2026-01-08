@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms'; 
+import { FormsModule } from '@angular/forms';
 import { LoginService } from '../../service/login.service';
 import { Router } from '@angular/router';
 
@@ -9,7 +9,7 @@ import { Router } from '@angular/router';
   standalone: true,
   imports: [
     CommonModule,
-    FormsModule 
+    FormsModule
   ],
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.css']
@@ -22,37 +22,40 @@ export class RegisterComponent {
   direccion: string = '';
   nif: string = '';
 
-  constructor(private loginService: LoginService,private router: Router) {}
+  constructor(private loginService: LoginService, private router: Router) { }
 
-    register(): void {
-        if (!this.nombre || !this.password || !this.confirmPassword || !this.email || !this.direccion || !this.nif) {
-            alert('Todos los campos son obligatorios');
-            return;
-        }
-
-        if (this.password !== this.confirmPassword) {
-            alert('Las contraseñas no coinciden');
-            return;
-        }
-
-        const userData = {
-            name: this.nombre,
-            gmail: this.email,
-            password: this.password,
-            direction: this.direccion,
-            nif: this.nif
-        };
-
-        this.loginService.register(userData).subscribe({
-            next: () => {
-            alert('Registro exitoso');
-            this.router.navigate(['/']);
-            },
-            error: (err) => {
-            console.error('Error en registro', err);
-            alert(err.error?.error || 'Error desconocido');
-            }
-        });
+  register(): void {
+    if (!this.nombre || !this.password || !this.confirmPassword || !this.email || !this.direccion || !this.nif) {
+      alert('Todos los campos son obligatorios');
+      return;
     }
+
+    if (this.password !== this.confirmPassword) {
+      alert('Las contraseñas no coinciden');
+      return;
+    }
+
+    const userData = {
+      name: this.nombre,
+      gmail: this.email,
+      password: this.password,
+      direction: this.direccion,
+      nif: this.nif
+    };
+
+    this.loginService.register(userData).subscribe({
+      next: () => {
+        alert('Registro exitoso');
+        this.router.navigate(['/']);
+      },
+      error: (err) => {
+        console.error('Error en registro', err);
+        alert(err.error?.error || 'Error desconocido');
+        if (err.status >= 500) {
+          this.router.navigate(['/error']);
+        }
+      }
+    });
+  }
 
 }

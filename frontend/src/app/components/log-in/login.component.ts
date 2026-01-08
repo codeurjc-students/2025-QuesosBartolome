@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms'; 
+import { FormsModule } from '@angular/forms';
 import { LoginService } from '../../service/login.service';
 import { Router } from '@angular/router';
 
@@ -9,7 +9,7 @@ import { Router } from '@angular/router';
   standalone: true,
   imports: [
     CommonModule,
-    FormsModule 
+    FormsModule
   ],
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css']
@@ -18,9 +18,9 @@ export class LoginComponent {
   username: string = '';
   password: string = '';
 
-  constructor(private loginService: LoginService,private router: Router) {}
+  constructor(private loginService: LoginService, private router: Router) { }
 
-    login(): void {
+  login(): void {
     this.loginService.login(this.username, this.password).subscribe({
       next: (response) => {
         console.log("Login ok:", response);
@@ -30,6 +30,9 @@ export class LoginComponent {
       error: (err) => {
         console.error("Error en login:", err);
         alert("Credenciales incorrectas.");
+        if (err.status >= 500) {
+          this.router.navigate(['/error']);
+        }
       }
     });
   }

@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { UserService } from '../../service/user.service';
 import { UserDTO } from '../../dto/user.dto';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-userPage',
@@ -28,7 +29,7 @@ export class UserPageComponent implements OnInit {
   placeholderRatings = [
   ];
 
-  constructor(private userService: UserService) {}
+  constructor(private userService: UserService, private router: Router) {}
 
   ngOnInit(): void {
     this.loadUser();
@@ -40,7 +41,12 @@ export class UserPageComponent implements OnInit {
         this.user = data;
         this.loadUserImage(data.id);
       },
-      error: () => console.warn("No se pudo cargar el usuario")
+      error: (err) => {
+        console.warn("No se pudo cargar el usuario");
+        if (err.status >= 500) {
+          this.router.navigate(['/error']);
+        }
+      }
     });
   }
 

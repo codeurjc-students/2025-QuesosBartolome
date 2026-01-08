@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { OrderService } from '../../service/order.service';
 import { CartDTO } from '../../dto/cart.dto';
 import { CartService } from '../../service/cart.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-myOrder',
@@ -23,7 +24,7 @@ export class MyOrderComponent implements OnInit {
 
   loading = true;
 
-  constructor(private orderService: OrderService, private cartService: CartService) { }
+  constructor(private orderService: OrderService, private cartService: CartService, private router: Router) { }
 
   ngOnInit(): void {
     this.cartService.getMyCart().subscribe({
@@ -34,6 +35,9 @@ export class MyOrderComponent implements OnInit {
       error: (err) => {
         console.error('Error cargando pedido', err);
         this.loading = false;
+        if (err.status >= 500) {
+          this.router.navigate(['/error']);
+        }
       }
     });
   }
@@ -45,7 +49,12 @@ export class MyOrderComponent implements OnInit {
   removeItem(itemId: number) {
     this.cartService.removeItemFromCart(itemId).subscribe({
       next: (order) => this.order = order,
-      error: err => console.error('Error eliminando item', err)
+      error: err => {
+        console.error('Error eliminando item', err)
+        if (err.status >= 500) {
+          this.router.navigate(['/error']);
+        }
+      }
     });
   }
 
@@ -58,6 +67,9 @@ export class MyOrderComponent implements OnInit {
       error: err => {
         console.error('Error al hacer pedido', err)
         alert('Error al hacer el pedido');
+        if (err.status >= 500) {
+          this.router.navigate(['/error']);
+        }
       }
     });
   }
