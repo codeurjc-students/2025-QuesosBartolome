@@ -3,6 +3,7 @@ import { HttpClientModule } from '@angular/common/http';
 import { UserService } from './user.service';
 import { LoginService } from './login.service';
 import { UserDTO } from '../dto/user.dto';
+import { Page } from '../dto/page.dto';
 
 describe('UserService (integration with real login)', () => {
   let service: UserService;
@@ -104,4 +105,33 @@ describe('UserService (integration with real login)', () => {
     });
   });
 
+  it('should return a paginated list of users after login', (done) => {
+    loginService.login('German', 'password123').subscribe({
+      next: () => {
+        // Get first page with 10 users
+        service.getAllUsers(0, 10).subscribe({
+          next: (page: Page<UserDTO>) => {
+            expect(page).toBeTruthy();
+            expect(page.content).toBeInstanceOf(Array);
+            expect(page.totalElements).toBeGreaterThanOrEqual(0);
+            if (page.content.length > 0) {
+              const firstUser = page.content[0];
+              expect(firstUser.id).toBeDefined();
+              expect(firstUser.name).toBeDefined();
+              expect(firstUser.gmail).toContain('@');
+            }
+            done();
+          },
+          error: (err) => {
+            fail('Failed to get all users: ' + err.message);
+            done();
+          }
+        });
+      },
+      error: (err) => {
+        fail('Login failed: ' + err.message);
+        done();
+      }
+    });
+  });
 });

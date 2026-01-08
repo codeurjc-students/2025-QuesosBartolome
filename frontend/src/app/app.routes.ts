@@ -7,6 +7,7 @@ import { AboutUsComponent } from './components/about-Us/aboutUs.component';
 import { CheeseDetailsComponent } from './components/cheese-details/cheese-details.component';
 import { MyOrderComponent } from './components/myOrder/myOrder.component';
 import { OrdersComponent } from './components/orders/orders.component';
+import { ClientsComponent } from './components/clients/clients.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: '/cheeses', pathMatch: 'full' },
@@ -17,5 +18,6 @@ export const routes: Routes = [
   { path: 'about-us', component: AboutUsComponent },
   { path: 'cheeses/:id', component: CheeseDetailsComponent },
   { path: 'myorder', component: MyOrderComponent },
-  { path: 'orders', component: OrdersComponent }
+  { path: 'orders', component: OrdersComponent },
+  { path: 'users', component: ClientsComponent }
 ];
