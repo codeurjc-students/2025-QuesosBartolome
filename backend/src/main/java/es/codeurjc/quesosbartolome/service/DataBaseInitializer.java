@@ -129,6 +129,17 @@ public class DataBaseInitializer {
         user1.setCart(new Cart(user1));
         user1.setImage(saveImage("images/default-profile.jpg"));
 
+        // Create user 2
+        User user2 = new User();
+        user1.setName("User");
+        user1.setPassword(passwordEncoder.encode("password123"));
+        user2.setGmail("user@example.com");
+        user2.setDirection("12 Main St");
+        user2.setNif("99999999A");
+        user2.setRols("USER");
+        user2.setCart(new Cart(user2));
+        user2.setImage(saveImage("images/default-profile.jpg"));
+
 
         // Create Admin 1
         User userAdmin = new User();
@@ -149,6 +160,7 @@ public class DataBaseInitializer {
 
         // Save users in DB
         userRepository.save(user1);
+        userRepository.save(user2);
         userRepository.save(userAdmin);
 
 

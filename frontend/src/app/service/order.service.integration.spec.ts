@@ -62,7 +62,7 @@ beforeEach(() => {
   });
 
   it('should fail to confirm empty order after login', (done) => {
-    loginService.login('Victor', 'password123').subscribe({
+    loginService.login('User', 'password123').subscribe({
       next: () => {
 
         service.confirmOrder().subscribe({
