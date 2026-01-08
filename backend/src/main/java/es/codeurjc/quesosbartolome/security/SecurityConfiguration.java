@@ -100,11 +100,14 @@ public class SecurityConfiguration {
                     .requestMatchers(HttpMethod.GET, "/api/v1/users/all").hasAnyRole("ADMIN")
             );
         http.cors(cors -> {});
+        // Disable CSRF protection (it is difficult to implement in REST APIs)
         http.csrf(csrf -> csrf.disable());
+        // Disable Form login Authentication
         http.formLogin(form -> form.disable());
+        // Disable Basic Authentication
         http.httpBasic(basic -> basic.disable());
         http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
-
+        // Add the JWT filter before the standard authentication filter
         http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
