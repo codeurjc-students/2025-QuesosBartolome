@@ -88,8 +88,8 @@ public class SecurityConfiguration {
                     .requestMatchers(HttpMethod.POST, "/api/v1/auth/**").permitAll()
                     .requestMatchers(HttpMethod.GET, "/api/v1/cheeses/**").permitAll()
                     .requestMatchers(HttpMethod.GET, "/api/v1/cheeses").permitAll()
-                    .requestMatchers(HttpMethod.GET, "/api/v1/users/**").permitAll()
-                    .requestMatchers(HttpMethod.GET, "/api/v1/users/**/image").permitAll()
+                    .requestMatchers(HttpMethod.GET, "/api/v1/users/{id:[0-9]+}").permitAll()
+                    .requestMatchers(HttpMethod.GET, "/api/v1/users/*/image").permitAll()
 
                     // Endpoint de perfil
                     .requestMatchers(HttpMethod.GET, "/api/v1/users").authenticated()
@@ -97,6 +97,7 @@ public class SecurityConfiguration {
                     .requestMatchers(HttpMethod.PUT, "/api/v1/cart/**").hasAnyRole("USER")
                     .requestMatchers(HttpMethod.POST, "/api/v1/orders/confirm").hasAnyRole("USER")
                     .requestMatchers(HttpMethod.GET, "/api/v1/orders").hasAnyRole("ADMIN")
+                    .requestMatchers(HttpMethod.GET, "/api/v1/users/all").hasAnyRole("ADMIN")
             );
         http.cors(cors -> {});
         http.csrf(csrf -> csrf.disable());

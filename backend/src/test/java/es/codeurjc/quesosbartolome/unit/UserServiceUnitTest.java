@@ -15,8 +15,13 @@ import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import java.sql.Blob;
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -31,13 +36,11 @@ class UserServiceTest {
     @Spy
     private UserMapper userMapper = Mappers.getMapper(UserMapper.class);
 
-
     @Mock
     private PasswordEncoder passwordEncoder;
 
     @InjectMocks
     private UserService userService;
-
 
     @Test
     void shouldCreateUserCorrectly() {
@@ -48,8 +51,7 @@ class UserServiceTest {
                 "password123",
                 "john@gmail.com",
                 "Calle 1",
-                "12345678A"
-        );
+                "12345678A");
 
         UserDTO dto = userMapper.toDTO(auxuser);
 
@@ -80,8 +82,7 @@ class UserServiceTest {
                 "encodedPwd",
                 "maria@gmail.com",
                 "Calle 2",
-                "87654321B"
-        );
+                "87654321B");
 
         when(userRepository.findByName("maria")).thenReturn(Optional.of(saved));
 
@@ -107,8 +108,7 @@ class UserServiceTest {
                 "pwd",
                 "luis@gmail.com",
                 "Calle 3",
-                "11223344C"
-        );
+                "11223344C");
         user.setId(5L);
         user.setImage(blob);
 
@@ -141,8 +141,7 @@ class UserServiceTest {
                 "encodedPwd",
                 "carlos@gmail.com",
                 "Calle 3",
-                "99999999C"
-        );
+                "99999999C");
 
         when(userRepository.findById(1L)).thenReturn(Optional.of(saved));
 
@@ -157,6 +156,62 @@ class UserServiceTest {
         assertThat(result.get().nif()).isEqualTo("99999999C");
     }
 
+    @Test
+    void shouldFindAllUsersWithUserRole() {
 
+        // Given
+        Pageable pageable = PageRequest.of(0, 2);
+
+        User user1 = new User(
+                "ana",
+                "pwd1",
+                "ana@gmail.com",
+                "Calle 4",
+                "11111111A");
+
+        User user2 = new User(
+                "pedro",
+                "pwd2",
+                "pedro@gmail.com",
+                "Calle 5",
+                "22222222B");
+
+        Page<User> userPage = new PageImpl<>(List.of(user1, user2), pageable, 2);
+
+        when(userRepository.findByRolsContaining("USER", pageable))
+                .thenReturn(userPage);
+
+        // When
+        Page<UserDTO> result = userService.findAllUsersWithUserRole(pageable);
+
+        // Then
+        assertThat(result).isNotNull();
+        assertThat(result.getContent()).hasSize(2);
+
+        assertThat(result.getContent().get(0).name()).isEqualTo("ana");
+        assertThat(result.getContent().get(1).name()).isEqualTo("pedro");
+
+        verify(userRepository).findByRolsContaining("USER", pageable);
+    }
+
+    @Test
+    void shouldReturnEmptyPageWhenNoUsersWithUserRole() {
+
+        // Given
+        Pageable pageable = PageRequest.of(0, 5);
+        Page<User> emptyPage = Page.empty(pageable);
+
+        when(userRepository.findByRolsContaining("USER", pageable))
+                .thenReturn(emptyPage);
+
+        // When
+        Page<UserDTO> result = userService.findAllUsersWithUserRole(pageable);
+
+        // Then
+        assertThat(result).isNotNull();
+        assertThat(result.getContent()).isEmpty();
+
+        verify(userRepository).findByRolsContaining("USER", pageable);
+    }
 
 }

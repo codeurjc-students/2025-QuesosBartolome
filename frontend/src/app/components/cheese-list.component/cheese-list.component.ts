@@ -77,6 +77,9 @@ export class CheeseListComponent implements OnInit {
   goToOrders(): void {
     this.router.navigate(['/orders']);
   }
+  goToClients(): void {
+    this.router.navigate(['/users']);
+  }
 
   logout(): void {
     this.loginService.logout().subscribe({

@@ -14,6 +14,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import java.util.Optional;
 import java.sql.Blob;
@@ -44,17 +47,15 @@ public class UserServiceIntegrationTest {
     @Test
     void shouldCreateUserCorrectly() {
 
-        //Given
+        // Given
         User auxuser = new User(
                 "john",
                 "password123",
                 "john@gmail.com",
                 "Calle 1",
-                "12345678A"
-        );
+                "12345678A");
 
         UserDTO dto = userMapper.toDTO(auxuser);
-
 
         // When
         userService.createUser(dto);
@@ -77,10 +78,11 @@ public class UserServiceIntegrationTest {
     void shouldFindUserByName() {
 
         // Given
-        User saved =new User("maria", passwordEncoder.encode("mypwd"), "maria@gmail.com", "Calle 2", "87654321B", "USER");
+        User saved = new User("maria", passwordEncoder.encode("mypwd"), "maria@gmail.com", "Calle 2", "87654321B",
+                "USER");
 
         userRepository.save(saved);
-        
+
         // When
         Optional<UserDTO> user = userService.findByName("maria");
 
@@ -102,8 +104,7 @@ public class UserServiceIntegrationTest {
                 "carlos@gmail.com",
                 "Calle 3",
                 "99999999C",
-                "USER"
-        );
+                "USER");
 
         saved = userRepository.save(saved);
 
@@ -141,9 +142,7 @@ public class UserServiceIntegrationTest {
                 "ana@gmail.com",
                 "Calle Falsa 123",
                 "12345678Z",
-                "USER"
-        );
-
+                "USER");
 
         user.setImage(blob);
 
@@ -170,8 +169,7 @@ public class UserServiceIntegrationTest {
                 "pepe@gmail.com",
                 "Calle X",
                 "87654321Y",
-                "USER"
-        );
+                "USER");
 
         user = userRepository.save(user);
 
@@ -181,7 +179,6 @@ public class UserServiceIntegrationTest {
         // Then
         assertThat(result).isEmpty();
     }
-
 
     @Test
     void shouldReturnEmptyWhenUserNotFound() {
@@ -193,6 +190,100 @@ public class UserServiceIntegrationTest {
         assertThat(result).isEmpty();
     }
 
+    @Test
+    void shouldFindAllUsersWithUserRole() {
 
+        // Given
+        User user1 = new User(
+                "ana",
+                passwordEncoder.encode("pwd1"),
+                "ana@gmail.com",
+                "Calle 1",
+                "11111111A",
+                "USER");
+
+        User user2 = new User(
+                "pedro",
+                passwordEncoder.encode("pwd2"),
+                "pedro@gmail.com",
+                "Calle 2",
+                "22222222B",
+                "USER");
+
+        User admin = new User(
+                "admin",
+                passwordEncoder.encode("adminpwd"),
+                "admin@gmail.com",
+                "Calle Admin",
+                "99999999Z",
+                "ADMIN");
+
+        userRepository.save(user1);
+        userRepository.save(user2);
+        userRepository.save(admin);
+
+        Pageable pageable = PageRequest.of(0, 10);
+
+        // When
+        Page<UserDTO> result = userService.findAllUsersWithUserRole(pageable);
+
+        // Then
+        assertThat(result).isNotNull();
+        assertThat(result.getContent()).hasSize(2);
+
+        assertThat(result.getContent())
+                .extracting(UserDTO::name)
+                .containsExactlyInAnyOrder("ana", "pedro");
+    }
+
+    @Test
+    void shouldPaginateUsersWithUserRole() {
+
+        // Given
+        for (int i = 1; i <= 5; i++) {
+            User user = new User(
+                    "user" + i,
+                    passwordEncoder.encode("pwd"),
+                    "user" + i + "@gmail.com",
+                    "Calle " + i,
+                    "0000000" + i + "A",
+                    "USER");
+            userRepository.save(user);
+        }
+
+        Pageable pageable = PageRequest.of(0, 2);
+
+        // When
+        Page<UserDTO> result = userService.findAllUsersWithUserRole(pageable);
+
+        // Then
+        assertThat(result.getContent()).hasSize(2);
+        assertThat(result.getTotalElements()).isEqualTo(5);
+        assertThat(result.getTotalPages()).isEqualTo(3);
+    }
+
+    @Test
+    void shouldReturnEmptyPageWhenNoUsersWithUserRole() {
+
+        // Given
+        User admin = new User(
+                "admin",
+                passwordEncoder.encode("pwd"),
+                "admin@gmail.com",
+                "Calle Admin",
+                "99999999X",
+                "ADMIN");
+
+        userRepository.save(admin);
+
+        Pageable pageable = PageRequest.of(0, 5);
+
+        // When
+        Page<UserDTO> result = userService.findAllUsersWithUserRole(pageable);
+
+        // Then
+        assertThat(result.getContent()).isEmpty();
+        assertThat(result.getTotalElements()).isZero();
+    }
 
 }

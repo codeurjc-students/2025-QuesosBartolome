@@ -1,0 +1,48 @@
+<div class="users-container">
+
+  <h1>Clientes</h1>
+
+  <div class="users-card">
+
+    <!-- HEADER -->
+    <div class="users-header header-highlight">
+      <span>id</span>
+      <span></span>
+      <span>Nombre</span>
+      <span>Email</span>
+      <span>Dirección</span>
+      <span>NIF</span>
+      <span></span>
+    </div>
+
+    <!-- ROWS -->
+    <div class="users-row" *ngFor="let user of users; let i = index">
+      <span>{{ user.id }}</span>
+
+      <!-- Imagen -->
+      <img
+        class="avatar"
+        [src]="imageUrl || 'assets/avatar-default.jpg'"
+        alt="avatar"
+      />
+
+      <span>{{ user.name }}</span>
+      <span>{{ user.gmail }}</span>
+      <span>{{ user.direction }}</span>
+      <span>{{ user.nif }}</span>
+
+      <button class="btn-ban" (click)="banUser(user.id)">
+        Banear
+      </button>
+    </div>
+
+  </div>
+
+  <!-- PAGINACIÓN -->
+  <div class="pagination">
+    <button class="arrow" (click)="prevPage()">‹</button>
+    <span class="page-number">{{ currentPage + 1 }}</span>
+    <button class="arrow" (click)="nextPage()">›</button>
+  </div>
+
+</div>
