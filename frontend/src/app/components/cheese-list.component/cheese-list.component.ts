@@ -26,11 +26,11 @@ export class CheeseListComponent implements OnInit {
   currentUser: UserDTO | null = null;
 
   constructor(
-    private cheeseService: CheeseService, 
+    private cheeseService: CheeseService,
     private router: Router,
     private userService: UserService,
     private loginService: LoginService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     // Load cheeses
@@ -38,7 +38,12 @@ export class CheeseListComponent implements OnInit {
       next: (list) => {
         this.cheeses = list;
       },
-      error: (err) => console.error('Error loading cheeses', err)
+      error: (err) => {
+        console.error('Error loading cheeses', err)
+        if (err.status >= 500) {
+          this.router.navigate(['/error']);
+        }
+      }
     });
 
     // Check login status and get current user
@@ -89,14 +94,19 @@ export class CheeseListComponent implements OnInit {
         console.log('Logged out successfully');
         this.router.navigate(['/']);
       },
-      error: (err) => console.error('Error during logout', err)
+      error: (err) => {
+        console.error('Error during logout', err)
+        if (err.status >= 500) {
+          this.router.navigate(['/error']);
+        }
+      }
     });
   }
 
   openNewCheeseModal(): void {
     alert('Open modal for creating a new cheese (not implemented)');
   }
-  
+
   isAdmin(): boolean {
     return this.currentUser?.rols?.includes("ADMIN") ?? false;
   }

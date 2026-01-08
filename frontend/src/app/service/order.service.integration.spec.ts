@@ -6,22 +6,25 @@ import { LoginService } from './login.service';
 import { OrderDTO } from '../dto/order.dto';
 import { Page } from '../dto/page.dto';
 
-describe('OrderService (integration with real login)', () => {
+describe('OrderService (integration)', () => {
 
   let service: OrderService;
   let cartService: CartService;
   let loginService: LoginService;
 
-  beforeEach(() => {
-    TestBed.configureTestingModule({
-      imports: [HttpClientModule],
-      providers: [OrderService, CartService, LoginService]
-    });
+beforeEach(() => {
+  TestBed.resetTestingModule();
 
-    service = TestBed.inject(OrderService);
-    cartService = TestBed.inject(CartService);
-    loginService = TestBed.inject(LoginService);
+  TestBed.configureTestingModule({
+    imports: [HttpClientModule],
+    providers: [OrderService, CartService, LoginService]
   });
+
+  service = TestBed.inject(OrderService);
+  cartService = TestBed.inject(CartService);
+  loginService = TestBed.inject(LoginService);
+});
+
 
   it('should confirm order using real API after login', (done) => {
     loginService.login('Victor', 'password123').subscribe({

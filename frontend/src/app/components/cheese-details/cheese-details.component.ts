@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { CheeseService } from '../../service/cheese.service';
 import { CheeseDTO } from '../../dto/cheese.dto';
 import { UserDTO } from '../../dto/user.dto';
@@ -26,6 +26,7 @@ export class CheeseDetailsComponent implements OnInit {
     private route: ActivatedRoute,
     private cheeseService: CheeseService,
     private userService: UserService,
+    private router: Router,
     private cartService: CartService
   ) { }
 
@@ -40,23 +41,26 @@ export class CheeseDetailsComponent implements OnInit {
         this.currentUser = user;
         this.isLoggedIn = true;
       },
-      error: () => {
+      error: (err) => {
         // If token is invalid or request fails, consider user as logged out
         this.currentUser = null;
         this.isLoggedIn = false;
+        if (err.status >= 500) {
+          this.router.navigate(['/error']);
+        }
       }
     });
   }
 
   loadCheese(id: number): void {
-  this.cheeseService.getCheeseById(id).subscribe({
-    next: (data) => {
-      this.cheese = data;
-      this.loadCheeseImage(data.id);
-    },
-    error: err => console.error('Error obteniendo queso', err)
-  });
-}
+    this.cheeseService.getCheeseById(id).subscribe({
+      next: (data) => {
+        this.cheese = data;
+        this.loadCheeseImage(data.id);
+      },
+      error: err => console.error('Error obteniendo queso', err)
+    });
+  }
 
   loadCheeseImage(id: number) {
     this.cheeseService.getCheeseImage(id).subscribe({
@@ -100,12 +104,14 @@ export class CheeseDetailsComponent implements OnInit {
       .subscribe({
         next: () => {
           alert('Producto añadido al pedido');
-          this.loadCheese(cheeseId); 
+          this.loadCheese(cheeseId);
         },
         error: (err) => {
           console.error('FULL ERROR:', err);
-
           alert('Error al añadir el producto');
+          if (err.status >= 500) {
+            this.router.navigate(['/error']);
+          }
         }
       });
   }

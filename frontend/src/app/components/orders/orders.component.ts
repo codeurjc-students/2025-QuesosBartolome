@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { OrderService } from '../../service/order.service';
 import { OrderDTO } from '../../dto/order.dto';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-orders',
@@ -18,7 +19,7 @@ export class OrdersComponent implements OnInit {
   currentPage = 0;
   pageSize = 10;
 
-  constructor(private orderService: OrderService) {}
+  constructor(private orderService: OrderService, private router: Router) {}
 
   ngOnInit(): void {
     this.loadOrders();
@@ -36,6 +37,9 @@ export class OrdersComponent implements OnInit {
       error: (err) => {
         console.error('Error cargando pedidos', err);
         this.loading = false;
+        if (err.status >= 500) {
+          this.router.navigate(['/error']);
+        }
       }
     });
   }
