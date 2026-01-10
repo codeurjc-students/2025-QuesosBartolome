@@ -1,22 +1,60 @@
-version: '3.9'
+version: "3.8"
+
 services:
-  mysql:
+  db:
     image: mysql:8.0
+    container_name: mysql-db
+    restart: unless-stopped
+    env_file:
+      - .env
     environment:
-      MYSQL_ROOT_PASSWORD: "Password0]"
-      MYSQL_DATABASE: quesosbartolome
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    volumes:
+      - db_data:/var/lib/mysql
+    networks:
+      - quesos-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
 
   app:
     image: victorbartolome/quesosbartolome:dev
+    container_name: webapp
+    restart: unless-stopped
+    env_file:
+      - .env
     depends_on:
-      mysql:
+      db:
         condition: service_healthy
-    ports:
-      - "8443:443"
     environment:
-      DB_HOST: mysql
-      DB_PORT: 3306
-      DB_NAME: quesosbartolome
-      DB_USER: root
-      DB_PASSWORD: "Password0]"
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
+      DB_NAME: ${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      SERVER_PORT: ${SERVER_PORT}
+      SERVER_SSL_KEY_STORE_PASSWORD: ${SERVER_SSL_KEY_STORE_PASSWORD}
+    ports:
+      - "${SERVER_PORT}:443"
+    networks:
+      - quesos-network
+    healthcheck:
+      test: ["CMD", "curl", "-k", "-f", "https://localhost:443/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 90s
 
+volumes:
+  db_data:
+    driver: local
+
+networks:
+  quesos-network:
+    driver: bridge
