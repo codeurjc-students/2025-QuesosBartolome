@@ -26,7 +26,7 @@ cd backend
 mvn clean install
 mvn spring-boot:run
 ```
-The server will start at http://localhost:8080
+The server will start at https://localhost:443
 
 - **Client (Frontend)**
 
@@ -41,7 +41,9 @@ The application will run at http://localhost:4200
 
 - Visual Studio Code: Main environment for viewing and editing source code for both the server and client.
 
-- Postman: Tool to interact with the server’s REST API. Postman Collection in `docs/Postman/QuesosBartolome.postman_collection.json`
+- Postman: Tool to interact with the server’s REST API.  
+  [📥 Download Postman Collection](docs/Postman/QuesosBartolome.postman_collection.json)
+
 
 
 #### Running Tests

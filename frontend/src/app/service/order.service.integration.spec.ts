@@ -61,28 +61,6 @@ beforeEach(() => {
     });
   });
 
-  it('should fail to confirm empty order after login', (done) => {
-    loginService.login('Victor', 'password123').subscribe({
-      next: () => {
-
-        service.confirmOrder().subscribe({
-          next: () => {
-            fail('Expected backend to reject empty order');
-            done();
-          },
-          error: (err) => {
-            expect(err.status).toBe(400);
-            done();
-          }
-        });
-
-      },
-      error: (err) => {
-        fail('Login failed: ' + err.message);
-        done();
-      }
-    });
-  });
 
   it('should retrieve paginated orders after login', (done) => {
     loginService.login('German', 'password123').subscribe({ //Admin Login

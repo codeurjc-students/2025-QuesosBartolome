@@ -24,10 +24,10 @@ For each feature, a feature/ branch is created where the implementation is devel
 
 | Metric | Value |
 |---------|-------|
-| Commits | -  | 
-| Branches | -  | 
-| Issues | -  | 
-| Pull Requests | -  | 
+| Commits | - 175 | 
+| Branches | - 1 | 
+| Issues | - Open: 1 <br> - Closed: 12 | 
+| Pull Requests | - Open: 0 <br> - Closed: 34  | 
 
 #### Continuous Integration
 
@@ -37,3 +37,23 @@ The Quesos Bartolomé application has a Continuous Integration (CI) system imple
 |---------|-------|
 | CI-Feature | - Runs automatically on every commit or push to a feature branch. Executes unit tests.  | 
 | CI-Full | - Runs automatically when a Pull Request is opened toward the main branch. Executes all tests on both client and server and performs static code analysis with SonarQube. If this control is not passed, the Pull Request cannot be completed.  | 
+
+#### Releases
+Releases are created through GitHub Releases when the features planned for that release are correctly implemented.
+With each release, the Publish on Release workflow is triggered, which builds and publishes the Docker images to DockerHub with version‑specific tags.
+
+##### Version 0.1
+Date: January 2026
+
+**Features**
+
+Below are the features included in this version:
+
+- View cheeses and their specific characteristics.
+- View the “About Us” section with relevant information about the cheesery, including a Google Maps location showing the exact position of the business.
+- View the profiles of review authors.
+- Register as a user and log in with personal credentials.
+- Registered users can view their profile.
+- Registered users can place orders to the cheesery and modify them dynamically using a shopping cart.
+- Administrators can view a paginated list of customers.
+- Administrators can view a paginated list of orders placed to the cheesery.

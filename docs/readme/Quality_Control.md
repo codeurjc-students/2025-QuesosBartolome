@@ -1,4 +1,5 @@
 ### Quality Control
+
 To ensure the quality and reliability of the Quesos Bartolomé application, a series of automated tests have been conducted for both the client and the server. The tests include system (E2E), unit, and integration tests.
 All tests are executed automatically through GitHub Actions workflows, depending on the type of quality control: CI-Feature (unit tests only) and CI-Full (all tests and static code analysis).
 
@@ -20,23 +21,21 @@ All tests are executed automatically through GitHub Actions workflows, depending
 #### Coverage
 - Backend Coverage:
   
-![Backend Coverage](../../Images/CoverageBackend.png)
+![Backend Coverage](/Images/BackendCoverage.png)
 
 - Frontend Coverage:
   
-![Frontend Coverage](../../Images/CoverageFrontend.png)
+![Frontend Coverage](/Images/FrontendCoverage.png)
 
 #### Test Results
 
-- Service: 7 tests executed:
+- Service:
   
-![TestBackend](../../Images/TestPassedBackend.png)
-- Client: 2 tests executed:
+![TestBackend](/Images/BackendTests.png)
+- Client:
   
-![TestFrontend](../../Images/TestPassedFrontend.png)
+![TestFrontend](/Images/FrontendResults.png)
+
 #### Static Code Analysis 
 
-![Sonar1](../../Images/SonarQube1.png)
-
-
-![Sonar2](../../Images/SonarQube2.png)
+![Sonar](/Images/SonarResults.png)
