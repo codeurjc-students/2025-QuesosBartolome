@@ -25,7 +25,7 @@ For the next version (0.2) of the application, the following functionalities are
 
 - Unregistered users: View reviews for each cheese and access the profile of each review’s author.
 - Registered users: Edit their profile and credentials, as well as view, create, delete, and edit reviews.
-- Administrators: Add, edit, and delete cheeses from the website, ban users, and visualize basic charts.
+- Administrators: Add, edit, and delete cheeses from the website, ban users, process orders and generate invoices.
 
 With this, we take another step toward a more complete and dynamic website, moving closer to the final experience we aim to offer.
 
@@ -35,7 +35,7 @@ With this, we take another step toward a more complete and dynamic website, movi
 - [Execution](docs/readme/ProgramExecution.md)
 - [Development Guide](docs/readme/DevelopmentGuide.md)
 - [Tracking](docs/readme/Tracking.md)
-- [Project Start](docs/readme/Tracking.md)
+- [Project Start](docs/readme/ProjectStart.md)
 
 ## Author
 
