@@ -9,6 +9,7 @@ import org.junit.jupiter.api.*;
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.*;
 
 import org.springframework.boot.test.context.SpringBootTest;
@@ -16,7 +17,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 @SpringBootTest(classes = es.codeurjc.quesosbartolome.QuesosbartolomeApplication.class)
 public class CheeseUITests {
 
-      private WebDriver driver;
+        private WebDriver driver;
         private WebDriverWait wait;
 
         @BeforeEach
@@ -38,6 +39,26 @@ public class CheeseUITests {
         public void teardown() {
                 if (driver != null)
                         driver.quit();
+        }
+
+        private void login(String username, String password) {
+                driver.get("http://localhost:4200/");
+                WebElement loginBtn = wait.until(ExpectedConditions.elementToBeClickable(
+                                By.xpath("//button[contains(text(),'Iniciar Sesión')]")));
+                loginBtn.click();
+
+                WebElement usernameInput = wait.until(ExpectedConditions.visibilityOfElementLocated(
+                                By.cssSelector("input[name='username']")));
+                WebElement passwordInput = driver.findElement(By.cssSelector("input[name='password']"));
+
+                usernameInput.sendKeys(username);
+                passwordInput.sendKeys(password);
+
+                WebElement submitButton = driver.findElement(By.cssSelector("button[type='submit']"));
+                submitButton.click();
+
+                Alert alert = wait.until(ExpectedConditions.alertIsPresent());
+                alert.accept();
         }
 
         @Test
@@ -218,6 +239,144 @@ public class CheeseUITests {
                                 "Login button should be visible when not logged in.");
                 assertTrue(authButtons.getText().contains("Registrarse"),
                                 "Register button should be visible when not logged in.");
+        }
+
+        @Test
+        public void testCreateCheeseSuccessfully() throws InterruptedException {
+
+                // 1. Login as ADMIN
+                login("German", "password123");
+
+                // 2. Go to New Cheese page
+                driver.get("http://localhost:4200/newCheese");
+                wait.until(ExpectedConditions.urlContains("/newCheese"));
+
+                // 3. Fill the form
+                driver.findElement(By.id("name")).sendKeys("Nuevo Queso");
+                driver.findElement(By.id("price")).sendKeys("12.50");
+                driver.findElement(By.id("description")).sendKeys("Queso creado ");
+
+                Select typeSelect = new Select(driver.findElement(By.id("type")));
+                typeSelect.selectByVisibleText("Cremoso");
+
+                WebElement manufacture = driver.findElement(By.id("manufactureDate"));
+                manufacture.sendKeys("2024-01-24");
+
+                WebElement expiration = driver.findElement(By.id("expirationDate"));
+                expiration.sendKeys("2025-01-24");
+                // 4. Submit form using Actions
+                WebElement createBtn = wait.until(
+                                ExpectedConditions.elementToBeClickable(By.cssSelector("button[type='submit']")));
+
+                new Actions(driver)
+                                .moveToElement(createBtn)
+                                .pause(200)
+                                .click()
+                                .perform();
+
+                // 5. Wait for success alert
+                Alert successAlert = wait.until(ExpectedConditions.alertIsPresent());
+                successAlert.accept();
+
+                // 6. Wait for redirect
+                wait.until(ExpectedConditions.urlToBe("http://localhost:4200/cheeses"));
+
+                // 7. Check cheese appears
+                WebElement cardGrid = wait.until(
+                                ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".card-grid")));
+
+                boolean exists = cardGrid.getText().contains("Nuevo Queso");
+                assertTrue(exists, "The newly created cheese should appear in the cheese list.");
+        }
+
+        @Test
+        public void testCreateCheeseMissingFieldsShowsAlert() throws InterruptedException {
+
+                // 1. Login as ADMIN
+                login("German", "password123");
+
+                // 2. Go to New Cheese page
+                driver.get("http://localhost:4200/newCheese");
+                wait.until(ExpectedConditions.urlContains("/newCheese"));
+
+                // 3. Fill only some fields
+                driver.findElement(By.id("name")).sendKeys("Queso Incompleto");
+                driver.findElement(By.id("price")).sendKeys("10.00");
+
+                // 4. Submit form using Actions (fix for intercepted click)
+                WebElement createBtn = wait.until(
+                                ExpectedConditions.elementToBeClickable(By.cssSelector("button[type='submit']")));
+
+                new Actions(driver)
+                                .moveToElement(createBtn)
+                                .pause(200)
+                                .click()
+                                .perform();
+
+                // 5. Capture alert
+                Alert errorAlert = wait.until(ExpectedConditions.alertIsPresent());
+                String alertText = errorAlert.getText();
+                errorAlert.accept();
+
+                assertEquals("Todos los campos son obligatorios", alertText);
+        }
+
+        @Test
+        public void testFormFieldValidationDebug() throws InterruptedException {
+
+                login("German", "password123");
+
+                driver.get("http://localhost:4200/newCheese");
+                wait.until(ExpectedConditions.urlContains("/newCheese"));
+
+                // Fill fields
+                driver.findElement(By.id("name")).sendKeys("Nuevo Queso");
+                driver.findElement(By.id("price")).sendKeys("12.50");
+                driver.findElement(By.id("description")).sendKeys("Queso creado");
+
+                Select typeSelect = new Select(driver.findElement(By.id("type")));
+                typeSelect.selectByVisibleText("Cremoso");
+
+                WebElement manufacture = driver.findElement(By.id("manufactureDate"));
+                manufacture.sendKeys(Keys.CONTROL + "a");
+                manufacture.sendKeys("24/01/2024");
+
+                WebElement expiration = driver.findElement(By.id("expirationDate"));
+                expiration.sendKeys(Keys.CONTROL + "a");
+                expiration.sendKeys("25/01/2025");
+
+                // Print debug info
+                System.out.println("---- FIELD DEBUG ----");
+                System.out.println("Name: " + driver.findElement(By.id("name")).getAttribute("value"));
+                System.out.println("Price: " + driver.findElement(By.id("price")).getAttribute("value"));
+                System.out.println("Description: " + driver.findElement(By.id("description")).getAttribute("value"));
+                System.out.println("Type: " + driver.findElement(By.id("type")).getAttribute("value"));
+                System.out.println(
+                                "Manufacture: " + driver.findElement(By.id("manufactureDate")).getAttribute("value"));
+                System.out.println("Expiration: " + driver.findElement(By.id("expirationDate")).getAttribute("value"));
+
+                WebElement form = driver.findElement(By.tagName("form"));
+                System.out.println("Form classes: " + form.getAttribute("class"));
+                System.out.println("----------------------");
+
+                // Try submit
+                WebElement createBtn = wait.until(
+                                ExpectedConditions.elementToBeClickable(By.cssSelector("button[type='submit']")));
+
+                new Actions(driver).moveToElement(createBtn).pause(200).click().perform();
+
+                // Check if alert appears
+                try {
+                        Alert alert = new WebDriverWait(driver, Duration.ofSeconds(3))
+                                        .until(ExpectedConditions.alertIsPresent());
+                        alert.accept();
+                        System.out.println("ALERT APPEARED");
+                } catch (TimeoutException e) {
+                        System.out.println("NO ALERT APPEARED");
+                }
+
+                // Check if still on form
+                System.out.println("Current URL: " + driver.getCurrentUrl());
         }
 
 }

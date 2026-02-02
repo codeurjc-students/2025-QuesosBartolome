@@ -13,13 +13,15 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
-
 
 @ExtendWith(MockitoExtension.class)
 class cheeseServiceUnitTest {
@@ -117,5 +119,140 @@ class cheeseServiceUnitTest {
         verify(cheeseRepository, times(1)).findById(1L);
     }
 
+    @Test
+    void createCheeseThrowsWhenNameExists() {
+        // GIVEN
+        CheeseDTO dto = new CheeseDTO(
+                null, "Semicurado", 10.0, "desc",
+                null, null, "type", List.of(1.0));
+
+        when(cheeseRepository.existsByName("Semicurado")).thenReturn(true);
+
+        // WHEN + THEN
+        assertThatThrownBy(() -> cheeseService.createCheese(dto))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Cheese with that name already exists");
+
+        verify(cheeseRepository).existsByName("Semicurado");
+        verify(cheeseRepository, never()).save(any());
+    }
+
+    @Test
+    void createCheeseThrowsWhenPriceInvalid() {
+        // GIVEN
+        CheeseDTO dto = new CheeseDTO(
+                null, "Nuevo", 0.0, "desc",
+                null, null, "type", List.of(1.0));
+
+        when(cheeseRepository.existsByName("Nuevo")).thenReturn(false);
+
+        // WHEN + THEN
+        assertThatThrownBy(() -> cheeseService.createCheese(dto))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Price must be greater than 0");
+
+        verify(cheeseRepository).existsByName("Nuevo");
+        verify(cheeseRepository, never()).save(any());
+    }
+
+    @Test
+    void createCheeseSetsEmptyBoxesWhenNull() {
+        // GIVEN
+        CheeseDTO dto = new CheeseDTO(
+                null, "Nuevo", 10.0, "desc",
+                null, null, "type", null);
+
+        when(cheeseRepository.existsByName("Nuevo")).thenReturn(false);
+
+        Cheese saved = new Cheese(1L, "Nuevo", 10.0, "desc", "type", "2024-01-01", "2025-01-01");
+        saved.setBoxes(List.of());
+        saved.setImage(null);
+
+        when(cheeseRepository.save(any())).thenReturn(saved);
+
+        // WHEN
+        CheeseDTO result = cheeseService.createCheese(dto);
+
+        // THEN
+        assertThat(result.name()).isEqualTo("Nuevo");
+        verify(cheeseRepository).save(any(Cheese.class));
+    }
+
+    @Test
+    void createCheeseSavesCorrectly() {
+        // GIVEN
+        CheeseDTO dto = new CheeseDTO(
+                null, "Nuevo", 15.0, "desc",
+                null, null, "type", List.of(1.0, 2.0));
+
+        when(cheeseRepository.existsByName("Nuevo")).thenReturn(false);
+
+        Cheese saved = new Cheese(1L, "Nuevo", 15.0, "desc", "type", "2024-01-01", "2025-01-01");
+        saved.setBoxes(List.of(1.0, 2.0));
+        saved.setImage(null);
+
+        when(cheeseRepository.save(any())).thenReturn(saved);
+
+        // WHEN
+        CheeseDTO result = cheeseService.createCheese(dto);
+
+        // THEN
+        assertThat(result.id()).isEqualTo(1L);
+        assertThat(result.name()).isEqualTo("Nuevo");
+        verify(cheeseRepository).save(any(Cheese.class));
+    }
+
+    @Test
+    void saveCheeseImageReturnsFalseWhenCheeseNotFound() throws Exception {
+        when(cheeseRepository.findById(99L)).thenReturn(Optional.empty());
+
+        boolean result = cheeseService.saveCheeseImage(99L, null);
+
+        assertThat(result).isFalse();
+        verify(cheeseRepository).findById(99L);
+    }
+
+    @Test
+    void saveCheeseImageUsesDefaultWhenFileNull() throws Exception {
+        Cheese cheese = new Cheese(1L, "Queso", 10.0, "desc", "type", "2024-01-01", "2025-01-01");
+        when(cheeseRepository.findById(1L)).thenReturn(Optional.of(cheese));
+
+        boolean result = cheeseService.saveCheeseImage(1L, null);
+
+        assertThat(result).isTrue();
+        assertThat(cheese.getImage()).isNotNull();
+        verify(cheeseRepository).save(cheese);
+    }
+
+    @Test
+    void saveCheeseImageUsesDefaultWhenFileEmpty() throws Exception {
+        Cheese cheese = new Cheese(1L, "Queso", 10.0, "desc", "type", "2024-01-01", "2025-01-01");
+        when(cheeseRepository.findById(1L)).thenReturn(Optional.of(cheese));
+
+        MultipartFile file = mock(MultipartFile.class);
+        when(file.isEmpty()).thenReturn(true);
+
+        boolean result = cheeseService.saveCheeseImage(1L, file);
+
+        assertThat(result).isTrue();
+        assertThat(cheese.getImage()).isNotNull();
+        verify(cheeseRepository).save(cheese);
+    }
+
+    @Test
+    void saveCheeseImageStoresUploadedFile() throws Exception {
+        Cheese cheese = new Cheese(1L, "Queso", 10.0, "desc", "type", "2024-01-01", "2025-01-01");
+        when(cheeseRepository.findById(1L)).thenReturn(Optional.of(cheese));
+
+        MultipartFile file = mock(MultipartFile.class);
+        when(file.isEmpty()).thenReturn(false);
+        when(file.getBytes()).thenReturn("fakeimage".getBytes());
+
+        boolean result = cheeseService.saveCheeseImage(1L, file);
+
+        assertThat(result).isTrue();
+        assertThat(cheese.getImage()).isNotNull();
+        verify(cheeseRepository).save(cheese);
+    }
 
 }

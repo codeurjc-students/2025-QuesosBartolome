@@ -25,7 +25,7 @@ describe('CheeseListComponent (unit)', () => {
     mockRouter = jasmine.createSpyObj('Router', ['navigate']);
 
     mockCheeseService.getAllCheeses.and.returnValue(of([
-     { id: 1, name: 'Semicurado', price: 10, description: '', type: '', manufactureDate: '', expirationDate: '', boxes: [] },
+      { id: 1, name: 'Semicurado', price: 10, description: '', type: '', manufactureDate: '', expirationDate: '', boxes: [] },
       { id: 2, name: 'Azul', price: 12, description: '', type: '', manufactureDate: '', expirationDate: '', boxes: [] }
     ]));
 
@@ -62,13 +62,30 @@ describe('CheeseListComponent (unit)', () => {
     expect(names).toContain('Azul');
   });
 
-  it('should render the add new cheese card', () => {
+  it('should render the add new cheese card when user is ADMIN', () => {
+    const adminUser: UserDTO = {
+      id: 1,
+      name: 'Admin',
+      password: '1234',
+      gmail: 'admin@gmail.com',
+      direction: 'Calle Falsa 123',
+      nif: '12345678A',
+      rols: ['ADMIN']
+    };
+
+    mockUserService.getCurrentUser.and.returnValue(of(adminUser));
+
+    fixture = TestBed.createComponent(CheeseListComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+
     const addCard = fixture.debugElement.query(By.css('.card.add-card'));
     expect(addCard).toBeTruthy();
 
     const text = addCard.nativeElement.textContent;
     expect(text).toContain('Nuevo Queso');
   });
+
 
   it('should set isLoggedIn=true when getCurrentUser() returns a user', () => {
     const mockUser: UserDTO = {

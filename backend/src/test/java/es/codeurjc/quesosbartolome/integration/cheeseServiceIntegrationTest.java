@@ -11,6 +11,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.util.List;
@@ -20,7 +21,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
 @ActiveProfiles("test") // use application-test.properties
-@Transactional 
+@Transactional
 public class cheeseServiceIntegrationTest {
 
     @Autowired
@@ -34,9 +35,10 @@ public class cheeseServiceIntegrationTest {
     @BeforeEach
     void setup() {
         cheeseRepository.deleteAll();
-        Cheese curado = cheeseRepository.save(new Cheese(null, "Curado", 10.0, "desc1", "tipo1", "2024-01-01", "2025-01-01"));
+        Cheese curado = cheeseRepository
+                .save(new Cheese(null, "Curado", 10.0, "desc1", "tipo1", "2024-01-01", "2025-01-01"));
         cheeseRepository.save(new Cheese(null, "Tierno", 12.0, "desc2", "tipo2", "2024-02-01", "2025-02-01"));
-        curadoId = curado.getId(); 
+        curadoId = curado.getId();
     }
 
     @AfterAll
@@ -53,16 +55,15 @@ public class cheeseServiceIntegrationTest {
 
     @Test
     void shouldReturnIdCheese() {
-        Optional<CheeseDTO> cheese = cheeseService.findById(curadoId); 
+        Optional<CheeseDTO> cheese = cheeseService.findById(curadoId);
         assertThat(cheese).isPresent();
         assertThat(cheese.get().name()).isEqualTo("Curado");
     }
-    
+
     @Test
     void shouldReturnEmptyImageWhenCheeseHasNoImage() {
         Cheese sinImagen = cheeseRepository.save(
-            new Cheese(null, "SinImagen", 8.0, "desc3", "tipo3", "2024-03-01", "2025-03-01")
-        );
+                new Cheese(null, "SinImagen", 8.0, "desc3", "tipo3", "2024-03-01", "2025-03-01"));
         Optional<java.sql.Blob> image = cheeseService.getCheeseImageById(sinImagen.getId());
         assertThat(image).isEmpty();
     }
@@ -78,4 +79,135 @@ public class cheeseServiceIntegrationTest {
         assertThat(image).isPresent();
         assertThat(image.get().length()).isEqualTo(blob.length());
     }
+
+    @Test
+    void shouldCreateCheeseSuccessfully() {
+        CheeseDTO dto = new CheeseDTO(
+                null,
+                "Nuevo",
+                9.5,
+                "desc",
+                java.sql.Date.valueOf("2024-01-01"),
+                java.sql.Date.valueOf("2025-01-01"),
+                "tipoX",
+                List.of(1.0, 2.0));
+
+        CheeseDTO created = cheeseService.createCheese(dto);
+
+        assertThat(created.id()).isNotNull();
+        assertThat(created.name()).isEqualTo("Nuevo");
+
+        // Verificar que está en la BBDD
+        Optional<Cheese> saved = cheeseRepository.findById(created.id());
+        assertThat(saved).isPresent();
+        assertThat(saved.get().getName()).isEqualTo("Nuevo");
+    }
+
+    @Test
+    void shouldFailWhenNameAlreadyExists() {
+        CheeseDTO dto = new CheeseDTO(
+                null,
+                "Curado", // ya existe en setup()
+                9.5,
+                "desc",
+                java.sql.Date.valueOf("2024-01-01"),
+                java.sql.Date.valueOf("2025-01-01"),
+                "tipoX",
+                List.of(1.0));
+
+        org.assertj.core.api.Assertions.assertThatThrownBy(() -> cheeseService.createCheese(dto))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Cheese with that name already exists");
+    }
+
+    @Test
+    void shouldFailWhenPriceInvalid() {
+        CheeseDTO dto = new CheeseDTO(
+                null,
+                "Nuevo2",
+                0.0, // precio inválido
+                "desc",
+                java.sql.Date.valueOf("2024-01-01"),
+                java.sql.Date.valueOf("2025-01-01"),
+                "tipoX",
+                List.of(1.0));
+
+        org.assertj.core.api.Assertions.assertThatThrownBy(() -> cheeseService.createCheese(dto))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Price must be greater than 0");
+    }
+
+    @Test
+    void shouldSetEmptyBoxesWhenNull() {
+        CheeseDTO dto = new CheeseDTO(
+                null,
+                "Nuevo3",
+                5.0,
+                "desc",
+                java.sql.Date.valueOf("2024-01-01"),
+                java.sql.Date.valueOf("2025-01-01"),
+                "tipoX",
+                null // boxes null
+        );
+
+        CheeseDTO created = cheeseService.createCheese(dto);
+
+        Cheese saved = cheeseRepository.findById(created.id()).get();
+        assertThat(saved.getBoxes()).isEmpty();
+    }
+
+    @Test
+    void shouldReturnFalseWhenCheeseNotFound() throws Exception {
+        boolean result = cheeseService.saveCheeseImage(999L, null);
+        assertThat(result).isFalse();
+    }
+
+    @Test
+    void shouldSaveDefaultImageWhenFileNull() throws Exception {
+        Cheese cheese = cheeseRepository.save(
+                new Cheese(null, "SinImg", 10.0, "d", "t", "2024-01-01", "2025-01-01"));
+
+        boolean result = cheeseService.saveCheeseImage(cheese.getId(), null);
+
+        assertThat(result).isTrue();
+
+        Cheese updated = cheeseRepository.findById(cheese.getId()).get();
+        assertThat(updated.getImage()).isNotNull();
+    }
+
+    @Test
+    void shouldSaveDefaultImageWhenFileEmpty() throws Exception {
+        Cheese cheese = cheeseRepository.save(
+                new Cheese(null, "SinImg2", 10.0, "d", "t", "2024-01-01", "2025-01-01"));
+
+        MockMultipartFile emptyFile = new MockMultipartFile("file", new byte[0]);
+
+        boolean result = cheeseService.saveCheeseImage(cheese.getId(), emptyFile);
+
+        assertThat(result).isTrue();
+
+        Cheese updated = cheeseRepository.findById(cheese.getId()).get();
+        assertThat(updated.getImage()).isNotNull();
+    }
+
+    @Test
+    void shouldSaveUploadedImage() throws Exception {
+        Cheese cheese = cheeseRepository.save(
+                new Cheese(null, "ConImg", 10.0, "d", "t", "2024-01-01", "2025-01-01"));
+
+        MockMultipartFile file = new MockMultipartFile(
+                "file",
+                "imagen.png",
+                "image/png",
+                "fakeimage".getBytes());
+
+        boolean result = cheeseService.saveCheeseImage(cheese.getId(), file);
+
+        assertThat(result).isTrue();
+
+        Cheese updated = cheeseRepository.findById(cheese.getId()).get();
+        assertThat(updated.getImage()).isNotNull();
+        assertThat(updated.getImage().length()).isEqualTo("fakeimage".getBytes().length);
+    }
+
 }

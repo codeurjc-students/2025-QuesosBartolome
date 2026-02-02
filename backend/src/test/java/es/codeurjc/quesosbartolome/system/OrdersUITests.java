@@ -75,7 +75,7 @@ public class OrdersUITests {
     }
 
     private void createOrderAsUser() {
-        // Ir a un queso concreto
+        // Go to cheese details page
         driver.get("http://localhost:4200/cheeses/2");
 
         WebElement boxesInput = wait.until(
@@ -89,10 +89,10 @@ public class OrdersUITests {
         Alert successAlert = wait.until(ExpectedConditions.alertIsPresent());
         successAlert.accept();
 
-        // Ir a Mi pedido
+        // Go to My Order page
         driver.get("http://localhost:4200/myorder");
 
-        // Confirmar pedido
+        // Confirm the order
         WebElement confirmBtn = wait.until(
                 ExpectedConditions.elementToBeClickable(By.cssSelector(".btn.confirm")));
         confirmBtn.click();
@@ -110,27 +110,27 @@ public class OrdersUITests {
     @Order(1)
     public void testAdminCanSeeCreatedOrder() {
 
-        // 1. Login como usuario normal y crear pedido
+        // 1. Login as normal USER and create an order
         login("Victor", "password123");
         createOrderAsUser();
         logout();
 
-        // 2. Login como ADMIN
+        // 2. Login as ADMIN
         login("German", "password123");
 
-        // 3. Ir al menú Pedidos
+        // 3. Go to Orders page
         WebElement ordersMenu = wait.until(ExpectedConditions.elementToBeClickable(
                 By.xpath("//li[contains(text(),'Pedidos')]")));
         ordersMenu.click();
 
-        // 4. Comprobar que aparece al menos un pedido
+        // 4. Check that the order appears in the list
         List<WebElement> orderRows = wait.until(
                 ExpectedConditions.visibilityOfAllElementsLocatedBy(
                         By.cssSelector(".orders-row")));
 
         assertFalse(orderRows.isEmpty(), "Admin should see at least one order");
 
-        // 5. Comprobar que el pedido contiene el usuario Victor
+        // 5. Check that one of the orders belongs to Victor
         boolean foundVictor = orderRows.stream()
                 .anyMatch(row -> row.getText().contains("Victor"));
 

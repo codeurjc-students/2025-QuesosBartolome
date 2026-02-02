@@ -85,6 +85,9 @@ export class CheeseListComponent implements OnInit {
   goToClients(): void {
     this.router.navigate(['/users']);
   }
+  goToNewCheese(): void {
+    this.router.navigate(['/newCheese']);
+  }
 
   logout(): void {
     this.loginService.logout().subscribe({

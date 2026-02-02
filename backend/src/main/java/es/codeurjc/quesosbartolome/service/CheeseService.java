@@ -5,9 +5,12 @@ import es.codeurjc.quesosbartolome.dto.CheeseMapper;
 import es.codeurjc.quesosbartolome.model.Cheese;
 import es.codeurjc.quesosbartolome.repository.CheeseRepository;
 
+import org.hibernate.engine.jdbc.BlobProxy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.InputStream;
 import java.sql.Blob;
 import java.util.List;
 import java.util.Optional;
@@ -17,7 +20,7 @@ import java.util.stream.Collectors;
 public class CheeseService {
 
     @Autowired
-    private CheeseRepository cheeseRepository; 
+    private CheeseRepository cheeseRepository;
 
     @Autowired
     private CheeseMapper cheeseMapper;
@@ -33,6 +36,7 @@ public class CheeseService {
         return cheeseRepository.findById(id)
                 .map(cheeseMapper::toDTO);
     }
+
     public Optional<Blob> getCheeseImageById(Long id) {
         Optional<Cheese> cheeseOpt = cheeseRepository.findById(id);
 
@@ -42,6 +46,62 @@ public class CheeseService {
 
         return Optional.ofNullable(cheeseOpt.get().getImage());
     }
-} 
 
+    public CheeseDTO createCheese(CheeseDTO dto) {
 
+        if (cheeseRepository.existsByName(dto.name())) {
+            throw new IllegalArgumentException("Cheese with that name already exists");
+        }
+
+        if (dto.price() <= 0) {
+            throw new IllegalArgumentException("Price must be greater than 0");
+        }
+
+        Cheese cheese = cheeseMapper.toDomain(dto);
+
+        if (cheese.getBoxes() == null) {
+            cheese.setBoxes(List.of());
+        }
+
+        // image → null
+        cheese.setImage(null);
+
+        Cheese saved = cheeseRepository.save(cheese);
+        return cheeseMapper.toDTO(saved);
+    }
+
+    public boolean saveCheeseImage(Long id, MultipartFile file) throws Exception {
+
+        Optional<Cheese> cheeseOpt = cheeseRepository.findById(id);
+
+        if (cheeseOpt.isEmpty()) {
+            return false;
+        }
+
+        Cheese cheese = cheeseOpt.get();
+
+        if (file == null || file.isEmpty()) {
+
+            InputStream defaultImageStream = getClass().getResourceAsStream("/images/queso-default.jpg");
+
+            if (defaultImageStream == null) {
+                throw new RuntimeException("The file queso-default.jpg was not found in the resources folder.");
+            }
+
+            byte[] defaultBytes = defaultImageStream.readAllBytes();
+
+            Blob defaultBlob = BlobProxy.generateProxy(defaultBytes);
+
+            cheese.setImage(defaultBlob);
+
+        } else {
+            Blob blob = BlobProxy.generateProxy(file.getBytes());
+            cheese.setImage(blob);
+        }
+
+        cheeseRepository.save(cheese);
+
+        return true;
+    }
+
+}

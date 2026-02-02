@@ -2,6 +2,7 @@ package es.codeurjc.quesosbartolome.model;
 
 import java.sql.Blob;
 import java.sql.Date;
+import java.util.ArrayList;
 import java.util.List;
 
 import jakarta.persistence.Column;
@@ -34,7 +35,7 @@ public class Cheese {
     private Blob image;
     
     @OneToMany(mappedBy = "cheese")
-    private List<Review> reviews;
+    private List<Review> reviews = new ArrayList<>();
     
 
 

@@ -56,7 +56,7 @@ export class CheeseDetailsComponent implements OnInit {
     this.cheeseService.getCheeseById(id).subscribe({
       next: (data) => {
         this.cheese = data;
-        this.loadCheeseImage(data.id);
+        this.loadCheeseImage(data.id!);
       },
       error: err => console.error('Error obteniendo queso', err)
     });
@@ -100,11 +100,11 @@ export class CheeseDetailsComponent implements OnInit {
     const userId = this.currentUser.id;
     const cheeseId = this.cheese.id;
 
-    this.cartService.addCheeseToOrder(userId, cheeseId, boxes)
+    this.cartService.addCheeseToOrder(userId, cheeseId!, boxes)
       .subscribe({
         next: () => {
           alert('Producto añadido al pedido');
-          this.loadCheese(cheeseId);
+          this.loadCheese(cheeseId!);
         },
         error: (err) => {
           console.error('FULL ERROR:', err);

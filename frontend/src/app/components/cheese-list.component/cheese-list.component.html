@@ -74,7 +74,7 @@
     </div> 
 
     <div class="card-grid">
-      <div class="card shadow-sm" *ngFor="let cheese of cheeses" (click)="goToDetails(cheese.id)">
+      <div class="card shadow-sm" *ngFor="let cheese of cheeses" (click)="goToDetails(cheese.id!)">
         <div class="image-placeholder">
           <img [src]="'https://localhost:443/api/v1/cheeses/' + cheese.id + '/image'" alt="Imagen de {{ cheese.name }}" />
         </div>
@@ -84,7 +84,7 @@
         </div>
       </div>
 
-      <div class="card add-card" (click)="openNewCheeseModal()">
+      <div class="card add-card" (click)="goToNewCheese()" *ngIf="isLoggedIn && isAdmin()">
         <div class="add-content">
           <span class="plus">+</span>
           <p>Nuevo Queso</p>
