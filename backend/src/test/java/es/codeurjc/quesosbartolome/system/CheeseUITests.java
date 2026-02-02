@@ -252,7 +252,7 @@ public class CheeseUITests {
                 wait.until(ExpectedConditions.urlContains("/newCheese"));
 
                 // 3. Fill the form
-                driver.findElement(By.id("name")).sendKeys("Nuevo Queso");
+                driver.findElement(By.id("name")).sendKeys("Nuevo Queso creado Selenium");
                 driver.findElement(By.id("price")).sendKeys("12.50");
                 driver.findElement(By.id("description")).sendKeys("Queso creado ");
 
@@ -285,7 +285,7 @@ public class CheeseUITests {
                 WebElement cardGrid = wait.until(
                                 ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".card-grid")));
 
-                boolean exists = cardGrid.getText().contains("Nuevo Queso");
+                boolean exists = cardGrid.getText().contains("Nuevo Queso creado Selenium");
                 assertTrue(exists, "The newly created cheese should appear in the cheese list.");
         }
 
@@ -321,62 +321,5 @@ public class CheeseUITests {
                 assertEquals("Todos los campos son obligatorios", alertText);
         }
 
-        @Test
-        public void testFormFieldValidationDebug() throws InterruptedException {
-
-                login("German", "password123");
-
-                driver.get("http://localhost:4200/newCheese");
-                wait.until(ExpectedConditions.urlContains("/newCheese"));
-
-                // Fill fields
-                driver.findElement(By.id("name")).sendKeys("Nuevo Queso");
-                driver.findElement(By.id("price")).sendKeys("12.50");
-                driver.findElement(By.id("description")).sendKeys("Queso creado");
-
-                Select typeSelect = new Select(driver.findElement(By.id("type")));
-                typeSelect.selectByVisibleText("Cremoso");
-
-                WebElement manufacture = driver.findElement(By.id("manufactureDate"));
-                manufacture.sendKeys(Keys.CONTROL + "a");
-                manufacture.sendKeys("24/01/2024");
-
-                WebElement expiration = driver.findElement(By.id("expirationDate"));
-                expiration.sendKeys(Keys.CONTROL + "a");
-                expiration.sendKeys("25/01/2025");
-
-                // Print debug info
-                System.out.println("---- FIELD DEBUG ----");
-                System.out.println("Name: " + driver.findElement(By.id("name")).getAttribute("value"));
-                System.out.println("Price: " + driver.findElement(By.id("price")).getAttribute("value"));
-                System.out.println("Description: " + driver.findElement(By.id("description")).getAttribute("value"));
-                System.out.println("Type: " + driver.findElement(By.id("type")).getAttribute("value"));
-                System.out.println(
-                                "Manufacture: " + driver.findElement(By.id("manufactureDate")).getAttribute("value"));
-                System.out.println("Expiration: " + driver.findElement(By.id("expirationDate")).getAttribute("value"));
-
-                WebElement form = driver.findElement(By.tagName("form"));
-                System.out.println("Form classes: " + form.getAttribute("class"));
-                System.out.println("----------------------");
-
-                // Try submit
-                WebElement createBtn = wait.until(
-                                ExpectedConditions.elementToBeClickable(By.cssSelector("button[type='submit']")));
-
-                new Actions(driver).moveToElement(createBtn).pause(200).click().perform();
-
-                // Check if alert appears
-                try {
-                        Alert alert = new WebDriverWait(driver, Duration.ofSeconds(3))
-                                        .until(ExpectedConditions.alertIsPresent());
-                        alert.accept();
-                        System.out.println("ALERT APPEARED");
-                } catch (TimeoutException e) {
-                        System.out.println("NO ALERT APPEARED");
-                }
-
-                // Check if still on form
-                System.out.println("Current URL: " + driver.getCurrentUrl());
-        }
 
 }
