@@ -264,15 +264,26 @@ public class CheeseUITests {
 
                 WebElement expiration = driver.findElement(By.id("expirationDate"));
                 expiration.sendKeys("2025-01-24");
-                // 4. Submit form using Actions
+                
+                // 4. Submit form - ensure button is in view and clickable
                 WebElement createBtn = wait.until(
                                 ExpectedConditions.elementToBeClickable(By.cssSelector("button[type='submit']")));
 
-                new Actions(driver)
-                                .moveToElement(createBtn)
-                                .pause(200)
-                                .click()
-                                .perform();
+                // Scroll to button to ensure it's visible
+                ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block: 'center'});", createBtn);
+                Thread.sleep(300); // Brief pause after scroll
+
+                // Try Actions first
+                try {
+                        new Actions(driver)
+                                        .moveToElement(createBtn)
+                                        .pause(Duration.ofMillis(300))
+                                        .click()
+                                        .perform();
+                } catch (Exception e) {
+                        // Fallback to JavaScript click if Actions fails
+                        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", createBtn);
+                }
 
                 // 5. Wait for success alert
                 Alert successAlert = wait.until(ExpectedConditions.alertIsPresent());
@@ -303,15 +314,25 @@ public class CheeseUITests {
                 driver.findElement(By.id("name")).sendKeys("Queso Incompleto");
                 driver.findElement(By.id("price")).sendKeys("10.00");
 
-                // 4. Submit form using Actions (fix for intercepted click)
+                // 4. Submit form - ensure button is in view and clickable
                 WebElement createBtn = wait.until(
                                 ExpectedConditions.elementToBeClickable(By.cssSelector("button[type='submit']")));
 
-                new Actions(driver)
-                                .moveToElement(createBtn)
-                                .pause(200)
-                                .click()
-                                .perform();
+                // Scroll to button to ensure it's visible
+                ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block: 'center'});", createBtn);
+                Thread.sleep(300); // Brief pause after scroll
+
+                // Try Actions first
+                try {
+                        new Actions(driver)
+                                        .moveToElement(createBtn)
+                                        .pause(Duration.ofMillis(300))
+                                        .click()
+                                        .perform();
+                } catch (Exception e) {
+                        // Fallback to JavaScript click if Actions fails
+                        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", createBtn);
+                }
 
                 // 5. Capture alert
                 Alert errorAlert = wait.until(ExpectedConditions.alertIsPresent());
@@ -319,6 +340,60 @@ public class CheeseUITests {
                 errorAlert.accept();
 
                 assertEquals("Todos los campos son obligatorios", alertText);
+        }
+
+        @Test
+        public void testCreateCheeseWithExpirationDateBeforeManufactureDateShowsAlert() throws InterruptedException {
+
+                // 1. Login as ADMIN
+                login("German", "password123");
+
+                // 2. Go to New Cheese page
+                driver.get("http://localhost:4200/newCheese");
+                wait.until(ExpectedConditions.urlContains("/newCheese"));
+
+                // 3. Fill all fields but with expiration date before manufacture date
+                driver.findElement(By.id("name")).sendKeys("Queso Fecha Inválida");
+                driver.findElement(By.id("price")).sendKeys("15.00");
+                driver.findElement(By.id("description")).sendKeys("Queso con fechas incorrectas");
+
+                Select typeSelect = new Select(driver.findElement(By.id("type")));
+                typeSelect.selectByVisibleText("Cremoso");
+
+                // Set manufacture date to 2025-01-24 and expiration date to 2024-01-24 (before manufacture)
+                WebElement manufacture = driver.findElement(By.id("manufactureDate"));
+                manufacture.sendKeys("2025-01-24");
+
+                WebElement expiration = driver.findElement(By.id("expirationDate"));
+                expiration.sendKeys("2024-01-24");
+
+                // 4. Submit form - ensure button is in view and clickable
+                WebElement createBtn = wait.until(
+                                ExpectedConditions.elementToBeClickable(By.cssSelector("button[type='submit']")));
+
+                // Scroll to button to ensure it's visible
+                ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block: 'center'});", createBtn);
+                Thread.sleep(300); // Brief pause after scroll
+
+                // Try Actions first
+                try {
+                        new Actions(driver)
+                                        .moveToElement(createBtn)
+                                        .pause(Duration.ofMillis(300))
+                                        .click()
+                                        .perform();
+                } catch (Exception e) {
+                        // Fallback to JavaScript click if Actions fails
+                        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", createBtn);
+                }
+
+                // 5. Capture alert and verify error message
+                Alert errorAlert = wait.until(ExpectedConditions.alertIsPresent());
+                String alertText = errorAlert.getText();
+                errorAlert.accept();
+
+                assertEquals("La fecha de caducidad debe ser posterior a la de fabricación", alertText,
+                                "Should show error when expiration date is before manufacture date");
         }
 
 
