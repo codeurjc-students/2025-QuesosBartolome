@@ -170,7 +170,6 @@ public class CheeseUITests {
                 assertFalse(sidebar.getText().contains("Clientes"), "USER must NOT see 'Clientes'");
         }
 
-        
         @Test
         @Order(4)
         public void testUserNavigationMenuForAdmin() {
@@ -211,7 +210,7 @@ public class CheeseUITests {
                 assertTrue(sidebar.getText().contains("Stock"), "ADMIN should see 'Stock'");
                 assertTrue(sidebar.getText().contains("Clientes"), "ADMIN should see 'Clientes'");
         }
-        
+
         @Test
         @Order(5)
         public void testNavigationMenuWhenNotLoggedIn() {
@@ -272,13 +271,14 @@ public class CheeseUITests {
 
                 WebElement expiration = driver.findElement(By.id("expirationDate"));
                 expiration.sendKeys("2025-01-24");
-                
+
                 // 4. Submit form - ensure button is in view and clickable
                 WebElement createBtn = wait.until(
                                 ExpectedConditions.elementToBeClickable(By.cssSelector("button[type='submit']")));
 
                 // Scroll to button to ensure it's visible
-                ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block: 'center'});", createBtn);
+                ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block: 'center'});",
+                                createBtn);
                 Thread.sleep(300); // Brief pause after scroll
 
                 // Try Actions first
@@ -328,7 +328,8 @@ public class CheeseUITests {
                                 ExpectedConditions.elementToBeClickable(By.cssSelector("button[type='submit']")));
 
                 // Scroll to button to ensure it's visible
-                ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block: 'center'});", createBtn);
+                ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block: 'center'});",
+                                createBtn);
                 Thread.sleep(300); // Brief pause after scroll
 
                 // Try Actions first
@@ -370,7 +371,8 @@ public class CheeseUITests {
                 Select typeSelect = new Select(driver.findElement(By.id("type")));
                 typeSelect.selectByVisibleText("Cremoso");
 
-                // Set manufacture date to 2025-01-24 and expiration date to 2024-01-24 (before manufacture)
+                // Set manufacture date to 2025-01-24 and expiration date to 2024-01-24 (before
+                // manufacture)
                 WebElement manufacture = driver.findElement(By.id("manufactureDate"));
                 manufacture.sendKeys("2025-01-24");
 
@@ -382,7 +384,8 @@ public class CheeseUITests {
                                 ExpectedConditions.elementToBeClickable(By.cssSelector("button[type='submit']")));
 
                 // Scroll to button to ensure it's visible
-                ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block: 'center'});", createBtn);
+                ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block: 'center'});",
+                                createBtn);
                 Thread.sleep(300); // Brief pause after scroll
 
                 // Try Actions first
@@ -414,15 +417,45 @@ public class CheeseUITests {
                 // 1. Login as ADMIN
                 login("German", "password123");
 
-                // 2. Navigate to a cheese details page (Semicurado)
+                // 2. Primero crear un queso auxiliar para editar
+                driver.get("http://localhost:4200/newCheese");
+                wait.until(ExpectedConditions.urlContains("/newCheese"));
+
+                driver.findElement(By.id("name")).sendKeys("QuesoParaEditar");
+                driver.findElement(By.id("price")).sendKeys("20.00");
+                driver.findElement(By.id("description")).sendKeys("Este queso será editado en el test");
+
+                Select typeSelect = new Select(driver.findElement(By.id("type")));
+                typeSelect.selectByVisibleText("Pasta prensada");
+
+                WebElement manufactureDateInput = driver.findElement(By.id("manufactureDate"));
+                manufactureDateInput.sendKeys("2024-01-15");
+
+                WebElement expirationDateInput = driver.findElement(By.id("expirationDate"));
+                expirationDateInput.sendKeys("2025-01-15");
+
+                WebElement createBtn = driver.findElement(By.cssSelector("button[type='submit']"));
+                createBtn.click();
+
+                Alert createAlert = wait.until(ExpectedConditions.alertIsPresent());
+                createAlert.accept();
+
+                // 3. Esperar a volver a la página de inicio y buscar el queso creado
+                wait.until(ExpectedConditions.urlToBe("http://localhost:4200/"));
+                Thread.sleep(1000);
+
+                driver.get("http://localhost:4200/cheeses");
+                wait.until(ExpectedConditions.urlContains("/cheeses"));
                 wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".card-grid")));
-                WebElement semicuradoCard = wait.until(ExpectedConditions.visibilityOfElementLocated(
-                                By.xpath("//div[contains(@class,'card')]//p[text()='Semicurado']/ancestor::div[contains(@class,'card')]")));
-                semicuradoCard.click();
+
+                // 4. Navegar al queso auxiliar creado
+                WebElement auxiliarCheeseCard = wait.until(ExpectedConditions.visibilityOfElementLocated(
+                                By.xpath("//div[contains(@class,'card')]//p[text()='QuesoParaEditar']/ancestor::div[contains(@class,'card')]")));
+                auxiliarCheeseCard.click();
 
                 wait.until(ExpectedConditions.urlMatches("http://localhost:4200/cheeses/\\d+"));
 
-                // 3. Click Edit button
+                // 5. Click Edit button
                 WebElement editBtn = wait
                                 .until(ExpectedConditions.elementToBeClickable(By.cssSelector(".edit-btn")));
                 ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block: 'center'});", editBtn);
@@ -438,16 +471,16 @@ public class CheeseUITests {
                         ((JavascriptExecutor) driver).executeScript("arguments[0].click();", editBtn);
                 }
 
-                // 4. Wait for navigation to edit page
+                // 6. Wait for navigation to edit page
                 wait.until(ExpectedConditions.urlMatches("http://localhost:4200/cheeses/\\d+/edit"));
 
-                // 5. Verify form is populated with existing data
+                // 7. Verify form is populated with existing data
                 WebElement nameInput = driver.findElement(By.id("name"));
-                assertEquals("Semicurado", nameInput.getAttribute("value"), "Name should be pre-filled");
+                assertEquals("QuesoParaEditar", nameInput.getAttribute("value"), "Name should be pre-filled");
 
-                // 6. Modify fields
+                // 8. Modify fields
                 nameInput.clear();
-                nameInput.sendKeys("Semicurado Editado");
+                nameInput.sendKeys("QuesoEditado");
 
                 WebElement priceInput = driver.findElement(By.id("price"));
                 priceInput.clear();
@@ -455,9 +488,9 @@ public class CheeseUITests {
 
                 WebElement descriptionInput = driver.findElement(By.id("description"));
                 descriptionInput.clear();
-                descriptionInput.sendKeys("Descripción actualizada del queso Semicurado");
+                descriptionInput.sendKeys("Descripción actualizada del queso auxiliar");
 
-                // 7. Submit form
+                // 9. Submit form
                 WebElement submitBtn = wait.until(
                                 ExpectedConditions.elementToBeClickable(By.cssSelector("button[type='submit']")));
                 ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block: 'center'});",
@@ -474,62 +507,18 @@ public class CheeseUITests {
                         ((JavascriptExecutor) driver).executeScript("arguments[0].click();", submitBtn);
                 }
 
-                // 8. Verify success alert
+                // 10. Verify success alert
                 Alert successAlert = wait.until(ExpectedConditions.alertIsPresent());
                 assertEquals("Queso actualizado correctamente", successAlert.getText());
                 successAlert.accept();
 
-                // 9. Verify redirect to cheese details page
+                // 11. Verify redirect to cheese details page
                 wait.until(ExpectedConditions.urlMatches("http://localhost:4200/cheeses/\\d+"));
 
-                // 10. Verify updated data is displayed
+                // 12. Verify updated data is displayed
                 WebElement title = wait
                                 .until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".cheese-title")));
-                assertEquals("Semicurado Editado", title.getText(), "Cheese name should be updated");
-                
-                // 11. RESTORE original name for subsequent tests - click edit again
-                WebElement editBtnAgain = wait
-                                .until(ExpectedConditions.elementToBeClickable(By.cssSelector(".edit-btn")));
-                ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block: 'center'});", editBtnAgain);
-                Thread.sleep(300);
-
-                try {
-                        new Actions(driver)
-                                        .moveToElement(editBtnAgain)
-                                        .pause(Duration.ofMillis(300))
-                                        .click()
-                                        .perform();
-                } catch (Exception e) {
-                        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", editBtnAgain);
-                }
-
-                wait.until(ExpectedConditions.urlMatches("http://localhost:4200/cheeses/\\d+/edit"));
-                
-                // 12. Restore original name
-                WebElement nameInputRestore = driver.findElement(By.id("name"));
-                nameInputRestore.clear();
-                nameInputRestore.sendKeys("Semicurado");
-                
-                WebElement submitBtnRestore = wait.until(
-                                ExpectedConditions.elementToBeClickable(By.cssSelector("button[type='submit']")));
-                ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block: 'center'});",
-                                submitBtnRestore);
-                Thread.sleep(300);
-
-                try {
-                        new Actions(driver)
-                                        .moveToElement(submitBtnRestore)
-                                        .pause(Duration.ofMillis(300))
-                                        .click()
-                                        .perform();
-                } catch (Exception e) {
-                        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", submitBtnRestore);
-                }
-
-                Alert restoreAlert = wait.until(ExpectedConditions.alertIsPresent());
-                restoreAlert.accept();
-                
-                wait.until(ExpectedConditions.urlMatches("http://localhost:4200/cheeses/\\d+"));
+                assertEquals("QuesoEditado", title.getText(), "Cheese name should be updated");
         }
 
         @Test
@@ -604,11 +593,31 @@ public class CheeseUITests {
                 // 1. Login as ADMIN
                 login("German", "password123");
 
-                // 2. Navigate to cheese details and click edit
+                // 2. Crear un queso auxiliar primero para editar
+                driver.get("http://localhost:4200/newCheese");
+                wait.until(ExpectedConditions.urlContains("/newCheese"));
+
+                driver.findElement(By.id("name")).sendKeys("QuesoValidacion");
+                driver.findElement(By.id("price")).sendKeys("15.00");
+                driver.findElement(By.id("description")).sendKeys("Test validación");
+
+                Select createTypeSelect = new Select(driver.findElement(By.id("type")));
+                createTypeSelect.selectByVisibleText("Curado");
+
+                driver.findElement(By.id("manufactureDate")).sendKeys("2024-01-10");
+                driver.findElement(By.id("expirationDate")).sendKeys("2025-01-10");
+
+                driver.findElement(By.cssSelector("button[type='submit']")).click();
+                Alert createAlert = wait.until(ExpectedConditions.alertIsPresent());
+                createAlert.accept();
+                wait.until(ExpectedConditions.urlToBe("http://localhost:4200/"));
+                Thread.sleep(1000);
+                // 3. Navigate to cheese details and click edit
+                driver.get("http://localhost:4200/cheeses");
                 wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".card-grid")));
-                WebElement semicuradoCard = wait.until(ExpectedConditions.visibilityOfElementLocated(
-                                By.xpath("//div[contains(@class,'card')]//p[text()='Semicurado']/ancestor::div[contains(@class,'card')]")));
-                semicuradoCard.click();
+                WebElement cheeseCard = wait.until(ExpectedConditions.visibilityOfElementLocated(
+                                By.xpath("//div[contains(@class,'card')]//p[text()='QuesoValidacion']/ancestor::div[contains(@class,'card')]")));
+                cheeseCard.click();
 
                 wait.until(ExpectedConditions.urlMatches("http://localhost:4200/cheeses/\\d+"));
 
@@ -633,8 +642,10 @@ public class CheeseUITests {
                 WebElement nameInput = driver.findElement(By.id("name"));
                 ((JavascriptExecutor) driver).executeScript("arguments[0].value = '';", nameInput);
                 // Trigger blur event to make Angular detect the change
-                ((JavascriptExecutor) driver).executeScript("arguments[0].dispatchEvent(new Event('input')); arguments[0].dispatchEvent(new Event('blur'));", nameInput);
-                
+                ((JavascriptExecutor) driver).executeScript(
+                                "arguments[0].dispatchEvent(new Event('input')); arguments[0].dispatchEvent(new Event('blur'));",
+                                nameInput);
+
                 Thread.sleep(300); // Brief pause for validation to process
 
                 // 4. Try to submit
@@ -733,7 +744,8 @@ public class CheeseUITests {
                 // 4. Click Delete button
                 WebElement deleteBtn = wait
                                 .until(ExpectedConditions.elementToBeClickable(By.cssSelector(".delete-btn")));
-                ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block: 'center'});", deleteBtn);
+                ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block: 'center'});",
+                                deleteBtn);
                 Thread.sleep(300);
 
                 try {
@@ -763,23 +775,23 @@ public class CheeseUITests {
                 driver.get("http://localhost:4200/about-us");
                 wait.until(ExpectedConditions.urlContains("/about-us"));
                 Thread.sleep(500);
-                
+
                 driver.get("http://localhost:4200/cheeses");
                 wait.until(ExpectedConditions.urlToBe("http://localhost:4200/cheeses"));
-                
+
                 // Wait for card grid to be visible and fully loaded
                 wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".card-grid")));
                 Thread.sleep(1500); // Give extra time for all cheeses to render
-                
+
                 List<WebElement> cheeseNames = driver.findElements(By.cssSelector(".card-body p"));
-                
+
                 // Check using contains instead of equalsIgnoreCase for more lenient matching
                 boolean cheeseExists = cheeseNames.stream()
                                 .anyMatch(el -> {
                                         String text = el.getText();
                                         return text != null && text.toLowerCase().contains("Queso Para Borrar");
                                 });
-                
+
                 assertFalse(cheeseExists, "Deleted cheese should not appear in the list");
         }
 
@@ -790,22 +802,25 @@ public class CheeseUITests {
                 // 1. Login as ADMIN
                 login("German", "password123");
 
-                // 2. Navigate to a cheese details page (use Semicurado as it's always available)
+                // 2. Navigate to a cheese details page (use Semicurado as it's always
+                // available)
                 wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".card-grid")));
                 WebElement semicuradoCard = wait.until(ExpectedConditions.visibilityOfElementLocated(
                                 By.xpath("//div[contains(@class,'card')]//p[text()='Semicurado']/ancestor::div[contains(@class,'card')]")));
                 semicuradoCard.click();
 
                 wait.until(ExpectedConditions.urlMatches("http://localhost:4200/cheeses/\\d+"));
-                
+
                 // 2a. Verify we landed on the correct cheese page
-                WebElement actualTitle = wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".cheese-title")));
+                WebElement actualTitle = wait
+                                .until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".cheese-title")));
                 assertEquals("Semicurado", actualTitle.getText(), "Should have navigated to Semicurado cheese");
 
                 // 3. Click Delete button
                 WebElement deleteBtn = wait
                                 .until(ExpectedConditions.elementToBeClickable(By.cssSelector(".delete-btn")));
-                ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block: 'center'});", deleteBtn);
+                ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block: 'center'});",
+                                deleteBtn);
                 Thread.sleep(300);
 
                 try {
@@ -826,7 +841,7 @@ public class CheeseUITests {
                 Thread.sleep(500); // Brief wait to ensure no redirect happens
                 assertTrue(driver.getCurrentUrl().matches("http://localhost:4200/cheeses/\\d+"),
                                 "Should stay on cheese details page when delete is cancelled");
-        
+
                 // 6. Verify cheese details are still visible
                 WebElement title = driver.findElement(By.cssSelector(".cheese-title"));
                 assertEquals("Semicurado", title.getText(), "Cheese should still be displayed");
@@ -876,6 +891,5 @@ public class CheeseUITests {
                                 .until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".delete-btn")));
                 assertTrue(deleteBtn.isDisplayed(), "ADMIN should see delete button");
         }
-
 
 }

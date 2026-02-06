@@ -47,6 +47,36 @@ public class ApiCheeseTests {
                 .detailedCookies();
     }
 
+    /**
+     * Crea un queso auxiliar temporal para tests de edición/eliminación
+     * @param cookies Cookies de autenticación de admin
+     * @param name Nombre del queso auxiliar
+     * @return ID del queso creado
+     */
+    private Long createAuxiliaryCheese(io.restassured.http.Cookies cookies, String name) throws JSONException {
+        JSONObject requestBody = new JSONObject();
+        requestBody.put("id", JSONObject.NULL);
+        requestBody.put("name", name);
+        requestBody.put("price", 10.0);
+        requestBody.put("description", "Queso auxiliar para test");
+        requestBody.put("manufactureDate", "2024-01-01");
+        requestBody.put("expirationDate", "2025-01-01");
+        requestBody.put("Type", "Curado");
+        requestBody.put("boxes", new JSONArray(List.of(1.0, 2.0)));
+
+        return given()
+                .cookies(cookies)
+                .contentType("application/json")
+                .body(requestBody.toString())
+                .when()
+                .post("/api/v1/cheeses/new")
+                .then()
+                .statusCode(201)
+                .extract()
+                .jsonPath()
+                .getLong("id");
+    }
+
     @Test
     @Order(1)
     void testGetAllCheeses() {
@@ -215,11 +245,14 @@ public class ApiCheeseTests {
     void testUpdateCheese_Ok() throws JSONException {
         var cookies = login("German", "password123");
 
+        // Crear queso auxiliar para editar
+        Long cheeseId = createAuxiliaryCheese(cookies, "QuesoParaActualizar");
+
         JSONObject body = new JSONObject();
-        body.put("id", 1);
-        body.put("name", "Actualizado");
+        body.put("id", cheeseId);
+        body.put("name", "QuesoActualizado");
         body.put("price", 15.0);
-        body.put("description", "desc");
+        body.put("description", "desc actualizada");
         body.put("manufactureDate", "2024-01-01");
         body.put("expirationDate", "2025-01-01");
         body.put("Type", "Curado");
@@ -230,10 +263,10 @@ public class ApiCheeseTests {
                 .contentType("application/json")
                 .body(body.toString())
                 .when()
-                .put("/api/v1/cheeses/1")
+                .put("/api/v1/cheeses/" + cheeseId)
                 .then()
                 .statusCode(200)
-                .body("name", equalTo("Actualizado"));
+                .body("name", equalTo("QuesoActualizado"));
     }
 
     @Test
@@ -280,11 +313,14 @@ public class ApiCheeseTests {
     void testUpdateCheeseImage_Ok() throws JSONException {
         var cookies = login("German", "password123");
 
+        // Crear queso auxiliar para actualizar imagen
+        Long cheeseId = createAuxiliaryCheese(cookies, "QuesoParaImagenUpdate");
+
         given()
                 .cookies(cookies)
                 .multiPart("file", "imagen.png", "fake".getBytes())
                 .when()
-                .put("/api/v1/cheeses/1/image")
+                .put("/api/v1/cheeses/" + cheeseId + "/image")
                 .then()
                 .statusCode(200);
     }
@@ -333,11 +369,14 @@ public class ApiCheeseTests {
     void testUploadCheeseImage_Ok() throws JSONException {
         var cookies = login("German", "password123");
 
+        // Crear queso auxiliar para subir imagen
+        Long cheeseId = createAuxiliaryCheese(cookies, "QuesoParaImagenUpload");
+
         given()
                 .cookies(cookies)
                 .multiPart("file", "imagen.png", "fakecontent".getBytes())
                 .when()
-                .post("/api/v1/cheeses/1/image")
+                .post("/api/v1/cheeses/" + cheeseId + "/image")
                 .then()
                 .statusCode(200);
     }
@@ -382,10 +421,13 @@ public class ApiCheeseTests {
     void testDeleteCheese_NoContent() throws JSONException {
         var cookies = login("German", "password123");
 
+        // Crear queso auxiliar para eliminar
+        Long cheeseId = createAuxiliaryCheese(cookies, "QuesoParaEliminar");
+
         given()
                 .cookies(cookies)
                 .when()
-                .delete("/api/v1/cheeses/5")
+                .delete("/api/v1/cheeses/" + cheeseId)
                 .then()
                 .statusCode(204);
     }
