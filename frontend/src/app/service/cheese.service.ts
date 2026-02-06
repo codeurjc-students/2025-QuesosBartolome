@@ -43,5 +43,18 @@ export class CheeseService {
     return this.http.post(`${this.apiUrl}/${id}/image`, formData, { withCredentials: true });
   }
 
+  updateCheese(id: number, cheeseData: CheeseDTO): Observable<CheeseDTO> {
+    return this.http.put<CheeseDTO>(`${this.apiUrl}/${id}`, cheeseData, { withCredentials: true });
+  }
+
+  updateCheeseImage(id: number, file: File): Observable<any> {
+    const formData = new FormData();
+    formData.append("file", file);
+    return this.http.put(`${this.apiUrl}/${id}/image`, formData, { withCredentials: true });
+  }
+
+  deleteCheese(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${id}`, { withCredentials: true });
+  }
 
 }

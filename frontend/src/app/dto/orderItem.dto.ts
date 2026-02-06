@@ -1,8 +1,9 @@
-import { CheeseBasicDTO } from './cheeseBasic.dto';
-
 export interface OrderItemDTO {
   id: number;
-  cheese: CheeseBasicDTO;
+  cheeseId?: number;
+  cheeseName: string;
+  cheesePrice: number;
+  boxes: number[];
   weight: number;
-  price: number;
+  totalPrice: number;
 }

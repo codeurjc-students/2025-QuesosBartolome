@@ -100,6 +100,11 @@ public class SecurityConfiguration {
                     .requestMatchers(HttpMethod.GET, "/api/v1/users/all").hasAnyRole("ADMIN")
                     .requestMatchers(HttpMethod.POST, "/api/v1/cheeses/new").hasAnyRole("ADMIN")
                     .requestMatchers(HttpMethod.POST, "/api/v1/cheeses/*/image").hasAnyRole("ADMIN")
+                    .requestMatchers(HttpMethod.PUT, "/api/v1/cheeses/*").hasAnyRole("ADMIN")
+                    .requestMatchers(HttpMethod.PUT, "/api/v1/cheeses/*/image").hasAnyRole("ADMIN")
+                    .requestMatchers(HttpMethod.DELETE, "/api/v1/cheeses/*").hasAnyRole("ADMIN")
+
+
             );
         http.cors(cors -> {});
         // Disable CSRF protection (it is difficult to implement in REST APIs)

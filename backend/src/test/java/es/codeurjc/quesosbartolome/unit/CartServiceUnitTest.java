@@ -21,6 +21,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -44,6 +45,15 @@ class CartServiceUnitTest {
 
     @InjectMocks
     private CartService cartService;
+
+    @Test
+    void getCurrentCartDTOThrowsWhenUserNotFound() {
+        // User not found in repository
+        when(userRepository.findById(1L)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> cartService.getCurrentCartDTO(1L))
+                .isInstanceOf(NoSuchElementException.class);
+    }
 
     @Test
     void getCurrentCartDTOReturnsNullWhenCartIsNull() {
@@ -225,15 +235,22 @@ class CartServiceUnitTest {
 
         OrderItem item = new OrderItem();
         item.setId(5L);
+        item.setCheeseId(1L);
+        item.setBoxes(List.of(1.0, 1.0));
         item.setWeight(2.0);
-        item.setPrice(20.0);
+        item.setTotalPrice(20.0);
         cart.getItems().add(item);
 
         User user = new User();
         user.setId(1L);
         user.setCart(cart);
 
+        Cheese cheese = new Cheese();
+        cheese.setId(1L);
+        cheese.setBoxes(new ArrayList<>(List.of(0.5, 0.5)));
+
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+        when(cheeseRepository.findById(1L)).thenReturn(Optional.of(cheese));
 
         CartDTO dto = cartService.removeItemFromCart(1L, 5L);
 
@@ -241,6 +258,8 @@ class CartServiceUnitTest {
         assertThat(cart.getItems()).isEmpty();
         assertThat(cart.getTotalWeight()).isEqualTo(8);
         assertThat(cart.getTotalPrice()).isEqualTo(80);
+        assertThat(cheese.getBoxes()).hasSize(4); // 2 original + 2 returned
         verify(cartRepository).save(cart);
+        verify(cheeseRepository).save(cheese);
     }
 }

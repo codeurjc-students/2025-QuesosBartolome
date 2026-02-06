@@ -1,6 +1,8 @@
 package es.codeurjc.quesosbartolome.model;
 
 import jakarta.persistence.*;
+import java.util.List;
+import java.util.ArrayList;
 
 @Entity
 public class OrderItem {
@@ -17,29 +19,41 @@ public class OrderItem {
     @JoinColumn(name = "order_id")
     private Order order;
 
-    @ManyToOne
-    private Cheese cheese;
+    private Long cheeseId;
+    private String cheeseName;
+    private Double cheesePrice;
 
-    private Double weight; // kg
-    private Double price; // weight * cheese.price
+    @ElementCollection
+    private List<Double> boxes;
+    private Double weight;
+    private Double totalPrice;
 
     // CONSTRUCTORS
-    public OrderItem() {}
+    public OrderItem() {
+    }
 
     // To Cart
-    public OrderItem(Cart cart, Cheese cheese, Double weight, Double price) {
+    public OrderItem(Cart cart, Long cheeseId, String cheeseName, Double cheesePrice, List<Double> boxes, Double weight,
+            Double totalPrice) {
         this.cart = cart;
-        this.cheese = cheese;
+        this.cheeseId = cheeseId;
+        this.cheeseName = cheeseName;
+        this.cheesePrice = cheesePrice;
+        this.boxes = new ArrayList<>(boxes);
         this.weight = weight;
-        this.price = price;
+        this.totalPrice = totalPrice;
     }
 
     // To Order
-    public OrderItem(Order order, Cheese cheese, Double weight, Double price) {
+    public OrderItem(Order order, Long cheeseId, String cheeseName, Double cheesePrice, List<Double> boxes,
+            Double weight, Double totalPrice) {
         this.order = order;
-        this.cheese = cheese;
+        this.cheeseId = cheeseId;
+        this.cheeseName = cheeseName;
+        this.cheesePrice = cheesePrice;
+        this.boxes = new ArrayList<>(boxes);
         this.weight = weight;
-        this.price = price;
+        this.totalPrice = totalPrice;
     }
 
     // GETTERS & SETTERS
@@ -67,14 +81,37 @@ public class OrderItem {
         this.order = order;
     }
 
-    public Cheese getCheese() {
-        return cheese;
+    public Long getCheeseId() {
+        return cheeseId;
     }
 
-    public void setCheese(Cheese cheese) {
-        this.cheese = cheese;
+    public void setCheeseId(Long cheeseId) {
+        this.cheeseId = cheeseId;
     }
 
+    public String getCheeseName() {
+        return cheeseName;
+    }
+
+    public void setCheeseName(String cheeseName) {
+        this.cheeseName = cheeseName;
+    }
+
+    public Double getCheesePrice() {
+        return cheesePrice;
+    }
+
+    public void setCheesePrice(Double cheesePrice) {
+        this.cheesePrice = cheesePrice;
+    }
+
+    public List<Double> getBoxes() {
+        return boxes;
+    }
+
+    public void setBoxes(List<Double> boxes) {
+        this.boxes = boxes;
+    }
 
     public Double getWeight() {
         return weight;
@@ -84,12 +121,12 @@ public class OrderItem {
         this.weight = weight;
     }
 
-    public Double getPrice() {
-        return price;
+    public Double getTotalPrice() {
+        return totalPrice;
     }
 
-    public void setPrice(Double price) {
-        this.price = price;
+    public void setTotalPrice(Double totalPrice) {
+        this.totalPrice = totalPrice;
     }
 
 }

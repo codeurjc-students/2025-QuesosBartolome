@@ -190,5 +190,119 @@ describe('CheeseService (integration)', () => {
     });
   });
 
+  it('should edit an existing cheese in the real API', (done) => {
+
+    loginService.login('German', 'password123').subscribe({
+      next: () => {
+
+        const updatedCheese: CheeseDTO = {
+          id: 1,
+          name: 'Semicurado Editado',
+          price: 18.50,
+          description: 'Queso semicurado actualizado',
+          manufactureDate: '2024-01-01',
+          expirationDate: '2025-06-01',
+          type: 'Pasta prensada',
+          boxes: [6.32, 5.87]
+        };
+
+        service.updateCheese(1, updatedCheese).subscribe({
+          next: (edited: CheeseDTO) => {
+            expect(edited).toBeTruthy();
+            expect(edited.id).toBe(1);
+            expect(edited.name).toBe('Semicurado Editado');
+            expect(edited.price).toBe(18.50);
+
+            // Restore original data to avoid affecting other tests
+            const original: CheeseDTO = {
+              id: 1,
+              name: 'Semicurado',
+              price: 17.50,
+              description: 'Queso de pasta prensada madurado durante 21 días, con un sabor que comienza suave y cremoso pero se intensifica al final. Aromático sin resultar demasiado fuerte, ofrece un equilibrio agradable que lo hace fácil de disfrutar solo o acompañado.',
+              manufactureDate: '2024-01-01',
+              expirationDate: '2025-01-01',
+              type: 'Pasta prensada',
+              boxes: [6.32, 5.87, 5.82, 6.56, 5.98, 6.34, 6.41, 6.03, 5.79, 6.22]
+            };
+
+            service.updateCheese(1, original).subscribe({
+              next: () => {
+                done();
+              },
+              error: (err) => {
+                fail('Failed to restore original: ' + err.message);
+                done();
+              }
+            });
+          },
+          error: (err) => {
+            fail('Edit failed: ' + err.message);
+            done();
+          }
+        });
+
+      },
+      error: (err) => {
+        fail('Login failed: ' + err.message);
+        done();
+      }
+    });
+  });
+
+  it('should delete a cheese in the real API', (done) => {
+
+    loginService.login('German', 'password123').subscribe({
+      next: () => {
+
+        // first create a cheese to delete
+        const cheeseToDelete: CheeseDTO = {
+          name: 'CheeseToDelete',
+          price: 15,
+          description: 'Este queso será eliminado',
+          manufactureDate: '2024-01-24',
+          expirationDate: '2025-01-25',
+          type: 'Cremoso',
+          boxes: []
+        };
+
+        service.createCheese(cheeseToDelete).subscribe({
+          next: (created: CheeseDTO) => {
+            expect(created.id).toBeTruthy();
+
+            // Now delete the cheese
+            service.deleteCheese(created.id!).subscribe({
+              next: () => {
+                // Verify it no longer exists
+                service.getCheeseById(created.id!).subscribe({
+                  next: () => {
+                    fail('Cheese should have been deleted');
+                    done();
+                  },
+                  error: (err) => {
+                    expect(err.status).toBe(404);
+                    done();
+                  }
+                });
+              },
+              error: (err) => {
+                fail('Delete failed: ' + err.message);
+                done();
+              }
+            });
+          },
+          error: (err) => {
+            fail('Create failed: ' + err.message);
+            done();
+          }
+        });
+
+      },
+      error: (err) => {
+        fail('Login failed: ' + err.message);
+        done();
+      }
+    });
+  });
+
 
 });

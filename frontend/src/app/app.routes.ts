@@ -19,6 +19,7 @@ export const routes: Routes = [
   { path: 'user', component: UserPageComponent },
   { path: 'about-us', component: AboutUsComponent },
   { path: 'cheeses/:id', component: CheeseDetailsComponent },
+  { path: 'cheeses/:id/edit', component: CheeseFormComponent },
   { path: 'newCheese', component: CheeseFormComponent},
   { path: 'myorder', component: MyOrderComponent },
   { path: 'orders', component: OrdersComponent },

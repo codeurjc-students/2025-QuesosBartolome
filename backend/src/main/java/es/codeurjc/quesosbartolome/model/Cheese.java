@@ -27,7 +27,7 @@ public class Cheese {
     private String description;
     private Date manufactureDate;
     private Date expirationDate;
-    private String Type;
+    private String type;
     @ElementCollection
     private List<Double> boxes;
 
@@ -49,7 +49,7 @@ public class Cheese {
         this.name = name;
         this.price = price;
         this.description = description;
-        this.Type = type;
+        this.type = type;
         this.manufactureDate = Date.valueOf(manufactureDate);
         this.expirationDate = Date.valueOf(expirationDate);
     }
@@ -104,11 +104,11 @@ public class Cheese {
     }
 
     public String getType() {
-        return Type;
+        return type;
     }
 
     public void setType(String type) {
-        Type = type;
+        this.type = type;
     }
     
     public List<Double> getBoxes() {

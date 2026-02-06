@@ -20,6 +20,7 @@ import org.springframework.test.context.ActiveProfiles;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -51,7 +52,7 @@ public class CartServiceIntegrationTest {
         userRepository.deleteAll();
         cheeseRepository.deleteAll();
 
-        // Creamos usuario con carrito vacío
+        // Create user with empty cart
         Cart cart = new Cart();
         cart.setItems(new ArrayList<>());
         cart.setTotalPrice(0.0);
@@ -63,7 +64,7 @@ public class CartServiceIntegrationTest {
         user.setCart(cart);
         userRepository.save(user);
 
-        // Creamos un queso con cajas
+        // Create cheese with boxes
         cheese = new Cheese(null, "Curado", 10.0, "desc", "tipo", "2024-01-01", "2025-01-01");
         cheese.setBoxes(new ArrayList<>(List.of(1.0, 2.0, 3.0)));
         cheeseRepository.save(cheese);
@@ -71,8 +72,8 @@ public class CartServiceIntegrationTest {
 
     @AfterAll
     static void afterAll(@Autowired UserRepository userRepository,
-                         @Autowired CartRepository cartRepository,
-                         @Autowired CheeseRepository cheeseRepository) {
+            @Autowired CartRepository cartRepository,
+            @Autowired CheeseRepository cheeseRepository) {
         userRepository.deleteAll();
         cartRepository.deleteAll();
         cheeseRepository.deleteAll();
@@ -83,6 +84,12 @@ public class CartServiceIntegrationTest {
         CartDTO dto = cartService.getCurrentCartDTO(user.getId());
         assertThat(dto).isNotNull();
         assertThat(dto.id()).isEqualTo(user.getCart().getId());
+    }
+
+    @Test
+    void shouldThrowWhenUserNotFoundInGetCurrentCart() {
+        assertThatThrownBy(() -> cartService.getCurrentCartDTO(999L))
+                .isInstanceOf(NoSuchElementException.class);
     }
 
     @Test
@@ -116,13 +123,43 @@ public class CartServiceIntegrationTest {
     }
 
     @Test
+    void shouldThrowWhenUserHasNoCart() {
+        User u = new User();
+        u.setName("juan");
+        u.setCart(null);
+        userRepository.save(u);
+
+        assertThatThrownBy(() -> cartService.addItemToCart("juan", cheese.getId(), 1))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("Cart not initialized");
+    }
+
+    @Test
     void shouldRemoveItemFromCartSuccessfully() {
-        // Primero añadimos un item
+        // Add item first
         cartService.addItemToCart("pepe", cheese.getId(), 1);
         Cart cart = userRepository.findById(user.getId()).get().getCart();
         OrderItem item = cart.getItems().get(0);
 
         CartDTO dto = cartService.removeItemFromCart(user.getId(), item.getId());
+        assertThat(dto).isNotNull();
+        assertThat(cart.getItems()).isEmpty();
+        assertThat(cart.getTotalPrice()).isEqualTo(0.0);
+        assertThat(cart.getTotalWeight()).isEqualTo(0.0);
+    }
+
+    @Test
+    void shouldRemoveItemEvenIfCheeseWasDeleted() {
+        // Add item first
+        cartService.addItemToCart("pepe", cheese.getId(), 1);
+        Cart cart = userRepository.findById(user.getId()).get().getCart();
+        OrderItem item = cart.getItems().get(0);
+
+        // Delete cheese from DB
+        cheeseRepository.deleteById(cheese.getId());
+
+        CartDTO dto = cartService.removeItemFromCart(user.getId(), item.getId());
+
         assertThat(dto).isNotNull();
         assertThat(cart.getItems()).isEmpty();
         assertThat(cart.getTotalPrice()).isEqualTo(0.0);

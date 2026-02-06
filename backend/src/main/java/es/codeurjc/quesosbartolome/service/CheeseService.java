@@ -70,6 +70,36 @@ public class CheeseService {
         return cheeseMapper.toDTO(saved);
     }
 
+    public CheeseDTO updateCheese(Long id, CheeseDTO dto) {
+        Optional<Cheese> cheeseOpt = cheeseRepository.findById(id);
+
+        if (cheeseOpt.isEmpty()) {
+            throw new IllegalArgumentException("Cheese not found");
+        }
+
+        Cheese cheese = cheeseOpt.get();
+
+        // Check if name is being changed and if it already exists
+        if (!cheese.getName().equals(dto.name()) && cheeseRepository.existsByName(dto.name())) {
+            throw new IllegalArgumentException("Cheese with that name already exists");
+        }
+
+        if (dto.price() <= 0) {
+            throw new IllegalArgumentException("Price must be greater than 0");
+        }
+
+        // Update fields
+        cheese.setName(dto.name());
+        cheese.setPrice(dto.price());
+        cheese.setDescription(dto.description());
+        cheese.setManufactureDate(dto.manufactureDate());
+        cheese.setExpirationDate(dto.expirationDate());
+        cheese.setType(dto.type());
+
+        Cheese updated = cheeseRepository.save(cheese);
+        return cheeseMapper.toDTO(updated);
+    }
+
     public boolean saveCheeseImage(Long id, MultipartFile file) throws Exception {
 
         Optional<Cheese> cheeseOpt = cheeseRepository.findById(id);
@@ -101,6 +131,17 @@ public class CheeseService {
 
         cheeseRepository.save(cheese);
 
+        return true;
+    }
+
+    public boolean deleteCheese(Long id) {
+        Optional<Cheese> cheeseOpt = cheeseRepository.findById(id);
+
+        if (cheeseOpt.isEmpty()) {
+            return false;
+        }
+
+        cheeseRepository.deleteById(id);
         return true;
     }
 

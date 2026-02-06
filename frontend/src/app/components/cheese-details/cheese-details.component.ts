@@ -79,7 +79,7 @@ export class CheeseDetailsComponent implements OnInit {
 
   addToOrder(boxesValue: string) {
 
-    // Validaciones
+    // Validate input
     if (!boxesValue) {
       alert('Debes introducir una cantidad');
       return;
@@ -126,6 +126,34 @@ export class CheeseDetailsComponent implements OnInit {
 
   get isAdmin(): boolean {
     return this.currentUser?.rols?.includes('ADMIN') ?? false;
+  }
+
+  editCheese(): void {
+    if (this.cheese && this.cheese.id) {
+      this.router.navigate(['/cheeses', this.cheese.id, 'edit']);
+    }
+  }
+
+  deleteCheese(): void {
+    if (!this.cheese || !this.cheese.id) {
+      return;
+    }
+
+    if (confirm(`¿Estás seguro de que quieres eliminar el queso "${this.cheese.name}"?`)) {
+      this.cheeseService.deleteCheese(this.cheese.id).subscribe({
+        next: () => {
+          alert('Queso eliminado correctamente');
+          this.router.navigate(['/cheeses']);
+        },
+        error: (err) => {
+          console.error('Error al eliminar el queso:', err);
+          alert('Error al eliminar el queso');
+          if (err.status >= 500) {
+            this.router.navigate(['/error']);
+          }
+        }
+      });
+    }
   }
 
 }

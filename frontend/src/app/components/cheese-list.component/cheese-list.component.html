@@ -10,33 +10,33 @@
       <ul>
 
           <li (click)="goToAbout()">
-            <i class="fa-solid fa-info-circle"></i> Acerca de nosotros
+            Acerca de nosotros
           </li>
 
           <li (click)="goToMyOrder()" *ngIf="isLoggedIn && isUser()">
-            <i class="fa-solid fa-box"></i> Mi pedido
+            Mi pedido
           </li>
 
           <ng-container *ngIf="isLoggedIn && isAdmin()">
 
             <li (click)="goToOrders()">
-              <i class="fa-solid fa-box"></i> Pedidos
+              Pedidos
             </li>
 
             <li>
-              <i class="fa-solid fa-file-invoice"></i> Facturas
+              Facturas
             </li>
 
             <li>
-              <i class="fa-solid fa-chart-line"></i> Gráficos
+              Gráficos
             </li>
 
             <li>
-              <i class="fa-solid fa-cubes"></i> Stock
+              Stock
             </li>
 
             <li (click)="goToClients()">
-              <i class="fa-solid fa-users"></i> Clientes
+              Clientes
             </li>
 
           </ng-container>

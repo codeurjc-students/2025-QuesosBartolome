@@ -84,14 +84,14 @@ public class CartService {
         List<Double> selectedBoxes = cheese.getBoxes().subList(0, boxes);
         double totalWeight = selectedBoxes.stream().mapToDouble(Double::doubleValue).sum();
         double totalPrice = totalWeight * cheese.getPrice();
-
-        // Actualizar cajas del queso
+        // Update cheese boxes
         cheese.setBoxes(new ArrayList<>(
                 cheese.getBoxes().subList(boxes, cheese.getBoxes().size())));
         cheeseRepository.save(cheese);
 
-        // Crear item
-        OrderItem item = new OrderItem(cart, cheese, totalWeight, totalPrice);
+        // Create and add order item to cart
+        OrderItem item = new OrderItem(cart, cheese.getId(), cheese.getName(), cheese.getPrice(),
+                new ArrayList<>(selectedBoxes), totalWeight, totalPrice);
         cart.getItems().add(item);
 
         cart.setTotalWeight(cart.getTotalWeight() + totalWeight);
@@ -110,8 +110,22 @@ public class CartService {
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("Item not found"));
 
+        // Return boxes to cheese if it still exists
+        if (item.getCheeseId() != null) {
+            Optional<Cheese> cheeseOpt = cheeseRepository.findById(item.getCheeseId());
+            if (cheeseOpt.isPresent()) {
+                Cheese cheese = cheeseOpt.get();
+                List<Double> updatedBoxes = new ArrayList<>(cheese.getBoxes());
+                updatedBoxes.addAll(item.getBoxes());
+                cheese.setBoxes(updatedBoxes);
+                cheeseRepository.save(cheese);
+            }
+            // if cheese doesn't exist, we can't return the boxes, but we can ignore that
+            // since the cheese is gone and won't be ordered
+        }
+
         cart.setTotalWeight(cart.getTotalWeight() - item.getWeight());
-        cart.setTotalPrice(cart.getTotalPrice() - item.getPrice());
+        cart.setTotalPrice(cart.getTotalPrice() - item.getTotalPrice());
 
         cart.getItems().remove(item);
 

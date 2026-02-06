@@ -115,10 +115,10 @@ public class ApiOrderTests {
     void testConfirmOrder_Ok() throws JSONException {
         var cookies = registerAndLoginTestUser("OrderUser2", "password123");
 
-        // First add an item to the cart
+        // First add an item to the cart (using cheese 5 to avoid conflicts)
         given()
                 .cookies(cookies)
-                .queryParam("cheeseId", 1)
+                .queryParam("cheeseId", 5)
                 .queryParam("boxes", 1)
                 .when()
                 .put("/api/v1/cart/addItem")

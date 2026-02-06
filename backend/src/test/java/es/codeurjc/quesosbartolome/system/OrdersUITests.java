@@ -42,9 +42,6 @@ public class OrdersUITests {
             driver.quit();
     }
 
-    // ---------------------------
-    // Helpers
-    // ---------------------------
 
     private void login(String username, String password) {
         driver.get("http://localhost:4200/");
@@ -102,9 +99,6 @@ public class OrdersUITests {
         orderAlert.accept();
     }
 
-    // ---------------------------
-    // TEST PRINCIPAL
-    // ---------------------------
 
     @Test
     @Order(1)
