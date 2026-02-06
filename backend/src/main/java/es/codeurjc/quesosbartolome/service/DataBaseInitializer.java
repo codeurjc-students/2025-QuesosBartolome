@@ -22,7 +22,7 @@ import es.codeurjc.quesosbartolome.repository.CheeseRepository;
 import es.codeurjc.quesosbartolome.repository.UserRepository;
 import jakarta.annotation.PostConstruct;
 
-@Service 
+@Service
 public class DataBaseInitializer {
 
     @Autowired
@@ -32,7 +32,7 @@ public class DataBaseInitializer {
     private UserRepository userRepository;
 
     @Autowired
-	private PasswordEncoder passwordEncoder;
+    private PasswordEncoder passwordEncoder;
 
     public Blob saveImage(String resourcePath) throws IOException {
         ClassLoader classLoader = getClass().getClassLoader();
@@ -47,11 +47,21 @@ public class DataBaseInitializer {
             while ((bytesRead = inputStream.read(data, 0, data.length)) != -1) {
                 buffer.write(data, 0, bytesRead);
             }
-            
+
             return BlobProxy.generateProxy(buffer.toByteArray());
         }
     }
 
+    /**
+     * Generates a list of 25 random inventory values between 6.0 and 7.0 to simulate a large inventory for testing purposes.
+     */
+    private List<Double> generateLargeInventory() {
+        List<Double> inventory = new ArrayList<>();
+        for (int i = 0; i < 25; i++) {
+            inventory.add(6.0 + (Math.random() * 1.0));
+        }
+        return inventory;
+    }
 
     @PostConstruct
     public void init() throws IOException, URISyntaxException {
@@ -63,7 +73,7 @@ public class DataBaseInitializer {
         semicurado.setManufactureDate(Date.valueOf(LocalDate.now().minusMonths(2)));
         semicurado.setExpirationDate(Date.valueOf(LocalDate.now().plusMonths(10)));
         semicurado.setType("Pasta prensada");
-        semicurado.setBoxes(new ArrayList<>(List.of(6.32, 5.87, 5.82, 6.56, 5.98, 6.34, 6.41, 6.03, 5.79, 6.22)));
+        semicurado.setBoxes(generateLargeInventory());
         semicurado.setImage(saveImage("images/queso-default.jpg"));
         
 
@@ -76,7 +86,7 @@ public class DataBaseInitializer {
         azul.setManufactureDate(Date.valueOf(LocalDate.now().minusWeeks(3)));
         azul.setExpirationDate(Date.valueOf(LocalDate.now().plusMonths(2)));
         azul.setType("Maduración fúngica");
-        azul.setBoxes(new ArrayList<>(List.of(4.32, 4.87, 5.12, 4.56, 4.98, 5.34, 4.41, 5.03, 4.79, 5.22)));
+        azul.setBoxes(generateLargeInventory());
         azul.setImage(saveImage("images/queso-default.jpg"));
         
         
@@ -88,7 +98,7 @@ public class DataBaseInitializer {
         Curado.setManufactureDate(Date.valueOf(LocalDate.now().minusWeeks(5))); 
         Curado.setExpirationDate(Date.valueOf(LocalDate.now().plusMonths(3)));
         Curado.setType("Pasta prensada");
-        Curado.setBoxes(new ArrayList<>(List.of(6.32, 5.87, 5.82, 6.56, 5.98, 6.34, 6.41, 6.03, 5.79, 6.22)));
+        Curado.setBoxes(generateLargeInventory());
         Curado.setImage(saveImage("images/queso-default.jpg"));
         
 
@@ -113,7 +123,7 @@ public class DataBaseInitializer {
         Tierno.setManufactureDate(Date.valueOf(LocalDate.now().minusWeeks(2)));
         Tierno.setExpirationDate(Date.valueOf(LocalDate.now().plusMonths(1).plusWeeks(1)));
         Tierno.setType("Pasta prensada"); 
-        Tierno.setBoxes(new ArrayList<>(List.of(6.32, 5.87, 5.82, 6.56, 5.98, 6.34, 6.41, 6.03, 5.79, 6.22)));
+        Tierno.setBoxes(generateLargeInventory());
         Tierno.setImage(saveImage("images/queso-default.jpg"));
         
         
