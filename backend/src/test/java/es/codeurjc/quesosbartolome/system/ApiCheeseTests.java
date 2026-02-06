@@ -385,7 +385,7 @@ public class ApiCheeseTests {
         given()
                 .cookies(cookies)
                 .when()
-                .delete("/api/v1/cheeses/1")
+                .delete("/api/v1/cheeses/5")
                 .then()
                 .statusCode(204);
     }
