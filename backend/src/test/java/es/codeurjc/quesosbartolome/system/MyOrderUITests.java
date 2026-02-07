@@ -115,8 +115,8 @@ public class MyOrderUITests {
             ((JavascriptExecutor) driver).executeScript("arguments[0].click();", myOrderLink);
         }
 
-        // Wait for navigation to /myOrder page
-        wait.until(ExpectedConditions.urlContains("/myOrder"));
+        // Wait for navigation to /myorder page
+        wait.until(ExpectedConditions.urlContains("/myorder"));
         Thread.sleep(500);
 
         // Verify order container is visible
