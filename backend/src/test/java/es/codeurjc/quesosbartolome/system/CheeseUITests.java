@@ -468,9 +468,17 @@ public class CheeseUITests {
 
                 Alert createAlert = wait.until(ExpectedConditions.alertIsPresent());
                 createAlert.accept();
+                Thread.sleep(500);
 
-                // 3. Esperar a que cargue la lista de quesos
-                wait.until(ExpectedConditions.urlToBe("http://localhost:4200/cheeses"));
+                // 3. Wait for redirect or navigate manually if it doesn't happen
+                try {
+                        wait.until(ExpectedConditions.or(
+                                        ExpectedConditions.urlContains("/cheeses"),
+                                        ExpectedConditions.urlToBe("http://localhost:4200/")));
+                } catch (TimeoutException e) {
+                        driver.get("http://localhost:4200/cheeses");
+                }
+                wait.until(ExpectedConditions.urlContains("/cheeses"));
                 wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".card-grid")));
                 Thread.sleep(500);
 

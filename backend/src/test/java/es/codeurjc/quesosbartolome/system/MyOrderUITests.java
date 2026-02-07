@@ -96,7 +96,7 @@ public class MyOrderUITests {
 
     @Test
     @Order(1)
-    public void testMyOrderRenders() {
+    public void testMyOrderRenders() throws InterruptedException {
         loginAsUser();
 
         // Click on "Mi pedido" in sidebar
@@ -114,6 +114,10 @@ public class MyOrderUITests {
         } catch (Exception e) {
             ((JavascriptExecutor) driver).executeScript("arguments[0].click();", myOrderLink);
         }
+
+        // Wait for navigation to /myOrder page
+        wait.until(ExpectedConditions.urlContains("/myOrder"));
+        Thread.sleep(500);
 
         // Verify order container is visible
         WebElement orderContainer = wait.until(ExpectedConditions.visibilityOfElementLocated(
