@@ -363,35 +363,38 @@ public class CheeseUITests {
                                 createBtn);
                 Thread.sleep(500);
 
-                // Click with JavaScript to ensure it fires
-                ((JavascriptExecutor) driver).executeScript("arguments[0].click();", createBtn);
-                
-                // Wait a bit for the request to complete
-                Thread.sleep(1500);
-
-                // 5. Try to accept alert if present, if not present the creation might have failed silently
+                // Try Actions first for more natural interaction, fallback to JS
                 try {
-                        Alert alert = wait.until(ExpectedConditions.alertIsPresent());
-                        alert.accept();
-                        Thread.sleep(500);
-                } catch (TimeoutException e) {
-                        // No alert appeared - check if we're still on the form page
-                        if (driver.getCurrentUrl().contains("/newCheese")) {
-                                // Still on form - likely validation error or backend issue
-                                // Take a screenshot or log current state
-                                fail("No alert appeared after submitting form. Still on: " + driver.getCurrentUrl());
-                        }
+                        new Actions(driver)
+                                        .moveToElement(createBtn)
+                                        .pause(Duration.ofMillis(300))
+                                        .click()
+                                        .perform();
+                } catch (Exception e) {
+                        // Fallback to JavaScript click if Actions fails
+                        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", createBtn);
                 }
 
-                // 6. Navigate to cheeses list to verify creation
-                driver.get("http://localhost:4200/cheeses");
+                // 5. Wait for success alert - this blocks until backend completes the POST request
+                Alert successAlert = wait.until(ExpectedConditions.alertIsPresent());
+                successAlert.accept();
+                Thread.sleep(500);
+
+                // 6. Wait for redirect or navigate manually if it doesn't happen
+                try {
+                        wait.until(ExpectedConditions.or(
+                                        ExpectedConditions.urlContains("/cheeses"),
+                                        ExpectedConditions.urlToBe("http://localhost:4200/")));
+                } catch (TimeoutException e) {
+                        // If automatic redirect didn't happen, navigate manually
+                        driver.get("http://localhost:4200/cheeses");
+                }
                 wait.until(ExpectedConditions.urlContains("/cheeses"));
                 Thread.sleep(1000);
 
                 // 7. Check cheese appears
                 WebElement cardGrid = wait.until(
                                 ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".card-grid")));
-                Thread.sleep(500);
 
                 boolean exists = cardGrid.getText().contains(uniqueName);
                 assertTrue(exists, "The newly created cheese '" + uniqueName + "' should appear in the cheese list.");
