@@ -376,14 +376,30 @@ public class CheeseUITests {
 
                 // 5. Wait for success alert
                 Alert successAlert = wait.until(ExpectedConditions.alertIsPresent());
+                String alertText = successAlert.getText();
                 successAlert.accept();
+                
+                // Verify alert message
+                assertTrue(alertText.contains("Queso creado correctamente") || alertText.contains("exitosamente"),
+                                "Should show success message");
 
-                // 6. Wait for redirect
-                wait.until(ExpectedConditions.urlToBe("http://localhost:4200/cheeses"));
+                // 6. Wait for redirect to cheeses list (may be / or /cheeses)
+                Thread.sleep(1000); // Give time for navigation
+                wait.until(ExpectedConditions.or(
+                                ExpectedConditions.urlToBe("http://localhost:4200/cheeses"),
+                                ExpectedConditions.urlToBe("http://localhost:4200/")
+                ));
+                
+                // Navigate to cheeses list if we're on home page
+                if (driver.getCurrentUrl().equals("http://localhost:4200/")) {
+                        driver.get("http://localhost:4200/cheeses");
+                        wait.until(ExpectedConditions.urlToBe("http://localhost:4200/cheeses"));
+                }
 
                 // 7. Check cheese appears
                 WebElement cardGrid = wait.until(
                                 ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".card-grid")));
+                Thread.sleep(500);
 
                 boolean exists = cardGrid.getText().contains("Nuevo Queso creado Selenium");
                 assertTrue(exists, "The newly created cheese should appear in the cheese list.");

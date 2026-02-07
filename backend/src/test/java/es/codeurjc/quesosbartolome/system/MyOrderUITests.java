@@ -50,7 +50,18 @@ public class MyOrderUITests {
         driver.get("http://localhost:4200/");
         WebElement loginBtn = wait.until(ExpectedConditions.elementToBeClickable(
                 By.xpath("//button[contains(text(),'Iniciar Sesión')]")));
-        loginBtn.click();
+        
+        ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block: 'center'});", loginBtn);
+        try {
+            Thread.sleep(200);
+            new Actions(driver)
+                    .moveToElement(loginBtn)
+                    .pause(Duration.ofMillis(200))
+                    .click()
+                    .perform();
+        } catch (Exception e) {
+            ((JavascriptExecutor) driver).executeScript("arguments[0].click();", loginBtn);
+        }
 
         WebElement usernameInput = wait.until(ExpectedConditions.visibilityOfElementLocated(
                 By.cssSelector("input[name='username']")));
@@ -59,11 +70,28 @@ public class MyOrderUITests {
         usernameInput.sendKeys("User");
         passwordInput.sendKeys("password123");
 
-        WebElement submitButton = driver.findElement(By.cssSelector("button[type='submit']"));
-        submitButton.click();
+        WebElement submitButton = wait.until(ExpectedConditions.elementToBeClickable(
+                By.cssSelector("button[type='submit']")));
+        ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block: 'center'});", submitButton);
+        try {
+            Thread.sleep(200);
+            new Actions(driver)
+                    .moveToElement(submitButton)
+                    .pause(Duration.ofMillis(200))
+                    .click()
+                    .perform();
+        } catch (Exception e) {
+            ((JavascriptExecutor) driver).executeScript("arguments[0].click();", submitButton);
+        }
 
         Alert alert = wait.until(ExpectedConditions.alertIsPresent());
         alert.accept();
+        
+        try {
+            Thread.sleep(500); // Wait for login to complete
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
     }
 
     @Test
@@ -74,7 +102,18 @@ public class MyOrderUITests {
         // Click on "Mi pedido" in sidebar
         WebElement myOrderLink = wait.until(ExpectedConditions.elementToBeClickable(
                 By.xpath("//li[contains(text(),'Mi pedido')]")));
-        myOrderLink.click();
+        
+        ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block: 'center'});", myOrderLink);
+        try {
+            Thread.sleep(300);
+            new Actions(driver)
+                    .moveToElement(myOrderLink)
+                    .pause(Duration.ofMillis(300))
+                    .click()
+                    .perform();
+        } catch (Exception e) {
+            ((JavascriptExecutor) driver).executeScript("arguments[0].click();", myOrderLink);
+        }
 
         // Verify order container is visible
         WebElement orderContainer = wait.until(ExpectedConditions.visibilityOfElementLocated(
@@ -84,20 +123,34 @@ public class MyOrderUITests {
 
     @Test
     @Order(2)
-    public void testAddAndRemoveItem() {
+    public void testAddAndRemoveItem() throws InterruptedException {
         loginAsUser();
 
-        // Navigate directly to Azul cheese details (id=2)
-        driver.get("http://localhost:4200/cheeses/2");
+        // Navigate directly to Tierno cheese details (id=5) - has large inventory
+        driver.get("http://localhost:4200/cheeses/5");
+        wait.until(ExpectedConditions.urlContains("/cheeses/5"));
+        Thread.sleep(500);
 
         // Enter valid number of boxes
         WebElement boxesInput = wait
                 .until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".cajas-input")));
+        boxesInput.clear();
         boxesInput.sendKeys("1");
 
-        // Click Add button using Actions
+        // Click Add button with safe pattern
         WebElement addButton = wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(".add-btn")));
-        new Actions(driver).moveToElement(addButton).pause(200).click().perform();
+        ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block: 'center'});", addButton);
+        Thread.sleep(300);
+        
+        try {
+            new Actions(driver)
+                    .moveToElement(addButton)
+                    .pause(Duration.ofMillis(300))
+                    .click()
+                    .perform();
+        } catch (Exception e) {
+            ((JavascriptExecutor) driver).executeScript("arguments[0].click();", addButton);
+        }
 
         // Accept success alert
         Alert successAlert = wait.until(ExpectedConditions.alertIsPresent());
@@ -105,14 +158,27 @@ public class MyOrderUITests {
 
         // Go to "Mi pedido"
         driver.get("http://localhost:4200/myorder");
+        wait.until(ExpectedConditions.urlContains("/myorder"));
+        Thread.sleep(500);
 
         // Verify item appears
         List<WebElement> items = driver.findElements(By.cssSelector(".order-item"));
         assertFalse(items.isEmpty(), "Order should contain at least one item");
 
-        // Remove item
+        // Remove item with safe click
         WebElement deleteBtn = items.get(0).findElement(By.cssSelector(".btn-delete"));
-        deleteBtn.click();
+        ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block: 'center'});", deleteBtn);
+        Thread.sleep(300);
+        
+        try {
+            new Actions(driver)
+                    .moveToElement(deleteBtn)
+                    .pause(Duration.ofMillis(300))
+                    .click()
+                    .perform();
+        } catch (Exception e) {
+            ((JavascriptExecutor) driver).executeScript("arguments[0].click();", deleteBtn);
+        }
 
         // Verify item disappears
         wait.until(ExpectedConditions.numberOfElementsToBe(By.cssSelector(".order-item"), 0));
@@ -120,20 +186,34 @@ public class MyOrderUITests {
 
     @Test
     @Order(3)
-    public void testMakeOrderSuccess() {
+    public void testMakeOrderSuccess() throws InterruptedException {
         loginAsUser();
 
-        // Navigate directly to Azul cheese details (id=2)
-        driver.get("http://localhost:4200/cheeses/2");
+        // Navigate directly to Tierno cheese details (id=5) - has large inventory
+        driver.get("http://localhost:4200/cheeses/5");
+        wait.until(ExpectedConditions.urlContains("/cheeses/5"));
+        Thread.sleep(500);
 
         // Enter valid number of boxes
         WebElement boxesInput = wait
                 .until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".cajas-input")));
+        boxesInput.clear();
         boxesInput.sendKeys("1");
 
-        // Click Add button using Actions
+        // Click Add button with safe pattern
         WebElement addButton = wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(".add-btn")));
-        new Actions(driver).moveToElement(addButton).pause(200).click().perform();
+        ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block: 'center'});", addButton);
+        Thread.sleep(300);
+        
+        try {
+            new Actions(driver)
+                    .moveToElement(addButton)
+                    .pause(Duration.ofMillis(300))
+                    .click()
+                    .perform();
+        } catch (Exception e) {
+            ((JavascriptExecutor) driver).executeScript("arguments[0].click();", addButton);
+        }
 
         // Accept success alert
         Alert successAlert = wait.until(ExpectedConditions.alertIsPresent());
@@ -141,10 +221,23 @@ public class MyOrderUITests {
 
         // Go to "My order"
         driver.get("http://localhost:4200/myorder");
+        wait.until(ExpectedConditions.urlContains("/myorder"));
+        Thread.sleep(500);
 
-        // Click "Hacer Pedido"
+        // Click "Hacer Pedido" with safe pattern
         WebElement confirmBtn = wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(".btn.confirm")));
-        confirmBtn.click();
+        ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block: 'center'});", confirmBtn);
+        Thread.sleep(300);
+        
+        try {
+            new Actions(driver)
+                    .moveToElement(confirmBtn)
+                    .pause(Duration.ofMillis(300))
+                    .click()
+                    .perform();
+        } catch (Exception e) {
+            ((JavascriptExecutor) driver).executeScript("arguments[0].click();", confirmBtn);
+        }
 
         // Expect success alert
         Alert orderAlert = wait.until(ExpectedConditions.alertIsPresent());
@@ -158,15 +251,28 @@ public class MyOrderUITests {
 
     @Test
     @Order(4)
-    public void testMakeOrderFailure() {
+    public void testMakeOrderFailure() throws InterruptedException {
         loginAsUser();
 
         // Go directly to "My order" without adding items
         driver.get("http://localhost:4200/myorder");
+        wait.until(ExpectedConditions.urlContains("/myorder"));
+        Thread.sleep(500);
 
-        // Click "Hacer Pedido"
+        // Click "Hacer Pedido" with safe pattern
         WebElement confirmBtn = wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(".btn.confirm")));
-        confirmBtn.click();
+        ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block: 'center'});", confirmBtn);
+        Thread.sleep(300);
+        
+        try {
+            new Actions(driver)
+                    .moveToElement(confirmBtn)
+                    .pause(Duration.ofMillis(300))
+                    .click()
+                    .perform();
+        } catch (Exception e) {
+            ((JavascriptExecutor) driver).executeScript("arguments[0].click();", confirmBtn);
+        }
 
         // Check the alert text
         Alert orderAlert = wait.until(ExpectedConditions.alertIsPresent());
