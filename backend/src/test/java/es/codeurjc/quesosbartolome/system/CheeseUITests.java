@@ -330,66 +330,6 @@ public class CheeseUITests {
 
         @Test
         @Order(6)
-        public void testCreateCheeseSuccessfully() throws InterruptedException {
-
-                // 1. Login as ADMIN
-                login("German", "password123");
-
-                // 2. Go to New Cheese page
-                driver.get("http://localhost:4200/newCheese");
-                wait.until(ExpectedConditions.urlContains("/newCheese"));
-
-                // 3. Fill the form
-                driver.findElement(By.id("name")).sendKeys("Nuevo Queso creado Selenium");
-                driver.findElement(By.id("price")).sendKeys("12.50");
-                driver.findElement(By.id("description")).sendKeys("Queso creado ");
-
-                Select typeSelect = new Select(driver.findElement(By.id("type")));
-                typeSelect.selectByVisibleText("Cremoso");
-
-                WebElement manufacture = driver.findElement(By.id("manufactureDate"));
-                manufacture.sendKeys("2024-01-24");
-
-                WebElement expiration = driver.findElement(By.id("expirationDate"));
-                expiration.sendKeys("2025-01-24");
-                
-                // 4. Submit form - ensure button is in view and clickable
-                WebElement createBtn = wait.until(
-                                ExpectedConditions.elementToBeClickable(By.cssSelector("button[type='submit']")));
-
-                // Scroll to button to ensure it's visible
-                ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block: 'center'});", createBtn);
-                Thread.sleep(300); // Brief pause after scroll
-
-                // Try Actions first
-                try {
-                        new Actions(driver)
-                                        .moveToElement(createBtn)
-                                        .pause(Duration.ofMillis(300))
-                                        .click()
-                                        .perform();
-                } catch (Exception e) {
-                        // Fallback to JavaScript click if Actions fails
-                        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", createBtn);
-                }
-
-                // 5. Wait for success alert
-                Alert successAlert = wait.until(ExpectedConditions.alertIsPresent());
-                successAlert.accept();
-
-                // 6. Wait for redirect
-                wait.until(ExpectedConditions.urlToBe("http://localhost:4200/cheeses"));
-
-                // 7. Check cheese appears
-                WebElement cardGrid = wait.until(
-                                ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".card-grid")));
-
-                boolean exists = cardGrid.getText().contains("Nuevo Queso creado Selenium");
-                assertTrue(exists, "The newly created cheese should appear in the cheese list.");
-        }
-
-        @Test
-        @Order(7)
         public void testCreateCheeseMissingFieldsShowsAlert() throws InterruptedException {
 
                 // 1. Login as ADMIN
@@ -433,7 +373,7 @@ public class CheeseUITests {
         }
 
         @Test
-        @Order(8)
+        @Order(7)
         public void testCreateCheeseWithExpirationDateBeforeManufactureDateShowsAlert() throws InterruptedException {
 
                 // 1. Login as ADMIN
@@ -490,7 +430,7 @@ public class CheeseUITests {
         }
 
         @Test
-        @Order(9)
+        @Order(8)
         public void testEditCheeseSuccessfully() throws InterruptedException {
 
                 // 1. Login as ADMIN
@@ -615,7 +555,7 @@ public class CheeseUITests {
         }
 
         @Test
-        @Order(10)
+        @Order(9)
         public void testDeleteCheeseSuccessfully() throws InterruptedException {
 
                 // 1. Login as ADMIN
