@@ -254,10 +254,29 @@ public class MyOrderUITests {
     public void testMakeOrderFailure() throws InterruptedException {
         loginAsUser();
 
-        // Go directly to "My order" without adding items
+        // Go to "My order" and ensure cart is empty
         driver.get("http://localhost:4200/myorder");
         wait.until(ExpectedConditions.urlContains("/myorder"));
         Thread.sleep(500);
+        
+        // Remove all items if any exist
+        List<WebElement> existingItems = driver.findElements(By.cssSelector(".order-item"));
+        while (!existingItems.isEmpty()) {
+            WebElement deleteBtn = existingItems.get(0).findElement(By.cssSelector(".btn-delete"));
+            ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block: 'center'});", deleteBtn);
+            Thread.sleep(200);
+            try {
+                new Actions(driver)
+                        .moveToElement(deleteBtn)
+                        .pause(Duration.ofMillis(200))
+                        .click()
+                        .perform();
+            } catch (Exception e) {
+                ((JavascriptExecutor) driver).executeScript("arguments[0].click();", deleteBtn);
+            }
+            Thread.sleep(300);
+            existingItems = driver.findElements(By.cssSelector(".order-item"));
+        }
 
         // Click "Hacer Pedido" with safe pattern
         WebElement confirmBtn = wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(".btn.confirm")));
