@@ -46,7 +46,7 @@ public class CheeseUITests {
                 driver.get("http://localhost:4200/");
                 WebElement loginBtn = wait.until(ExpectedConditions.elementToBeClickable(
                                 By.xpath("//button[contains(text(),'Iniciar Sesión')]")));
-                
+
                 ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block: 'center'});",
                                 loginBtn);
                 try {
@@ -580,6 +580,17 @@ public class CheeseUITests {
                 WebElement priceInput = driver.findElement(By.id("price"));
                 priceInput.clear();
                 priceInput.sendKeys("22.50");
+                driver.findElement(By.id("description")).clear();
+                driver.findElement(By.id("description")).sendKeys("Descripción editada");
+
+                Select typeSelect2 = new Select(driver.findElement(By.id("type")));
+                typeSelect2.selectByVisibleText("Cremoso");
+
+                driver.findElement(By.id("manufactureDate")).clear();
+                driver.findElement(By.id("manufactureDate")).sendKeys("2024-01-01");
+
+                driver.findElement(By.id("expirationDate")).clear();
+                driver.findElement(By.id("expirationDate")).sendKeys("2025-01-01");
 
                 // 7. Submit
                 WebElement submitBtn = wait.until(
@@ -649,13 +660,13 @@ public class CheeseUITests {
                 // 3. Navigate to the created cheese
                 wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".card-grid")));
                 Thread.sleep(500);
-                
+
                 WebElement cheeseCard = wait.until(ExpectedConditions.elementToBeClickable(
                                 By.xpath("//div[contains(@class,'card')]//p[text()='Queso Para Borrar']/ancestor::div[contains(@class,'card')]")));
                 ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block: 'center'});",
                                 cheeseCard);
                 Thread.sleep(300);
-                
+
                 try {
                         new Actions(driver)
                                         .moveToElement(cheeseCard)

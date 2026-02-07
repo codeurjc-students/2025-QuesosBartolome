@@ -48,10 +48,10 @@ public class ApiCheeseTests {
     }
 
     /**
-     * Crea un queso auxiliar temporal para tests de edición/eliminación
-     * @param cookies Cookies de autenticación de admin
-     * @param name Nombre del queso auxiliar
-     * @return ID del queso creado
+     * Create an auxiliary cheese temporarily for edit/delete tests
+     * @param cookies Admin authentication cookies
+     * @param name Name of the auxiliary cheese
+     * @return ID of the created cheese
      */
     private Long createAuxiliaryCheese(io.restassured.http.Cookies cookies, String name) throws JSONException {
         JSONObject requestBody = new JSONObject();
@@ -61,7 +61,7 @@ public class ApiCheeseTests {
         requestBody.put("description", "Queso auxiliar para test");
         requestBody.put("manufactureDate", "2024-01-01");
         requestBody.put("expirationDate", "2025-01-01");
-        requestBody.put("Type", "Curado");
+        requestBody.put("type", "Pasta Prensada");
         requestBody.put("boxes", new JSONArray(List.of(1.0, 2.0)));
 
         return given()
@@ -183,7 +183,7 @@ public class ApiCheeseTests {
         requestBody.put("description", "desc");
         requestBody.put("manufactureDate", "2024-01-01");
         requestBody.put("expirationDate", "2025-01-01");
-        requestBody.put("Type", "Curado");
+        requestBody.put("type", "Pasta Prensada");
         requestBody.put("boxes", new JSONArray(List.of(1.0, 2.0)));
 
         given()
@@ -245,7 +245,6 @@ public class ApiCheeseTests {
     void testUpdateCheese_Ok() throws JSONException {
         var cookies = login("German", "password123");
 
-        // Crear queso auxiliar para editar
         Long cheeseId = createAuxiliaryCheese(cookies, "QuesoParaActualizar");
 
         JSONObject body = new JSONObject();
@@ -313,7 +312,6 @@ public class ApiCheeseTests {
     void testUpdateCheeseImage_Ok() throws JSONException {
         var cookies = login("German", "password123");
 
-        // Crear queso auxiliar para actualizar imagen
         Long cheeseId = createAuxiliaryCheese(cookies, "QuesoParaImagenUpdate");
 
         given()
@@ -369,7 +367,6 @@ public class ApiCheeseTests {
     void testUploadCheeseImage_Ok() throws JSONException {
         var cookies = login("German", "password123");
 
-        // Crear queso auxiliar para subir imagen
         Long cheeseId = createAuxiliaryCheese(cookies, "QuesoParaImagenUpload");
 
         given()

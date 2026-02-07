@@ -56,7 +56,7 @@ public class MyOrderUITests {
                 By.cssSelector("input[name='username']")));
         WebElement passwordInput = driver.findElement(By.cssSelector("input[name='password']"));
 
-        usernameInput.sendKeys("Victor");
+        usernameInput.sendKeys("User");
         passwordInput.sendKeys("password123");
 
         WebElement submitButton = driver.findElement(By.cssSelector("button[type='submit']"));
