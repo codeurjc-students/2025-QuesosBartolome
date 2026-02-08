@@ -571,10 +571,16 @@ public class CheeseUITests {
                 // 5. Wait for alert and check its content
                 Alert alert = wait.until(ExpectedConditions.alertIsPresent());
                 String alertText = alert.getText();
+                
+                // Print alert for debugging in CI logs
+                System.out.println("=== ALERT TEXT RECEIVED: " + alertText);
+                
                 alert.accept();
                 
                 // Verify it's a success alert, not an error
                 if (!alertText.contains("correctamente") && !alertText.contains("creado")) {
+                        System.err.println("=== TEST FAILED - Alert text: " + alertText);
+                        System.err.println("=== Check backend logs above for the actual 500 error cause");
                         fail("Expected success alert but got: " + alertText);
                 }
                 

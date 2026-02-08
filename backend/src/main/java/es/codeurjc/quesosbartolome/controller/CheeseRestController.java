@@ -83,21 +83,30 @@ public class CheeseRestController {
 
         Principal principal = request.getUserPrincipal();
         if (principal == null) {
+            System.err.println("ERROR: No authenticated user (principal is null)");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
         if (!userService.isAdmin(principal.getName())) {
+            System.err.println("ERROR: User " + principal.getName() + " is not admin");
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
 
         try {
+            System.out.println("Creating cheese with DTO: " + dto);
             CheeseDTO created = cheeseService.createCheese(dto);
 
             URI location = URI.create("/api/v1/cheeses/" + created.id());
             return ResponseEntity.created(location).body(created);
 
         } catch (IllegalArgumentException e) {
+            System.err.println("ERROR (IllegalArgumentException): " + e.getMessage());
+            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        } catch (Exception e) {
+            System.err.println("ERROR (500): " + e.getClass().getName() + ": " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 
