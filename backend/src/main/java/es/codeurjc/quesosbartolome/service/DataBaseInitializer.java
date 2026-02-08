@@ -4,11 +4,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
-import java.security.SecureRandom;
 import java.sql.Blob;
 import java.sql.Date;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.engine.jdbc.BlobProxy;
@@ -67,6 +65,7 @@ public class DataBaseInitializer {
             5.12, 5.18, 5.23, 5.30, 5.37,
             4.66, 4.89, 4.74, 5.33, 4.58);
 
+        
     @PostConstruct
     public void init() throws IOException, URISyntaxException {
         // Create Cheese 1
