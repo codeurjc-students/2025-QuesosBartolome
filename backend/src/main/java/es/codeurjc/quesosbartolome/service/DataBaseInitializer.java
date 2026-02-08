@@ -4,6 +4,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
+import java.security.SecureRandom;
 import java.sql.Blob;
 import java.sql.Date;
 import java.time.LocalDate;
@@ -34,6 +35,8 @@ public class DataBaseInitializer {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    private static final SecureRandom SECURE_RANDOM = new SecureRandom();
+
     public Blob saveImage(String resourcePath) throws IOException {
         ClassLoader classLoader = getClass().getClassLoader();
         try (InputStream inputStream = classLoader.getResourceAsStream(resourcePath)) {
@@ -53,12 +56,14 @@ public class DataBaseInitializer {
     }
 
     /**
-     * Generates a list of 25 random inventory values between 6.0 and 7.0 to simulate a large inventory for testing purposes.
+     * Generates a list of 25 random inventory values between 6.0 and 7.0 to
+     * simulate a large inventory for testing purposes.
      */
     private List<Double> generateLargeInventory() {
         List<Double> inventory = new ArrayList<>();
         for (int i = 0; i < 25; i++) {
-            inventory.add(6.0 + (Math.random() * 1.0));
+            double value = 6.0 + SECURE_RANDOM.nextDouble();
+            inventory.add(value);
         }
         return inventory;
     }
@@ -69,65 +74,62 @@ public class DataBaseInitializer {
         Cheese semicurado = new Cheese();
         semicurado.setName("Semicurado");
         semicurado.setPrice(17.50);
-        semicurado.setDescription("Queso de pasta prensada madurado durante 21 días, con un sabor que comienza suave y cremoso pero se intensifica al final. Aromático sin resultar demasiado fuerte, ofrece un equilibrio agradable que lo hace fácil de disfrutar solo o acompañado.");
+        semicurado.setDescription(
+                "Queso de pasta prensada madurado durante 21 días, con un sabor que comienza suave y cremoso pero se intensifica al final. Aromático sin resultar demasiado fuerte, ofrece un equilibrio agradable que lo hace fácil de disfrutar solo o acompañado.");
         semicurado.setManufactureDate(Date.valueOf(LocalDate.now().minusMonths(2)));
         semicurado.setExpirationDate(Date.valueOf(LocalDate.now().plusMonths(10)));
         semicurado.setType("Pasta prensada");
         semicurado.setBoxes(generateLargeInventory());
         semicurado.setImage(saveImage("images/queso-default.jpg"));
-        
-
 
         // Create Cheese 2
         Cheese azul = new Cheese();
         azul.setName("Azul");
         azul.setPrice(15.00);
-        azul.setDescription("Queso azul de tradición clásica, de pasta prensada y curación cuidada, con vetas de moho que aportan un sabor intenso y profundo. Su textura es cremosa y su carácter es marcado sin llegar a ser excesivamente agresivo, ofreciendo ese equilibrio típico del azul de toda la vida.");
+        azul.setDescription(
+                "Queso azul de tradición clásica, de pasta prensada y curación cuidada, con vetas de moho que aportan un sabor intenso y profundo. Su textura es cremosa y su carácter es marcado sin llegar a ser excesivamente agresivo, ofreciendo ese equilibrio típico del azul de toda la vida.");
         azul.setManufactureDate(Date.valueOf(LocalDate.now().minusWeeks(3)));
         azul.setExpirationDate(Date.valueOf(LocalDate.now().plusMonths(2)));
         azul.setType("Maduración fúngica");
         azul.setBoxes(generateLargeInventory());
         azul.setImage(saveImage("images/queso-default.jpg"));
-        
-        
+
         // Create Cheese 3
         Cheese Curado = new Cheese();
-        Curado.setName("Curado"); 
-        Curado.setPrice(17.50); 
-        Curado.setDescription("Queso de pasta prensada madurado durante mes y medio, con una textura más firme y un sabor más desarrollado. Mantiene un carácter equilibrado: comienza suave pero gana intensidad sin llegar a ser excesivamente fuerte.");
-        Curado.setManufactureDate(Date.valueOf(LocalDate.now().minusWeeks(5))); 
+        Curado.setName("Curado");
+        Curado.setPrice(17.50);
+        Curado.setDescription(
+                "Queso de pasta prensada madurado durante mes y medio, con una textura más firme y un sabor más desarrollado. Mantiene un carácter equilibrado: comienza suave pero gana intensidad sin llegar a ser excesivamente fuerte.");
+        Curado.setManufactureDate(Date.valueOf(LocalDate.now().minusWeeks(5)));
         Curado.setExpirationDate(Date.valueOf(LocalDate.now().plusMonths(3)));
         Curado.setType("Pasta prensada");
         Curado.setBoxes(generateLargeInventory());
         Curado.setImage(saveImage("images/queso-default.jpg"));
-        
 
         // Create Cheese 4
         Cheese Chevrett = new Cheese();
-        Chevrett.setName("Chevrett"); 
-        Chevrett.setPrice(20.00); 
-        Chevrett.setDescription("Queso de pasta blanda y textura cremosa, similar a un camembert pero con matices propios. Su curación suave resalta un sabor delicado que se vuelve más aromático con el tiempo, sin resultar fuerte, ideal para quienes disfrutan de quesos tiernos pero con personalidad.");
+        Chevrett.setName("Chevrett");
+        Chevrett.setPrice(20.00);
+        Chevrett.setDescription(
+                "Queso de pasta blanda y textura cremosa, similar a un camembert pero con matices propios. Su curación suave resalta un sabor delicado que se vuelve más aromático con el tiempo, sin resultar fuerte, ideal para quienes disfrutan de quesos tiernos pero con personalidad.");
         Chevrett.setManufactureDate(Date.valueOf(LocalDate.now().minusWeeks(2)));
         Chevrett.setExpirationDate(Date.valueOf(LocalDate.now().plusMonths(1).plusWeeks(1)));
-        Chevrett.setType("Cremoso"); 
+        Chevrett.setType("Cremoso");
         Chevrett.setBoxes(new ArrayList<>());
         Chevrett.setImage(saveImage("images/queso-default.jpg"));
-        
-
 
         // Create Cheese 5
         Cheese Tierno = new Cheese();
-        Tierno.setName("Tierno"); 
-        Tierno.setPrice(18.00); 
-        Tierno.setDescription("Queso de pasta prensada madurado durante una semana, de textura muy suave y húmeda. Presenta un sabor ligero y lácteo, nada fuerte, ideal para quienes prefieren quesos delicados y fáciles de comer");
+        Tierno.setName("Tierno");
+        Tierno.setPrice(18.00);
+        Tierno.setDescription(
+                "Queso de pasta prensada madurado durante una semana, de textura muy suave y húmeda. Presenta un sabor ligero y lácteo, nada fuerte, ideal para quienes prefieren quesos delicados y fáciles de comer");
         Tierno.setManufactureDate(Date.valueOf(LocalDate.now().minusWeeks(2)));
         Tierno.setExpirationDate(Date.valueOf(LocalDate.now().plusMonths(1).plusWeeks(1)));
-        Tierno.setType("Pasta prensada"); 
+        Tierno.setType("Pasta prensada");
         Tierno.setBoxes(generateLargeInventory());
         Tierno.setImage(saveImage("images/queso-default.jpg"));
-        
-        
-        
+
         // Create user 1
         User user1 = new User();
         user1.setName("Victor");
@@ -149,7 +151,6 @@ public class DataBaseInitializer {
         user2.setRols("USER");
         user2.setCart(new Cart(user2));
         user2.setImage(saveImage("images/default-profile.jpg"));
-
 
         // Create Admin 1
         User userAdmin = new User();
@@ -173,8 +174,5 @@ public class DataBaseInitializer {
         userRepository.save(user2);
         userRepository.save(userAdmin);
 
-
-        
     }
 }
-
