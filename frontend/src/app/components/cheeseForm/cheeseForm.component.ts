@@ -118,7 +118,7 @@ export class CheeseFormComponent implements OnInit {
         if (err.status === 400) {
           alert("Error al crear queso. Verifica que no exista otro queso con el mismo nombre.");
         } else {
-          alert("Error al crear queso" + err.message);
+          alert("Error al crear queso");
         }
       }
     });
