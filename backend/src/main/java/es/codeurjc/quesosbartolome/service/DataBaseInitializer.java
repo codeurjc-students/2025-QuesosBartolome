@@ -53,17 +53,19 @@ public class DataBaseInitializer {
         }
     }
 
-    /**
-     * Generates a list of 25 random inventory values between 6.0 and 7.0 to
-     * simulate a large inventory for testing purposes.
-     */
-    private List<Double> generateLargeInventory() {
-        List<Double> inventory = new ArrayList<>();
-        for (int i = 0; i < 25; i++) {
-            inventory.add(6.0 + (Math.random() * 1.0));
-        }
-        return inventory;
-    }
+    List<Double> inventoryA = List.of(
+            5.12, 5.34, 5.48, 5.55, 5.63,
+            5.77, 5.89, 6.02, 6.15, 6.21,
+            6.33, 6.41, 6.52, 6.60, 6.71,
+            6.80, 6.85, 6.90, 6.95, 6.99,
+            6.45, 5.98, 6.27, 5.76, 6.58);
+
+    List<Double> inventoryB = List.of(
+            4.05, 4.12, 4.20, 4.28, 4.33,
+            4.41, 4.50, 4.57, 4.63, 4.70,
+            4.78, 4.85, 4.92, 4.99, 5.05,
+            5.12, 5.18, 5.23, 5.30, 5.37,
+            4.66, 4.89, 4.74, 5.33, 4.58);
 
     @PostConstruct
     public void init() throws IOException, URISyntaxException {
@@ -76,7 +78,7 @@ public class DataBaseInitializer {
         semicurado.setManufactureDate(Date.valueOf(LocalDate.now().minusMonths(2)));
         semicurado.setExpirationDate(Date.valueOf(LocalDate.now().plusMonths(10)));
         semicurado.setType("Pasta prensada");
-        semicurado.setBoxes(generateLargeInventory());
+        semicurado.setBoxes(inventoryA);
         semicurado.setImage(saveImage("images/queso-default.jpg"));
 
         // Create Cheese 2
@@ -88,7 +90,7 @@ public class DataBaseInitializer {
         azul.setManufactureDate(Date.valueOf(LocalDate.now().minusWeeks(3)));
         azul.setExpirationDate(Date.valueOf(LocalDate.now().plusMonths(2)));
         azul.setType("Maduración fúngica");
-        azul.setBoxes(generateLargeInventory());
+        azul.setBoxes(inventoryB);
         azul.setImage(saveImage("images/queso-default.jpg"));
 
         // Create Cheese 3
@@ -100,7 +102,7 @@ public class DataBaseInitializer {
         Curado.setManufactureDate(Date.valueOf(LocalDate.now().minusWeeks(5)));
         Curado.setExpirationDate(Date.valueOf(LocalDate.now().plusMonths(3)));
         Curado.setType("Pasta prensada");
-        Curado.setBoxes(generateLargeInventory());
+        Curado.setBoxes(inventoryA);
         Curado.setImage(saveImage("images/queso-default.jpg"));
 
         // Create Cheese 4
@@ -112,7 +114,7 @@ public class DataBaseInitializer {
         Chevrett.setManufactureDate(Date.valueOf(LocalDate.now().minusWeeks(2)));
         Chevrett.setExpirationDate(Date.valueOf(LocalDate.now().plusMonths(1).plusWeeks(1)));
         Chevrett.setType("Cremoso");
-        Chevrett.setBoxes(new ArrayList<>());
+        Chevrett.setBoxes(inventoryB);
         Chevrett.setImage(saveImage("images/queso-default.jpg"));
 
         // Create Cheese 5
@@ -124,7 +126,7 @@ public class DataBaseInitializer {
         Tierno.setManufactureDate(Date.valueOf(LocalDate.now().minusWeeks(2)));
         Tierno.setExpirationDate(Date.valueOf(LocalDate.now().plusMonths(1).plusWeeks(1)));
         Tierno.setType("Pasta prensada");
-        Tierno.setBoxes(generateLargeInventory());
+        Tierno.setBoxes(inventoryA);
         Tierno.setImage(saveImage("images/queso-default.jpg"));
 
         // Create user 1
