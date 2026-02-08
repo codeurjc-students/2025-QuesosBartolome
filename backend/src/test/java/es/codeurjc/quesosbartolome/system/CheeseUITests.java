@@ -540,11 +540,8 @@ public class CheeseUITests {
                 driver.get("http://localhost:4200/newCheese");
                 wait.until(ExpectedConditions.urlContains("/newCheese"));
 
-                // 3. Create unique cheese name to avoid duplicates
-                String uniqueName = "TestQueso" + System.currentTimeMillis();
-
-                // 4. Fill all form fields
-                driver.findElement(By.id("name")).sendKeys(uniqueName);
+                // 3. Fill all form fields
+                driver.findElement(By.id("name")).sendKeys("Nuevo Queso Test");
                 driver.findElement(By.id("price")).sendKeys("12.50");
                 driver.findElement(By.id("description")).sendKeys("Queso creado por test Selenium");
 
@@ -554,7 +551,7 @@ public class CheeseUITests {
                 driver.findElement(By.id("manufactureDate")).sendKeys("2024-01-24");
                 driver.findElement(By.id("expirationDate")).sendKeys("2025-01-24");
 
-                // 5. Submit form
+                // 4. Submit form
                 WebElement createBtn = wait.until(
                                 ExpectedConditions.elementToBeClickable(By.cssSelector("button[type='submit']")));
                 ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block: 'center'});",
@@ -571,12 +568,12 @@ public class CheeseUITests {
                         ((JavascriptExecutor) driver).executeScript("arguments[0].click();", createBtn);
                 }
 
-                // 6. Wait for success alert
+                // 5. Wait for success alert
                 Alert successAlert = wait.until(ExpectedConditions.alertIsPresent());
                 successAlert.accept();
                 Thread.sleep(500);
 
-                // 7. Wait for redirect or navigate manually if it doesn't happen
+                // 6. Wait for redirect or navigate manually if it doesn't happen
                 try {
                         wait.until(ExpectedConditions.or(
                                         ExpectedConditions.urlContains("/cheeses"),
@@ -587,13 +584,12 @@ public class CheeseUITests {
                 wait.until(ExpectedConditions.urlContains("/cheeses"));
                 Thread.sleep(1000);
 
-                // 8. Verify cheese appears in the list
+                // 7. Verify cheese appears in the list
                 WebElement cardGrid = wait.until(
                                 ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".card-grid")));
 
-                boolean exists = cardGrid.getText().contains(uniqueName);
-                assertTrue(exists,
-                                "The newly created cheese '" + uniqueName + "' should appear in the cheese list.");
+                boolean exists = cardGrid.getText().contains("Nuevo Queso Test");
+                assertTrue(exists, "The newly created cheese 'Nuevo Queso Test' should appear in the cheese list.");
         }
 
 }
