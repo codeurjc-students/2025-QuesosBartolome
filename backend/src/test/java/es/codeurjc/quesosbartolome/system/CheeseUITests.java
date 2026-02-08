@@ -568,9 +568,16 @@ public class CheeseUITests {
                         ((JavascriptExecutor) driver).executeScript("arguments[0].click();", createBtn);
                 }
 
-                // 5. Wait for success alert
-                Alert successAlert = wait.until(ExpectedConditions.alertIsPresent());
-                successAlert.accept();
+                // 5. Wait for alert and check its content
+                Alert alert = wait.until(ExpectedConditions.alertIsPresent());
+                String alertText = alert.getText();
+                alert.accept();
+                
+                // Verify it's a success alert, not an error
+                if (!alertText.contains("correctamente") && !alertText.contains("creado")) {
+                        fail("Expected success alert but got: " + alertText);
+                }
+                
                 Thread.sleep(500);
 
                 // 6. Wait for redirect
