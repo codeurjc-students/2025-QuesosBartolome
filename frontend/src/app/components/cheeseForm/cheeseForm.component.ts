@@ -95,18 +95,22 @@ export class CheeseFormComponent implements OnInit {
       next: (createdCheese) => {
         alert("Queso creado correctamente");
 
-        if (createdCheese.id) {
+        // If there's a file to upload, upload it first
+        if (createdCheese.id && this.selectedFile) {
           this.cheeseService.uploadCheeseImage(
             createdCheese.id,
             this.selectedFile
           ).subscribe({
             next: () => {
-              this.router.navigate(['/']);
+              this.router.navigate(['/cheeses']);
             },
             error: () => {
-              this.router.navigate(['/']);
+              this.router.navigate(['/cheeses']);
             }
           });
+        } else {
+          // No file to upload, navigate directly
+          this.router.navigate(['/cheeses']);
         }
       },
       error: (err) => {
