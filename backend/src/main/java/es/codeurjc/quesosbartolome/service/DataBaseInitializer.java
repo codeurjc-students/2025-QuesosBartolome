@@ -35,8 +35,6 @@ public class DataBaseInitializer {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    private static final SecureRandom SECURE_RANDOM = new SecureRandom();
-
     public Blob saveImage(String resourcePath) throws IOException {
         ClassLoader classLoader = getClass().getClassLoader();
         try (InputStream inputStream = classLoader.getResourceAsStream(resourcePath)) {
@@ -59,11 +57,11 @@ public class DataBaseInitializer {
      * Generates a list of 25 random inventory values between 6.0 and 7.0 to
      * simulate a large inventory for testing purposes.
      */
+    @SuppressWarnings("java:S2245")
     private List<Double> generateLargeInventory() {
         List<Double> inventory = new ArrayList<>();
         for (int i = 0; i < 25; i++) {
-            double value = 6.0 + SECURE_RANDOM.nextDouble();
-            inventory.add(value);
+            inventory.add(6.0 + (Math.random() * 1.0));
         }
         return inventory;
     }
