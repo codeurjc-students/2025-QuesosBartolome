@@ -529,4 +529,71 @@ public class CheeseUITests {
                 successAlert.accept();
         }
 
+        @Test
+        @Order(10)
+        public void testCreateCheeseSuccessfully() throws InterruptedException {
+
+                // 1. Login as ADMIN
+                login("German", "password123");
+
+                // 2. Navigate to new cheese form
+                driver.get("http://localhost:4200/newCheese");
+                wait.until(ExpectedConditions.urlContains("/newCheese"));
+
+                // 3. Create unique cheese name to avoid duplicates
+                String uniqueName = "TestQueso" + System.currentTimeMillis();
+
+                // 4. Fill all form fields
+                driver.findElement(By.id("name")).sendKeys(uniqueName);
+                driver.findElement(By.id("price")).sendKeys("12.50");
+                driver.findElement(By.id("description")).sendKeys("Queso creado por test Selenium");
+
+                Select typeSelect = new Select(driver.findElement(By.id("type")));
+                typeSelect.selectByVisibleText("Cremoso");
+
+                driver.findElement(By.id("manufactureDate")).sendKeys("2024-01-24");
+                driver.findElement(By.id("expirationDate")).sendKeys("2025-01-24");
+
+                // 5. Submit form
+                WebElement createBtn = wait.until(
+                                ExpectedConditions.elementToBeClickable(By.cssSelector("button[type='submit']")));
+                ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block: 'center'});",
+                                createBtn);
+                Thread.sleep(500);
+
+                try {
+                        new Actions(driver)
+                                        .moveToElement(createBtn)
+                                        .pause(Duration.ofMillis(300))
+                                        .click()
+                                        .perform();
+                } catch (Exception e) {
+                        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", createBtn);
+                }
+
+                // 6. Wait for success alert
+                Alert successAlert = wait.until(ExpectedConditions.alertIsPresent());
+                successAlert.accept();
+                Thread.sleep(500);
+
+                // 7. Wait for redirect or navigate manually if it doesn't happen
+                try {
+                        wait.until(ExpectedConditions.or(
+                                        ExpectedConditions.urlContains("/cheeses"),
+                                        ExpectedConditions.urlToBe("http://localhost:4200/")));
+                } catch (TimeoutException e) {
+                        driver.get("http://localhost:4200/cheeses");
+                }
+                wait.until(ExpectedConditions.urlContains("/cheeses"));
+                Thread.sleep(1000);
+
+                // 8. Verify cheese appears in the list
+                WebElement cardGrid = wait.until(
+                                ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".card-grid")));
+
+                boolean exists = cardGrid.getText().contains(uniqueName);
+                assertTrue(exists,
+                                "The newly created cheese '" + uniqueName + "' should appear in the cheese list.");
+        }
+
 }
