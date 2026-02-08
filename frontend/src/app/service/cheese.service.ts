@@ -32,13 +32,16 @@ export class CheeseService {
     );
   }
 
-  uploadCheeseImage(id: number, file: File | null) {
+  uploadCheeseImage(id: number, file: File | null): Observable<any> {
+    // Don't make HTTP request if there's no file
+    if (!file) {
+      return new Observable(observer => {
+        observer.complete();
+      });
+    }
 
     const formData = new FormData();
-
-    if (file) {
-      formData.append("file", file);
-    }
+    formData.append("file", file);
 
     return this.http.post(`${this.apiUrl}/${id}/image`, formData, { withCredentials: true });
   }

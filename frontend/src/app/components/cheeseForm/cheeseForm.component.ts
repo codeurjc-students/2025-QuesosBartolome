@@ -95,7 +95,8 @@ export class CheeseFormComponent implements OnInit {
       next: (createdCheese) => {
         alert("Queso creado correctamente");
 
-        if (createdCheese.id) {
+        // Only upload image if there's both an ID and a selected file
+        if (createdCheese.id && this.selectedFile) {
           this.cheeseService.uploadCheeseImage(
             createdCheese.id,
             this.selectedFile
@@ -107,7 +108,8 @@ export class CheeseFormComponent implements OnInit {
               this.router.navigate(['/']);
             }
           });
-        }else {
+        } else {
+          // No file selected or no ID - navigate immediately
           this.router.navigate(['/']);
         }
       },

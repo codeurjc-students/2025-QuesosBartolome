@@ -573,14 +573,7 @@ public class CheeseUITests {
                 successAlert.accept();
                 Thread.sleep(500);
 
-                // 6. Wait for redirect or navigate manually if it doesn't happen
-                try {
-                        wait.until(ExpectedConditions.or(
-                                        ExpectedConditions.urlContains("/cheeses"),
-                                        ExpectedConditions.urlToBe("http://localhost:4200/")));
-                } catch (TimeoutException e) {
-                        driver.get("http://localhost:4200/cheeses");
-                }
+                // 6. Wait for redirect
                 wait.until(ExpectedConditions.urlContains("/cheeses"));
                 Thread.sleep(1000);
 
