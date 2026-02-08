@@ -497,64 +497,12 @@ public class CheeseUITests {
                 // 1. Login as ADMIN
                 login("German", "password123");
 
-                // 2. First, create a cheese to delete
-                driver.get("http://localhost:4200/newCheese");
-                wait.until(ExpectedConditions.urlContains("/newCheese"));
-
-                driver.findElement(By.id("name")).sendKeys("Queso Para Borrar");
-                driver.findElement(By.id("price")).sendKeys("10.00");
-                driver.findElement(By.id("description")).sendKeys("Este queso será borrado en el test");
-
-                Select typeSelect = new Select(driver.findElement(By.id("type")));
-                typeSelect.selectByVisibleText("Cremoso");
-
-                driver.findElement(By.id("manufactureDate")).sendKeys("2024-01-01");
-                driver.findElement(By.id("expirationDate")).sendKeys("2025-01-01");
-
-                WebElement createBtn = wait.until(
-                                ExpectedConditions.elementToBeClickable(By.cssSelector("button[type='submit']")));
-                ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block: 'center'});",
-                                createBtn);
-                Thread.sleep(300);
-
-                try {
-                        new Actions(driver)
-                                        .moveToElement(createBtn)
-                                        .pause(Duration.ofMillis(300))
-                                        .click()
-                                        .perform();
-                } catch (Exception e) {
-                        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", createBtn);
-                }
-
-                Alert createAlert = wait.until(ExpectedConditions.alertIsPresent());
-                createAlert.accept();
-
-                wait.until(ExpectedConditions.urlToBe("http://localhost:4200/cheeses"));
-
-                // 3. Navigate to the created cheese
-                wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".card-grid")));
+                // 2. Navigate directly to cheese id=4 (Chevrett)
+                driver.get("http://localhost:4200/cheeses/4");
+                wait.until(ExpectedConditions.urlContains("/cheeses/4"));
                 Thread.sleep(500);
 
-                WebElement cheeseCard = wait.until(ExpectedConditions.elementToBeClickable(
-                                By.xpath("//div[contains(@class,'card')]//p[text()='Queso Para Borrar']/ancestor::div[contains(@class,'card')]")));
-                ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block: 'center'});",
-                                cheeseCard);
-                Thread.sleep(300);
-
-                try {
-                        new Actions(driver)
-                                        .moveToElement(cheeseCard)
-                                        .pause(Duration.ofMillis(300))
-                                        .click()
-                                        .perform();
-                } catch (Exception e) {
-                        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", cheeseCard);
-                }
-
-                wait.until(ExpectedConditions.urlMatches("http://localhost:4200/cheeses/\\d+"));
-
-                // 4. Click Delete button
+                // 3. Click Delete button
                 WebElement deleteBtn = wait
                                 .until(ExpectedConditions.elementToBeClickable(By.cssSelector(".delete-btn")));
                 ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block: 'center'});",
