@@ -59,8 +59,9 @@ public class CheeseService {
 
         Cheese cheese = cheeseMapper.toDomain(dto);
 
-        if (cheese.getBoxes() == null) {
-            cheese.setBoxes(List.of());
+        // JPA @ElementCollection requires a mutable list
+        if (cheese.getBoxes() == null || cheese.getBoxes().isEmpty()) {
+            cheese.setBoxes(new java.util.ArrayList<>());
         }
 
         // image → null
