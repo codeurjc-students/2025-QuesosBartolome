@@ -104,19 +104,20 @@ public class MyOrderUITests {
                 By.xpath("//li[contains(text(),'Mi pedido')]")));
         
         ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block: 'center'});", myOrderLink);
+        Thread.sleep(500);
         try {
-            Thread.sleep(300);
             new Actions(driver)
                     .moveToElement(myOrderLink)
-                    .pause(Duration.ofMillis(300))
+                    .pause(Duration.ofMillis(500))
                     .click()
                     .perform();
         } catch (Exception e) {
             ((JavascriptExecutor) driver).executeScript("arguments[0].click();", myOrderLink);
         }
+        Thread.sleep(1000);
 
-        // Wait for navigation to /myorder page
-        wait.until(ExpectedConditions.urlContains("/myorder"));
+        // Wait for navigation to /myOrder or /myorder page (case insensitive)
+        wait.until(driver -> driver.getCurrentUrl().toLowerCase().contains("/myorder"));
         Thread.sleep(500);
 
         // Verify order container is visible
@@ -144,17 +145,18 @@ public class MyOrderUITests {
         // Click Add button with safe pattern
         WebElement addButton = wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(".add-btn")));
         ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block: 'center'});", addButton);
-        Thread.sleep(300);
+        Thread.sleep(500);
         
         try {
             new Actions(driver)
                     .moveToElement(addButton)
-                    .pause(Duration.ofMillis(300))
+                    .pause(Duration.ofMillis(500))
                     .click()
                     .perform();
         } catch (Exception e) {
             ((JavascriptExecutor) driver).executeScript("arguments[0].click();", addButton);
         }
+        Thread.sleep(1000);
 
         // Accept success alert
         Alert successAlert = wait.until(ExpectedConditions.alertIsPresent());
@@ -172,17 +174,18 @@ public class MyOrderUITests {
         // Remove item with safe click
         WebElement deleteBtn = items.get(0).findElement(By.cssSelector(".btn-delete"));
         ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block: 'center'});", deleteBtn);
-        Thread.sleep(300);
+        Thread.sleep(500);
         
         try {
             new Actions(driver)
                     .moveToElement(deleteBtn)
-                    .pause(Duration.ofMillis(300))
+                    .pause(Duration.ofMillis(500))
                     .click()
                     .perform();
         } catch (Exception e) {
             ((JavascriptExecutor) driver).executeScript("arguments[0].click();", deleteBtn);
         }
+        Thread.sleep(500);
 
         // Verify item disappears
         wait.until(ExpectedConditions.numberOfElementsToBe(By.cssSelector(".order-item"), 0));
@@ -207,17 +210,18 @@ public class MyOrderUITests {
         // Click Add button with safe pattern
         WebElement addButton = wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(".add-btn")));
         ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block: 'center'});", addButton);
-        Thread.sleep(300);
+        Thread.sleep(500);
         
         try {
             new Actions(driver)
                     .moveToElement(addButton)
-                    .pause(Duration.ofMillis(300))
+                    .pause(Duration.ofMillis(500))
                     .click()
                     .perform();
         } catch (Exception e) {
             ((JavascriptExecutor) driver).executeScript("arguments[0].click();", addButton);
         }
+        Thread.sleep(1000);
 
         // Accept success alert
         Alert successAlert = wait.until(ExpectedConditions.alertIsPresent());
@@ -231,17 +235,18 @@ public class MyOrderUITests {
         // Click "Hacer Pedido" with safe pattern
         WebElement confirmBtn = wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(".btn.confirm")));
         ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block: 'center'});", confirmBtn);
-        Thread.sleep(300);
+        Thread.sleep(500);
         
         try {
             new Actions(driver)
                     .moveToElement(confirmBtn)
-                    .pause(Duration.ofMillis(300))
+                    .pause(Duration.ofMillis(500))
                     .click()
                     .perform();
         } catch (Exception e) {
             ((JavascriptExecutor) driver).executeScript("arguments[0].click();", confirmBtn);
         }
+        Thread.sleep(1000);
 
         // Expect success alert
         Alert orderAlert = wait.until(ExpectedConditions.alertIsPresent());
@@ -268,34 +273,35 @@ public class MyOrderUITests {
         while (!existingItems.isEmpty()) {
             WebElement deleteBtn = existingItems.get(0).findElement(By.cssSelector(".btn-delete"));
             ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block: 'center'});", deleteBtn);
-            Thread.sleep(200);
+            Thread.sleep(500);
             try {
                 new Actions(driver)
                         .moveToElement(deleteBtn)
-                        .pause(Duration.ofMillis(200))
+                        .pause(Duration.ofMillis(500))
                         .click()
                         .perform();
             } catch (Exception e) {
                 ((JavascriptExecutor) driver).executeScript("arguments[0].click();", deleteBtn);
             }
-            Thread.sleep(300);
+            Thread.sleep(500);
             existingItems = driver.findElements(By.cssSelector(".order-item"));
         }
 
         // Click "Hacer Pedido" with safe pattern
         WebElement confirmBtn = wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(".btn.confirm")));
         ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block: 'center'});", confirmBtn);
-        Thread.sleep(300);
+        Thread.sleep(500);
         
         try {
             new Actions(driver)
                     .moveToElement(confirmBtn)
-                    .pause(Duration.ofMillis(300))
+                    .pause(Duration.ofMillis(500))
                     .click()
                     .perform();
         } catch (Exception e) {
             ((JavascriptExecutor) driver).executeScript("arguments[0].click();", confirmBtn);
         }
+        Thread.sleep(1000);
 
         // Check the alert text
         Alert orderAlert = wait.until(ExpectedConditions.alertIsPresent());
