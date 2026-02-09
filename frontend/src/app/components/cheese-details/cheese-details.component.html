@@ -1,9 +1,7 @@
 <div class="details-container" *ngIf="cheese">
 
-  <!-- HEADER SECTION -->
   <div class="top-section">
 
-    <!-- IMAGE BOX -->
     <div class="image-box">
       <img 
         [src]="imageUrl || 'assets/cheese-default.png'" 
@@ -11,7 +9,6 @@
       />
     </div>
 
-    <!-- CHEESE INFO -->
     <div class="cheese-info">
       <h1 class="cheese-title">{{ cheese.name }}</h1>
       <p class="cheese-price">{{ cheese.price | currency }}</p>
@@ -19,10 +16,8 @@
       <p>Queso Graso E.S. 50 % M.G./ E.S. 45 %</p>
       <p>Se venden por cajas de 6 quesos cada una</p>
 
-      <!-- Boxes input and add button: only for logged-in USERS -->
       <div *ngIf="isLoggedIn && isUser" class="cajas-container">
         
-        <!-- fila del input y stock -->
         <div class="cajas-row">
           <label>Cajas:</label>
               <input
@@ -42,30 +37,27 @@
           </span>
         </div>
 
-        <!-- botón debajo -->
         <button class="btn add-btn" [disabled]="cajasDisponibles === 0" (click)="addToOrder(boxesInput.value)">
           Añadir
         </button>
 
       </div>
 
-      <!-- Admin edit button -->
       <div *ngIf="isLoggedIn && isAdmin" class="admin-actions">
-        <button class="btn edit-btn">Editar</button>
+        <button class="btn edit-btn" (click)="editCheese()">Editar</button>
+        <button class="btn delete-btn" (click)="deleteCheese()">Borrar</button>
       </div>
 
     </div>
 
   </div>
 
-  <!-- REVIEWS SECTION -->
   <section class="reviews-section">
     <h2>Reseñas</h2>
   </section>
 
 </div>
 
-<!-- LOADING STATE -->
 <div *ngIf="!cheese" class="loading">
   Cargando queso...
 </div>

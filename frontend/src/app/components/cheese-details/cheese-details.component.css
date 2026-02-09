@@ -166,12 +166,17 @@
   font-weight: bold;
 }
 
+.admin-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 0.8rem;
+}
+
 .edit-btn {
   width: 150px;              
   background-color: #a1252b; 
   color: #fff;              
   padding: 0.5rem 1rem;
-  margin-top: 0.8rem;
   border-radius: 6px;
   border: none;
   cursor: pointer;
@@ -181,4 +186,20 @@
 
 .edit-btn:hover {
   background-color: #a00030; 
+}
+
+.delete-btn {
+  width: 150px;              
+  background-color: #dc3545; 
+  color: #fff;              
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 0.3s;
+}
+
+.delete-btn:hover {
+  background-color: #c82333; 
 }

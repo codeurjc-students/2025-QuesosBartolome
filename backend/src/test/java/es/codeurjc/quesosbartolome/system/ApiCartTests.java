@@ -91,7 +91,7 @@ public class ApiCartTests {
 
         given()
             .cookies(cookies)
-            .queryParam("cheeseId", 1)
+            .queryParam("cheeseId", 2)
             .queryParam("boxes", 1)
         .when()
             .put("/api/v1/cart/addItem")
@@ -118,20 +118,25 @@ public class ApiCartTests {
     void testRemoveItemFromCart_Ok() throws JSONException {
         var cookies = registerAndLoginTestUser("CartUser4", "password123");
 
-        // First add an item
-        given()
+        // First add an item and extract the itemId
+        io.restassured.response.Response response = given()
             .cookies(cookies)
-            .queryParam("cheeseId", 1)
+            .queryParam("cheeseId", 3)
             .queryParam("boxes", 1)
         .when()
             .put("/api/v1/cart/addItem")
         .then()
-            .statusCode(200);
+            .statusCode(200)
+            .extract()
+            .response();
 
-        // Now remove the item with id 1 (example)
+        // Extract the itemId from the first item in the cart
+        Long itemId = response.jsonPath().getLong("items[0].id");
+
+        // Now remove the item using the actual itemId
         given()
             .cookies(cookies)
-            .queryParam("itemId", 1)
+            .queryParam("itemId", itemId)
         .when()
             .put("/api/v1/cart/removeItem")
         .then()

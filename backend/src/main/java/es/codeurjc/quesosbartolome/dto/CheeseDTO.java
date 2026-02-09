@@ -10,6 +10,6 @@ public record CheeseDTO(
     String description,
     Date manufactureDate,
     Date expirationDate,
-    String Type,
+    String type,
     List<Double> boxes
 ) {}

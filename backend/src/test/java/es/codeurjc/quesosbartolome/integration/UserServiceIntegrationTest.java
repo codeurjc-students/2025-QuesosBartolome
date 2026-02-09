@@ -286,4 +286,66 @@ public class UserServiceIntegrationTest {
         assertThat(result.getTotalElements()).isZero();
     }
 
+    @Test
+    void shouldReturnFalseWhenUserDoesNotExist_isAdmin() {
+
+        boolean result = userService.isAdmin("ghost");
+
+        assertThat(result).isFalse();
+    }
+
+    @Test
+    void shouldReturnFalseWhenUserHasNoRoles_isAdmin() {
+
+        User user = new User(
+                "pepe",
+                passwordEncoder.encode("pwd"),
+                "pepe@gmail.com",
+                "Calle X",
+                "11111111A");
+        user.setRols(); // sin roles
+
+        userRepository.save(user);
+
+        boolean result = userService.isAdmin("pepe");
+
+        assertThat(result).isFalse();
+    }
+
+    @Test
+    void shouldReturnFalseWhenUserIsNotAdmin_isAdmin() {
+
+        User user = new User(
+                "ana",
+                passwordEncoder.encode("pwd"),
+                "ana@gmail.com",
+                "Calle Y",
+                "22222222B",
+                "USER");
+
+        userRepository.save(user);
+
+        boolean result = userService.isAdmin("ana");
+
+        assertThat(result).isFalse();
+    }
+
+    @Test
+    void shouldReturnTrueWhenUserIsAdmin_isAdmin() {
+
+        User user = new User(
+                "admin",
+                passwordEncoder.encode("pwd"),
+                "admin@gmail.com",
+                "Calle Admin",
+                "33333333C",
+                "USER", "ADMIN");
+
+        userRepository.save(user);
+
+        boolean result = userService.isAdmin("admin");
+
+        assertThat(result).isTrue();
+    }
+
 }

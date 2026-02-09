@@ -9,14 +9,16 @@ import org.junit.jupiter.api.*;
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.*;
 
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest(classes = es.codeurjc.quesosbartolome.QuesosbartolomeApplication.class)
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class CheeseUITests {
 
-      private WebDriver driver;
+        private WebDriver driver;
         private WebDriverWait wait;
 
         @BeforeEach
@@ -40,7 +42,52 @@ public class CheeseUITests {
                         driver.quit();
         }
 
+        private void login(String username, String password) {
+                driver.get("http://localhost:4200/");
+                WebElement loginBtn = wait.until(ExpectedConditions.elementToBeClickable(
+                                By.xpath("//button[contains(text(),'Iniciar Sesión')]")));
+
+                ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block: 'center'});",
+                                loginBtn);
+                try {
+                        Thread.sleep(200);
+                        new Actions(driver)
+                                        .moveToElement(loginBtn)
+                                        .pause(Duration.ofMillis(200))
+                                        .click()
+                                        .perform();
+                } catch (Exception e) {
+                        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", loginBtn);
+                }
+
+                WebElement usernameInput = wait.until(ExpectedConditions.visibilityOfElementLocated(
+                                By.cssSelector("input[name='username']")));
+                WebElement passwordInput = driver.findElement(By.cssSelector("input[name='password']"));
+
+                usernameInput.sendKeys(username);
+                passwordInput.sendKeys(password);
+
+                WebElement submitButton = wait.until(ExpectedConditions.elementToBeClickable(
+                                By.cssSelector("button[type='submit']")));
+                ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block: 'center'});",
+                                submitButton);
+                try {
+                        Thread.sleep(200);
+                        new Actions(driver)
+                                        .moveToElement(submitButton)
+                                        .pause(Duration.ofMillis(200))
+                                        .click()
+                                        .perform();
+                } catch (Exception e) {
+                        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", submitButton);
+                }
+
+                Alert alert = wait.until(ExpectedConditions.alertIsPresent());
+                alert.accept();
+        }
+
         @Test
+        @Order(1)
         public void testQuesosSemicuradoYAzulVisibles() {
 
                 // 1: Open the main application page.
@@ -76,6 +123,7 @@ public class CheeseUITests {
         }
 
         @Test
+        @Order(2)
         public void testNavigateToAboutUs() {
 
                 // Open the app
@@ -90,7 +138,18 @@ public class CheeseUITests {
                                 By.xpath("//li[contains(., 'Acerca de nosotros')]"));
 
                 // Click the menu option
-                aboutBtn.click();
+                ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block: 'center'});",
+                                aboutBtn);
+                try {
+                        Thread.sleep(300);
+                        new Actions(driver)
+                                        .moveToElement(aboutBtn)
+                                        .pause(Duration.ofMillis(300))
+                                        .click()
+                                        .perform();
+                } catch (Exception e) {
+                        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", aboutBtn);
+                }
 
                 // Wait for navigation to /about-us
                 wait.until(ExpectedConditions.urlContains("/about-us"));
@@ -106,6 +165,7 @@ public class CheeseUITests {
         }
 
         @Test
+        @Order(3)
         public void testUserNavigationMenuForRegularUser() {
 
                 driver.get("http://localhost:4200/");
@@ -113,7 +173,18 @@ public class CheeseUITests {
                 // Open login page
                 WebElement loginBtn = wait.until(ExpectedConditions
                                 .elementToBeClickable(By.xpath("//button[contains(text(),'Iniciar Sesión')]")));
-                loginBtn.click();
+                ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block: 'center'});",
+                                loginBtn);
+                try {
+                        Thread.sleep(200);
+                        new Actions(driver)
+                                        .moveToElement(loginBtn)
+                                        .pause(Duration.ofMillis(200))
+                                        .click()
+                                        .perform();
+                } catch (Exception e) {
+                        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", loginBtn);
+                }
 
                 // Login as USER (Victor)
                 WebElement usernameInput = wait.until(ExpectedConditions
@@ -123,8 +194,20 @@ public class CheeseUITests {
                 usernameInput.sendKeys("Victor");
                 passwordInput.sendKeys("password123");
 
-                WebElement submitButton = driver.findElement(By.cssSelector("button[type='submit']"));
-                submitButton.click();
+                WebElement submitButton = wait.until(ExpectedConditions.elementToBeClickable(
+                                By.cssSelector("button[type='submit']")));
+                ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block: 'center'});",
+                                submitButton);
+                try {
+                        Thread.sleep(200);
+                        new Actions(driver)
+                                        .moveToElement(submitButton)
+                                        .pause(Duration.ofMillis(200))
+                                        .click()
+                                        .perform();
+                } catch (Exception e) {
+                        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", submitButton);
+                }
 
                 // Accept alert
                 Alert alert = wait.until(ExpectedConditions.alertIsPresent());
@@ -146,6 +229,7 @@ public class CheeseUITests {
         }
 
         @Test
+        @Order(4)
         public void testUserNavigationMenuForAdmin() {
 
                 driver.get("http://localhost:4200/");
@@ -153,7 +237,18 @@ public class CheeseUITests {
                 // Open login page
                 WebElement loginBtn = wait.until(ExpectedConditions
                                 .elementToBeClickable(By.xpath("//button[contains(text(),'Iniciar Sesión')]")));
-                loginBtn.click();
+                ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block: 'center'});",
+                                loginBtn);
+                try {
+                        Thread.sleep(200);
+                        new Actions(driver)
+                                        .moveToElement(loginBtn)
+                                        .pause(Duration.ofMillis(200))
+                                        .click()
+                                        .perform();
+                } catch (Exception e) {
+                        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", loginBtn);
+                }
 
                 // Login as ADMIN (German)
                 WebElement usernameInput = wait.until(ExpectedConditions
@@ -163,8 +258,20 @@ public class CheeseUITests {
                 usernameInput.sendKeys("German"); // ADMIN USERNAME
                 passwordInput.sendKeys("password123");
 
-                WebElement submitButton = driver.findElement(By.cssSelector("button[type='submit']"));
-                submitButton.click();
+                WebElement submitButton = wait.until(ExpectedConditions.elementToBeClickable(
+                                By.cssSelector("button[type='submit']")));
+                ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block: 'center'});",
+                                submitButton);
+                try {
+                        Thread.sleep(200);
+                        new Actions(driver)
+                                        .moveToElement(submitButton)
+                                        .pause(Duration.ofMillis(200))
+                                        .click()
+                                        .perform();
+                } catch (Exception e) {
+                        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", submitButton);
+                }
 
                 // Accept alert
                 Alert alert = wait.until(ExpectedConditions.alertIsPresent());
@@ -186,6 +293,7 @@ public class CheeseUITests {
         }
 
         @Test
+        @Order(5)
         public void testNavigationMenuWhenNotLoggedIn() {
 
                 // Open the application (fresh session)
@@ -218,6 +326,207 @@ public class CheeseUITests {
                                 "Login button should be visible when not logged in.");
                 assertTrue(authButtons.getText().contains("Registrarse"),
                                 "Register button should be visible when not logged in.");
+        }
+
+        @Test
+        @Order(6)
+        public void testCreateCheeseMissingFieldsShowsAlert() throws InterruptedException {
+
+                // 1. Login as ADMIN
+                login("German", "password123");
+
+                // 2. Go to New Cheese page
+                driver.get("http://localhost:4200/newCheese");
+                wait.until(ExpectedConditions.urlContains("/newCheese"));
+
+                // 3. Fill only some fields
+                driver.findElement(By.id("name")).sendKeys("Queso Incompleto");
+                driver.findElement(By.id("price")).sendKeys("10.00");
+
+                // 4. Submit form - ensure button is in view and clickable
+                WebElement createBtn = wait.until(
+                                ExpectedConditions.elementToBeClickable(By.cssSelector("button[type='submit']")));
+
+                // Scroll to button to ensure it's visible
+                ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block: 'center'});",
+                                createBtn);
+                Thread.sleep(300); // Brief pause after scroll
+
+                // Try Actions first
+                try {
+                        new Actions(driver)
+                                        .moveToElement(createBtn)
+                                        .pause(Duration.ofMillis(300))
+                                        .click()
+                                        .perform();
+                } catch (Exception e) {
+                        // Fallback to JavaScript click if Actions fails
+                        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", createBtn);
+                }
+
+                // 5. Capture alert
+                Alert errorAlert = wait.until(ExpectedConditions.alertIsPresent());
+                String alertText = errorAlert.getText();
+                errorAlert.accept();
+
+                assertEquals("Todos los campos son obligatorios", alertText);
+        }
+
+        @Test
+        @Order(7)
+        public void testCreateCheeseWithExpirationDateBeforeManufactureDateShowsAlert() throws InterruptedException {
+
+                // 1. Login as ADMIN
+                login("German", "password123");
+
+                // 2. Go to New Cheese page
+                driver.get("http://localhost:4200/newCheese");
+                wait.until(ExpectedConditions.urlContains("/newCheese"));
+
+                // 3. Fill all fields but with expiration date before manufacture date
+                driver.findElement(By.id("name")).sendKeys("Queso Fecha Inválida");
+                driver.findElement(By.id("price")).sendKeys("15.00");
+                driver.findElement(By.id("description")).sendKeys("Queso con fechas incorrectas");
+
+                Select typeSelect = new Select(driver.findElement(By.id("type")));
+                typeSelect.selectByVisibleText("Cremoso");
+
+                // Set manufacture date to 2025-01-24 and expiration date to 2024-01-24 (before
+                // manufacture)
+                WebElement manufacture = driver.findElement(By.id("manufactureDate"));
+                manufacture.sendKeys("2025-01-24");
+
+                WebElement expiration = driver.findElement(By.id("expirationDate"));
+                expiration.sendKeys("2024-01-24");
+
+                // 4. Submit form - ensure button is in view and clickable
+                WebElement createBtn = wait.until(
+                                ExpectedConditions.elementToBeClickable(By.cssSelector("button[type='submit']")));
+
+                // Scroll to button to ensure it's visible
+                ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block: 'center'});",
+                                createBtn);
+                Thread.sleep(300); // Brief pause after scroll
+
+                // Try Actions first
+                try {
+                        new Actions(driver)
+                                        .moveToElement(createBtn)
+                                        .pause(Duration.ofMillis(300))
+                                        .click()
+                                        .perform();
+                } catch (Exception e) {
+                        // Fallback to JavaScript click if Actions fails
+                        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", createBtn);
+                }
+
+                // 5. Capture alert and verify error message
+                Alert errorAlert = wait.until(ExpectedConditions.alertIsPresent());
+                String alertText = errorAlert.getText();
+                errorAlert.accept();
+
+                assertEquals("La fecha de caducidad debe ser posterior a la de fabricación", alertText,
+                                "Should show error when expiration date is before manufacture date");
+        }
+
+        @Test
+        @Order(8)
+        public void testEditCheeseSuccessfully() throws InterruptedException {
+
+                // 1. Login as ADMIN
+                login("German", "password123");
+
+                // 2. Navigate directly to an existing cheese (Curado, id=3) - no need to create
+                driver.get("http://localhost:4200/cheeses/3");
+                wait.until(ExpectedConditions.urlContains("/cheeses/3"));
+                Thread.sleep(500);
+
+                // 3. Click Edit button
+                WebElement editBtn = wait
+                                .until(ExpectedConditions.elementToBeClickable(By.cssSelector(".edit-btn")));
+                ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block: 'center'});", editBtn);
+                Thread.sleep(300);
+
+                try {
+                        new Actions(driver)
+                                        .moveToElement(editBtn)
+                                        .pause(Duration.ofMillis(300))
+                                        .click()
+                                        .perform();
+                } catch (Exception e) {
+                        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", editBtn);
+                }
+
+                wait.until(ExpectedConditions.urlContains("/cheeses/3/edit"));
+
+                // 4. Modify price and description (don't change name to avoid conflicts)
+                WebElement priceInput = driver.findElement(By.id("price"));
+                priceInput.clear();
+                priceInput.sendKeys("99.99");
+                
+                WebElement descInput = driver.findElement(By.id("description"));
+                descInput.clear();
+                descInput.sendKeys("Descripción editada por test");
+
+                // 5. Submit the edit form
+                WebElement submitBtn = wait.until(
+                                ExpectedConditions.elementToBeClickable(By.cssSelector("button[type='submit']")));
+                ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block: 'center'});",
+                                submitBtn);
+                Thread.sleep(300);
+
+                try {
+                        new Actions(driver)
+                                        .moveToElement(submitBtn)
+                                        .pause(Duration.ofMillis(300))
+                                        .click()
+                                        .perform();
+                } catch (Exception e) {
+                        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", submitBtn);
+                }
+
+                // 6. Verify success alert appears
+                Alert successAlert = wait.until(ExpectedConditions.alertIsPresent());
+                successAlert.accept();
+        }
+
+        @Test
+        @Order(9)
+        public void testDeleteCheeseSuccessfully() throws InterruptedException {
+
+                // 1. Login as ADMIN
+                login("German", "password123");
+
+                // 2. Navigate directly to cheese id=4 (Chevrett)
+                driver.get("http://localhost:4200/cheeses/4");
+                wait.until(ExpectedConditions.urlContains("/cheeses/4"));
+                Thread.sleep(500);
+
+                // 3. Click Delete button
+                WebElement deleteBtn = wait
+                                .until(ExpectedConditions.elementToBeClickable(By.cssSelector(".delete-btn")));
+                ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block: 'center'});",
+                                deleteBtn);
+                Thread.sleep(300);
+
+                try {
+                        new Actions(driver)
+                                        .moveToElement(deleteBtn)
+                                        .pause(Duration.ofMillis(300))
+                                        .click()
+                                        .perform();
+                } catch (Exception e) {
+                        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", deleteBtn);
+                }
+
+                // 5. Accept confirmation dialog
+                Alert confirmAlert = wait.until(ExpectedConditions.alertIsPresent());
+                confirmAlert.accept();
+
+                // 6. Wait for success alert
+                Alert successAlert = wait.until(ExpectedConditions.alertIsPresent());
+                assertEquals("Queso eliminado correctamente", successAlert.getText());
+                successAlert.accept();
         }
 
 }

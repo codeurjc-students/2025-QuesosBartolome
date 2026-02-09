@@ -106,7 +106,7 @@ public class CheeseDetailsUITests {
                                 By.xpath("//span[contains(@class,'stock-info')]")));
                 String stockText = stockLabel.getText().replaceAll("[^0-9]", "");
                 int stock = Integer.parseInt(stockText);
-                assertEquals(9, stock, "Semicurado stock must be 9.");
+                assertEquals(24, stock, "Semicurado stock must be 24.");
         }
 
         @Test

@@ -34,9 +34,12 @@ describe('MyOrderComponent (unit)', () => {
             items: [
                 {
                     id: 10,
-                    cheese: { id: 2, name: 'Azul', price: 12 },
+                    cheeseId: 2,
+                    cheeseName: 'Azul',
+                    cheesePrice: 12,
+                    boxes: [1.25],
                     weight: 1.25,
-                    price: 15
+                    totalPrice: 15
                 }
             ]
         };

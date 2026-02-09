@@ -4,22 +4,19 @@
 
   <div class="order-card">
 
-    <!-- ENCABEZADO DESTACADO -->
     <div class="order-header header-highlight">
       <span class="col-name">Queso</span>
       <span class="col-weight">Peso</span>
       <span class="col-price">Precio</span>
     </div>
 
-    <!-- ITEMS DEL PEDIDO -->
     <div class="order-item" *ngFor="let item of order?.items">
-      <span class="col-name">{{ item.cheese.name }}</span>
+      <span class="col-name">{{ item.cheeseName }}</span>
       <span class="col-weight badge">{{ item.weight | number:'1.2-2' }} Kg</span>
-      <span class="col-price badge">€{{ item.price | number:'1.2-2' }}</span>
+      <span class="col-price badge">€{{ item.totalPrice | number:'1.2-2' }}</span>
       <button class="btn-delete" (click)="removeItem(item.id)">✖</button>
     </div>
 
-    <!-- TOTAL -->
     <div class="order-total">
       <span class="col-name total-label">Total:</span>
       <span class="col-weight badge">{{ order.totalWeight | number:'1.2-2' }} Kg</span>
@@ -28,7 +25,6 @@
 
   </div>
 
-  <!-- BOTONES -->
   <div class="buttons-row">
     <button class="btn confirm" (click)="makeOrder()">Hacer Pedido</button>
   </div>

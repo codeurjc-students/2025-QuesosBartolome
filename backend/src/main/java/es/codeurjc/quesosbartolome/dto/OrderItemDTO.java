@@ -1,8 +1,13 @@
 package es.codeurjc.quesosbartolome.dto;
 
+import java.util.List;
+
 public record OrderItemDTO(
     Long id,
-    CheeseBasicDTO cheese,
+    Long cheeseId,
+    String cheeseName,
+    Double cheesePrice,
+    List<Double> boxes,
     Double weight,     
-    Double price   
+    Double totalPrice   
 ) {}

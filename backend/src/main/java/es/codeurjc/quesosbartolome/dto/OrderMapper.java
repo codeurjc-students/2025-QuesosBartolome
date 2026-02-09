@@ -3,7 +3,6 @@ package es.codeurjc.quesosbartolome.dto;
 import es.codeurjc.quesosbartolome.model.Order;
 import es.codeurjc.quesosbartolome.model.OrderItem;
 import es.codeurjc.quesosbartolome.model.User;
-import es.codeurjc.quesosbartolome.model.Cheese;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
@@ -47,37 +46,25 @@ public interface OrderMapper {
     })
     User toUserDomain(UserBasicDTO dto);
 
-    // CHEESE → DTO
-    @Mappings({
-        @Mapping(source = "id", target = "id"),
-        @Mapping(source = "name", target = "name"),
-        @Mapping(source = "price", target = "price")
-    })
-    CheeseBasicDTO toCheeseDTO(Cheese cheese);
-
-    // DTO → CHEESE
-    @Mappings({
-        @Mapping(source = "id", target = "id"),
-        @Mapping(source = "name", target = "name"),
-        @Mapping(source = "price", target = "price")
-    })
-    Cheese toCheeseDomain(CheeseBasicDTO dto);
-
     // ORDER ITEM → DTO
     @Mappings({
         @Mapping(source = "id", target = "id"),
-        @Mapping(source = "cheese", target = "cheese"),
+        @Mapping(source = "cheeseName", target = "cheeseName"),
+        @Mapping(source = "cheesePrice", target = "cheesePrice"),
+        @Mapping(source = "boxes", target = "boxes"),
         @Mapping(source = "weight", target = "weight"),
-        @Mapping(source = "price", target = "price")
+        @Mapping(source = "totalPrice", target = "totalPrice")
     })
     OrderItemDTO toItemDTO(OrderItem item);
 
     // DTO → ORDER ITEM
     @Mappings({
         @Mapping(source = "id", target = "id"),
-        @Mapping(source = "cheese", target = "cheese"),
+        @Mapping(source = "cheeseName", target = "cheeseName"),
+        @Mapping(source = "cheesePrice", target = "cheesePrice"),
+        @Mapping(source = "boxes", target = "boxes"),
         @Mapping(source = "weight", target = "weight"),
-        @Mapping(source = "price", target = "price")
+        @Mapping(source = "totalPrice", target = "totalPrice")
     })
     OrderItem toItemDomain(OrderItemDTO dto);
 }

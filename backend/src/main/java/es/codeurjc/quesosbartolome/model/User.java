@@ -2,7 +2,6 @@ package es.codeurjc.quesosbartolome.model;
 
 import java.sql.Blob;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import jakarta.persistence.CascadeType;
@@ -45,13 +44,12 @@ public class User {
     }
 
     public User(String name, String password, String gmail, String direction, String nif, String... rols) {
-
         this.name = name;
         this.password = password;
         this.gmail = gmail;
         this.direction = direction;
         this.nif = nif;
-        this.rols = rols != null ? List.of(rols) : Collections.emptyList();
+        this.rols = rols != null ? new ArrayList<>(List.of(rols)) : new ArrayList<>();
         this.cart = new Cart(this);
     }
 
@@ -125,7 +123,7 @@ public class User {
     }
 
     public void setRols(String... rols) {
-        this.rols = rols != null ? List.of(rols) : Collections.emptyList();
+        this.rols = rols != null ? new ArrayList<>(List.of(rols)) : new ArrayList<>();
     }
 
     public Cart getCart() {

@@ -1,16 +1,18 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { of, throwError } from 'rxjs';
 import { CheeseDetailsComponent } from './cheese-details.component';
 import { CheeseService } from '../../service/cheese.service';
 import { UserService } from '../../service/user.service';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { DebugElement } from '@angular/core';
 import { By } from '@angular/platform-browser';
 import { CheeseDTO } from '../../dto/cheese.dto';
 import { UserDTO } from '../../dto/user.dto';
 import { CartService } from '../../service/cart.service';
+import { CartDTO } from '../../dto/cart.dto';
 
 describe('CheeseDetailsComponent (unit)', () => {
+
   let component: CheeseDetailsComponent;
   let fixture: ComponentFixture<CheeseDetailsComponent>;
 
@@ -18,28 +20,47 @@ describe('CheeseDetailsComponent (unit)', () => {
   let mockUserService: jasmine.SpyObj<UserService>;
   let mockCartService: jasmine.SpyObj<CartService>;
   let mockRoute: any;
+  let mockRouter: jasmine.SpyObj<Router>;
+
+  const CHEESE_ID = 999; 
+
+  const baseCheese: CheeseDTO = {
+    id: CHEESE_ID,
+    name: 'Semicurado',
+    price: 10,
+    description: 'Queso delicioso',
+    type: 'Curado',
+    manufactureDate: '2024-01-01',
+    expirationDate: '2025-01-01',
+    boxes: [6.01, 7.02]
+  };
+
+  const baseUser: UserDTO = {
+    id: 1,
+    name: 'Pepito',
+    password: '1234',
+    gmail: 'pepito@gmail.com',
+    direction: 'Calle Falsa 123',
+    nif: '12345678A',
+    rols: ['USER']
+  };
 
   beforeEach(async () => {
-    mockCheeseService = jasmine.createSpyObj('CheeseService', ['getCheeseById', 'getCheeseImage']);
+
+    mockCheeseService = jasmine.createSpyObj('CheeseService', [
+      'getCheeseById',
+      'getCheeseImage',
+      'deleteCheese'
+    ]);
+
     mockUserService = jasmine.createSpyObj('UserService', ['getCurrentUser']);
     mockCartService = jasmine.createSpyObj('CartService', ['addCheeseToOrder']);
-    mockRoute = { snapshot: { paramMap: new Map([['id', '1']]) } };
+    mockRouter = jasmine.createSpyObj('Router', ['navigate']);
 
-    const mockCheese: CheeseDTO = {
-      id: 1,
-      name: 'Semicurado',
-      price: 10,
-      description: 'Queso delicioso',
-      type: 'Curado',
-      manufactureDate: '2024-01-01',
-      expirationDate: '2025-01-01',
-      boxes: [6.01, 7.02]
-    };
+    mockRoute = { snapshot: { paramMap: new Map([['id', CHEESE_ID.toString()]]) } };
 
-    mockCheeseService.getCheeseById.and.returnValue(of(mockCheese));
+    mockCheeseService.getCheeseById.and.returnValue(of(baseCheese));
     mockCheeseService.getCheeseImage.and.returnValue(of(new Blob(['fake'], { type: 'image/png' })));
-
-    // Default: not logged in
     mockUserService.getCurrentUser.and.returnValue(throwError(() => ({ status: 401 })));
 
     await TestBed.configureTestingModule({
@@ -48,7 +69,8 @@ describe('CheeseDetailsComponent (unit)', () => {
         { provide: CheeseService, useValue: mockCheeseService },
         { provide: UserService, useValue: mockUserService },
         { provide: CartService, useValue: mockCartService },
-        { provide: ActivatedRoute, useValue: mockRoute }
+        { provide: ActivatedRoute, useValue: mockRoute },
+        { provide: Router, useValue: mockRouter }
       ]
     }).compileComponents();
 
@@ -60,18 +82,18 @@ describe('CheeseDetailsComponent (unit)', () => {
   it('should render cheese details', () => {
     const debug: DebugElement = fixture.debugElement;
 
-    const title = debug.query(By.css('.cheese-title')).nativeElement.textContent.trim();
-    expect(title).toBe('Semicurado');
+    expect(debug.query(By.css('.cheese-title')).nativeElement.textContent.trim())
+      .toBe('Semicurado');
 
-    const price = debug.query(By.css('.cheese-price')).nativeElement.textContent.trim();
-    expect(price).toContain('10');
+    expect(debug.query(By.css('.cheese-price')).nativeElement.textContent.trim())
+      .toContain('10');
 
-    const description = debug.query(By.css('.cheese-description')).nativeElement.textContent.trim();
-    expect(description).toBe('Queso delicioso');
+    expect(debug.query(By.css('.cheese-description')).nativeElement.textContent.trim())
+      .toBe('Queso delicioso');
   });
 
   it('should load cheese image from service', () => {
-    expect(mockCheeseService.getCheeseImage).toHaveBeenCalledWith(1);
+    expect(mockCheeseService.getCheeseImage).toHaveBeenCalledWith(CHEESE_ID);
     expect(component.imageUrl).toContain('blob:');
   });
 
@@ -85,18 +107,20 @@ describe('CheeseDetailsComponent (unit)', () => {
     expect(component.imageUrl).toBe('assets/cheese-default.png');
   });
 
-  it('should set isLoggedIn=true when user service returns a user', () => {
-    const mockUser: UserDTO = {
-      id: 1,
-      name: 'Pepito',
-      password: '1234',
-      gmail: 'pepito@gmail.com',
-      direction: 'Calle Falsa 123',
-      nif: '12345678A',
-      rols: ['USER']
-    };
+  it('should fallback to default image when loadCheeseImage errors', () => {
+    mockCheeseService.getCheeseImage.and.returnValue(
+      throwError(() => new Error('fail'))
+    );
 
-    mockUserService.getCurrentUser.and.returnValue(of(mockUser));
+    fixture = TestBed.createComponent(CheeseDetailsComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+
+    expect(component.imageUrl).toBe('assets/cheese-default.png');
+  });
+
+  it('should set isLoggedIn=true when user service returns a user', () => {
+    mockUserService.getCurrentUser.and.returnValue(of(baseUser));
 
     fixture = TestBed.createComponent(CheeseDetailsComponent);
     component = fixture.componentInstance;
@@ -118,162 +142,179 @@ describe('CheeseDetailsComponent (unit)', () => {
   });
 
   it('should show stock info when cajasDisponibles > 0', () => {
-    const mockUser: UserDTO = {
-      id: 1,
-      name: 'Pepito',
-      password: '1234',
-      gmail: 'pepito@gmail.com',
-      direction: 'Calle Falsa 123',
-      nif: '12345678A',
-      rols: ['USER']
-    };
-    mockUserService.getCurrentUser.and.returnValue(of(mockUser));
-
-    const mockCheese: CheeseDTO = {
-      id: 1,
-      name: 'Semicurado',
-      price: 10,
-      description: 'Queso delicioso',
-      type: 'Curado',
-      manufactureDate: '2024-01-01',
-      expirationDate: '2025-01-01',
-      boxes: [6.01, 6.02]
-    };
-    mockCheeseService.getCheeseById.and.returnValue(of(mockCheese));
+    mockUserService.getCurrentUser.and.returnValue(of(baseUser));
+    mockCheeseService.getCheeseById.and.returnValue(of(baseCheese));
 
     fixture = TestBed.createComponent(CheeseDetailsComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
 
-    const debug: DebugElement = fixture.debugElement;
-    const stockInfo = debug.query(By.css('.stock-info')).nativeElement.textContent.trim();
+    const stockInfo = fixture.debugElement.query(By.css('.stock-info')).nativeElement.textContent.trim();
     expect(stockInfo).toContain('2 disponibles');
   });
 
   it('should show "Sin stock" when cajasDisponibles === 0', () => {
-    const mockUser: UserDTO = {
-      id: 1,
-      name: 'Pepito',
-      password: '1234',
-      gmail: 'pepito@gmail.com',
-      direction: 'Calle Falsa 123',
-      nif: '12345678A',
-      rols: ['USER']
-    };
-    mockUserService.getCurrentUser.and.returnValue(of(mockUser));
+    mockUserService.getCurrentUser.and.returnValue(of(baseUser));
 
-    const mockCheese: CheeseDTO = {
-      id: 2,
-      name: 'Azul',
-      price: 12,
-      description: 'Otro queso',
-      type: 'Azul',
-      manufactureDate: '2024-02-01',
-      expirationDate: '2025-02-01',
-      boxes: [] // out of stock
-    };
-    mockCheeseService.getCheeseById.and.returnValue(of(mockCheese));
+    const noStockCheese = { ...baseCheese, boxes: [] };
+    mockCheeseService.getCheeseById.and.returnValue(of(noStockCheese));
 
     fixture = TestBed.createComponent(CheeseDetailsComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
 
-    const debug: DebugElement = fixture.debugElement;
-    const stockInfo = debug.query(By.css('.stock-info-out')).nativeElement.textContent.trim();
+    const stockInfo = fixture.debugElement.query(By.css('.stock-info-out')).nativeElement.textContent.trim();
     expect(stockInfo).toBe('Sin stock');
   });
 
   it('should show loading state when cheese is not yet loaded', () => {
-    // Simulate getCheeseById failure
-    mockCheeseService.getCheeseById.and.returnValue(throwError(() => new Error('not found')));
+    mockCheeseService.getCheeseById.and.returnValue(
+      throwError(() => new Error('not found'))
+    );
 
     fixture = TestBed.createComponent(CheeseDetailsComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
 
-    const debug: DebugElement = fixture.debugElement;
-    const loading = debug.query(By.css('.loading')).nativeElement.textContent.trim();
+    const loading = fixture.debugElement.query(By.css('.loading')).nativeElement.textContent.trim();
     expect(loading).toBe('Cargando queso...');
   });
 
   it('should show edit button for ADMIN and hide cajas input', () => {
-    const mockAdmin: UserDTO = {
-      id: 2,
-      name: 'AdminUser',
-      password: 'admin',
-      gmail: 'admin@example.com',
-      direction: 'Admin Street',
-      nif: '87654321B',
-      rols: ['ADMIN']
-    };
-
+    const mockAdmin: UserDTO = { ...baseUser, rols: ['ADMIN'] };
     mockUserService.getCurrentUser.and.returnValue(of(mockAdmin));
 
     fixture = TestBed.createComponent(CheeseDetailsComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
 
-    const debug: DebugElement = fixture.debugElement;
-
-    // Botón de editar debe existir
-    const editButton = debug.query(By.css('.edit-btn'));
-    expect(editButton).toBeTruthy();
-
-    // Input de cajas NO debe existir
-    const cajasInput = debug.query(By.css('.cajas-input'));
-    expect(cajasInput).toBeNull();
-
-    // Stock info NO debe existir
-    const stockInfo = debug.query(By.css('.stock-info'));
-    expect(stockInfo).toBeNull();
+    expect(fixture.debugElement.query(By.css('.edit-btn'))).toBeTruthy();
+    expect(fixture.debugElement.query(By.css('.cajas-input'))).toBeNull();
   });
 
-  it('should add item to order when valid boxes are provided', () => {
-    // Mock logged user
-    const mockUser: UserDTO = {
-      id: 1,
-      name: 'Pepito',
-      password: '1234',
-      gmail: 'pepito@gmail.com',
-      direction: 'Calle Falsa 123',
-      nif: '12345678A',
-      rols: ['USER']
-    };
-    mockUserService.getCurrentUser.and.returnValue(of(mockUser));
-
-    // Mock cheese with stock
-    const mockCheese: CheeseDTO = {
-      id: 1,
-      name: 'Semicurado',
-      price: 10,
-      description: 'Queso delicioso',
-      type: 'Curado',
-      manufactureDate: '2024-01-01',
-      expirationDate: '2025-01-01',
-      boxes: [6.01, 7.02]
-    };
-    mockCheeseService.getCheeseById.and.returnValue(of(mockCheese));
-
-    // Mock addCheeseToOrder success
-    mockCartService.addCheeseToOrder.and.returnValue(of({} as any));
-
-    // Spy alert
+  it('should alert when boxesValue is empty', () => {
     spyOn(window, 'alert');
 
-    // Recreate component with new mocks
+    component.addToOrder("");
+
+    expect(window.alert).toHaveBeenCalledWith('Debes introducir una cantidad');
+  });
+
+  it('should alert when boxesValue is invalid', () => {
+    spyOn(window, 'alert');
+
+    component.cheese = { ...baseCheese };
+
+    component.addToOrder("0");
+
+    expect(window.alert).toHaveBeenCalledWith('Ingrese una cantidad correcta');
+  });
+
+  it('should alert when user is not logged in', () => {
+    spyOn(window, 'alert');
+
+    component.currentUser = null;
+    component.cheese = { ...baseCheese };
+
+    component.addToOrder("1");
+
+    expect(window.alert).toHaveBeenCalledWith('Debes estar logueado');
+  });
+
+  it('should alert when addCheeseToOrder fails', () => {
+    spyOn(window, 'alert');
+
+    component.currentUser = baseUser;
+    component.cheese = { ...baseCheese };
+
+    mockCartService.addCheeseToOrder.and.returnValue(
+      throwError(() => ({ status: 500 }))
+    );
+
+    component.addToOrder("1");
+
+    expect(window.alert).toHaveBeenCalledWith('Error al añadir el producto');
+  });
+
+  it('should add item to order when valid boxes are provided', fakeAsync(() => {
+  spyOn(window, 'alert');
+
+  mockUserService.getCurrentUser.and.returnValue(of(baseUser));
+  mockCheeseService.getCheeseById.and.returnValue(of(baseCheese));
+  mockCheeseService.getCheeseImage.and.returnValue(of(new Blob(['fake'])));
+
+  const mockCart: CartDTO = {
+    id: 1,
+    user: { id: 1, name: "Victor" },
+    totalWeight: 12.38,
+    totalPrice: 216.65,
+    items: [
+      {
+        id: 4,
+        cheeseId: 1,
+        cheeseName: "Semicurado",
+        cheesePrice: 17.5,
+        boxes: [5.82],
+        weight: 5.82,
+        totalPrice: 101.85
+      }
+    ]
+  };
+
+  mockCartService.addCheeseToOrder.and.returnValue(of(mockCart));
+
+  fixture = TestBed.createComponent(CheeseDetailsComponent);
+  component = fixture.componentInstance;
+  fixture.detectChanges();
+
+  component.addToOrder("1");
+  tick();
+
+  expect(mockCartService.addCheeseToOrder).toHaveBeenCalledWith(1, 999, 1);
+  expect(window.alert).toHaveBeenCalledWith('Producto añadido al pedido');
+}));
+
+  it('should delete cheese successfully', fakeAsync(() => {
+    spyOn(window, 'confirm').and.returnValue(true);
+    spyOn(window, 'alert');
+
+    mockUserService.getCurrentUser.and.returnValue(of(baseUser));
+    mockCheeseService.getCheeseById.and.returnValue(of(baseCheese));
+    mockCheeseService.getCheeseImage.and.returnValue(of(new Blob(['fake'])));
+    mockCheeseService.deleteCheese.and.returnValue(of(void 0));
+
     fixture = TestBed.createComponent(CheeseDetailsComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
 
-    // Call addToOrder with valid value
-    component.addToOrder("1");
+    component.deleteCheese();
+    tick();
 
-    // Expect service to be called correctly
-    expect(mockCartService.addCheeseToOrder)
-      .toHaveBeenCalledWith(1, 1, 1);
+    expect(window.alert).toHaveBeenCalledWith('Queso eliminado correctamente');
+    expect(mockRouter.navigate).toHaveBeenCalledWith(['/cheeses']);
+  }));
 
-    // Expect success alert
-    expect(window.alert).toHaveBeenCalledWith('Producto añadido al pedido');
+  it('should alert when deleteCheese fails', () => {
+    spyOn(window, 'confirm').and.returnValue(true);
+    spyOn(window, 'alert');
+
+    component.cheese = { ...baseCheese };
+
+    mockCheeseService.deleteCheese.and.returnValue(
+      throwError(() => ({ status: 500 }))
+    );
+
+    component.deleteCheese();
+
+    expect(window.alert).toHaveBeenCalledWith('Error al eliminar el queso');
+  });
+
+  it('should navigate to edit page when editCheese is called', () => {
+    component.cheese = { ...baseCheese };
+
+    component.editCheese();
+
+    expect(mockRouter.navigate).toHaveBeenCalledWith(['/cheeses', CHEESE_ID, 'edit']);
   });
 
 });

@@ -125,10 +125,14 @@ class OrderServiceUnitTest {
 
         Cheese cheese = new Cheese();
         cheese.setId(10L);
+        cheese.setName("Queso Manchego");
+        cheese.setPrice(10.0);
         OrderItem cartItem = new OrderItem();
-        cartItem.setCheese(cheese);
+        cartItem.setCheeseName(cheese.getName());
+        cartItem.setCheesePrice(cheese.getPrice());
+        cartItem.setBoxes(java.util.Arrays.asList(1.0, 1.0));
         cartItem.setWeight(2.0);
-        cartItem.setPrice(20.0);
+        cartItem.setTotalPrice(20.0);
         cart.getItems().add(cartItem);
 
         User user = new User();

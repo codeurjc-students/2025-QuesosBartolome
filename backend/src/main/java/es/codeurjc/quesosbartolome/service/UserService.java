@@ -74,4 +74,15 @@ public class UserService {
                 .map(user -> mapper.toDTO(user));
     }
 
+    public boolean isAdmin(String username) {
+
+        Optional<User> userOpt = repository.findByName(username);
+        if (userOpt.isEmpty()) {
+            return false;
+        }
+
+        User user = userOpt.get();
+        return user.getRols() != null && user.getRols().contains("ADMIN");
+    }
+
 }

@@ -56,9 +56,12 @@ public class OrderService {
         Order order = new Order(user);
 
         for (OrderItem cartItem : cart.getItems()) {
-            OrderItem orderItem = new OrderItem(order, cartItem.getCheese(),
+            OrderItem orderItem = new OrderItem(order, cartItem.getCheeseId(),
+                    cartItem.getCheeseName(),
+                    cartItem.getCheesePrice(),
+                    cartItem.getBoxes(),
                     cartItem.getWeight(),
-                    cartItem.getPrice());
+                    cartItem.getTotalPrice());
             order.getItems().add(orderItem);
         }
 

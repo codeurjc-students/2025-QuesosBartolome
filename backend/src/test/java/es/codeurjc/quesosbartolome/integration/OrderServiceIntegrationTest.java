@@ -59,7 +59,7 @@ public class OrderServiceIntegrationTest {
         cartRepository.deleteAll();
         cheeseRepository.deleteAll();
 
-        // Usuario con carrito
+        // User with empty cart
         Cart cart = new Cart();
         cart.setItems(new ArrayList<>());
         cart.setTotalPrice(0.0);
@@ -72,7 +72,7 @@ public class OrderServiceIntegrationTest {
         user.setOrders(new ArrayList<>());
         userRepository.save(user);
 
-        // Queso con cajas
+        // Cheese with boxes to avoid conflicts with other tests    
         cheese = new Cheese(null, "Curado", 10.0, "desc", "tipo", "2024-01-01", "2025-01-01");
         cheese.setBoxes(new ArrayList<>(List.of(1.0, 2.0, 3.0)));
         cheeseRepository.save(cheese);
@@ -103,7 +103,7 @@ public class OrderServiceIntegrationTest {
 
     @Test
     void shouldReturnPagedOrders() {
-        // Crear 15 pedidos
+        // Create 15 orders for the user
         for (int i = 0; i < 15; i++) {
             Order order = new Order(user);
             order.setTotalPrice(10.0 + i);
@@ -143,17 +143,19 @@ public class OrderServiceIntegrationTest {
 
     @Test
     void confirmOrderCreatesOrderSuccessfully() {
-        // Añadimos item al carrito
+        // Add item to cart
         OrderItem cartItem = new OrderItem();
-        cartItem.setCheese(cheese);
+        cartItem.setCheeseName(cheese.getName());
+        cartItem.setCheesePrice(cheese.getPrice());
+        cartItem.setBoxes(java.util.Arrays.asList(2.0));
         cartItem.setWeight(2.0);
-        cartItem.setPrice(20.0);
+        cartItem.setTotalPrice(20.0);
         user.getCart().getItems().add(cartItem);
         user.getCart().setTotalWeight(2.0);
         user.getCart().setTotalPrice(20.0);
         userRepository.save(user);
 
-        // Confirmamos pedido
+        // Confirm order
         OrderDTO dto = orderService.confirmOrder(user.getId());
 
         assertThat(dto).isNotNull();

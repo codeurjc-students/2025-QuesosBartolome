@@ -56,7 +56,7 @@ export class CheeseDetailsComponent implements OnInit {
     this.cheeseService.getCheeseById(id).subscribe({
       next: (data) => {
         this.cheese = data;
-        this.loadCheeseImage(data.id);
+        this.loadCheeseImage(data.id!);
       },
       error: err => console.error('Error obteniendo queso', err)
     });
@@ -79,7 +79,7 @@ export class CheeseDetailsComponent implements OnInit {
 
   addToOrder(boxesValue: string) {
 
-    // Validaciones
+    // Validate input
     if (!boxesValue) {
       alert('Debes introducir una cantidad');
       return;
@@ -100,11 +100,11 @@ export class CheeseDetailsComponent implements OnInit {
     const userId = this.currentUser.id;
     const cheeseId = this.cheese.id;
 
-    this.cartService.addCheeseToOrder(userId, cheeseId, boxes)
+    this.cartService.addCheeseToOrder(userId, cheeseId!, boxes)
       .subscribe({
         next: () => {
           alert('Producto añadido al pedido');
-          this.loadCheese(cheeseId);
+          this.loadCheese(cheeseId!);
         },
         error: (err) => {
           console.error('FULL ERROR:', err);
@@ -126,6 +126,34 @@ export class CheeseDetailsComponent implements OnInit {
 
   get isAdmin(): boolean {
     return this.currentUser?.rols?.includes('ADMIN') ?? false;
+  }
+
+  editCheese(): void {
+    if (this.cheese && this.cheese.id) {
+      this.router.navigate(['/cheeses', this.cheese.id, 'edit']);
+    }
+  }
+
+  deleteCheese(): void {
+    if (!this.cheese || !this.cheese.id) {
+      return;
+    }
+
+    if (confirm(`¿Estás seguro de que quieres eliminar el queso "${this.cheese.name}"?`)) {
+      this.cheeseService.deleteCheese(this.cheese.id).subscribe({
+        next: () => {
+          alert('Queso eliminado correctamente');
+          this.router.navigate(['/cheeses']);
+        },
+        error: (err) => {
+          console.error('Error al eliminar el queso:', err);
+          alert('Error al eliminar el queso');
+          if (err.status >= 500) {
+            this.router.navigate(['/error']);
+          }
+        }
+      });
+    }
   }
 
 }
