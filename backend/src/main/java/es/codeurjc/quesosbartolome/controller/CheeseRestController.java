@@ -89,7 +89,6 @@ public class CheeseRestController {
         if (!userService.isAdmin(principal.getName())) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
-
         try {
             CheeseDTO created = cheeseService.createCheese(dto);
 
