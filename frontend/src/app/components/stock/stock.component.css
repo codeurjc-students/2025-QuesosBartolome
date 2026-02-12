@@ -1,0 +1,201 @@
+:root {
+  --rojo-vino: #a1252b;
+  --crema: #f5e9d4;
+  --blanco: #ffffff;
+  --gris-suave: #f0f0f0;
+  --texto: #2e2e2e;
+}
+
+.main-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1rem;
+}
+
+.section-title {
+  width: 100%;
+  max-width: 1100px;
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: var(--texto);
+}
+
+.stock-grid {
+  width: 100%;
+  max-width: 1100px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.2rem;
+  justify-content: center;
+}
+
+.stock-card {
+  background-color: var(--blanco);
+  border-radius: 12px;
+  padding: 0.8rem;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  max-width: 280px;
+  margin: 0 auto;
+}
+
+.image-placeholder {
+  width: 100%;
+  height: 120px;
+  background-color: var(--gris-suave);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.image-placeholder img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.cheese-name {
+  text-align: center;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--texto);
+  margin: 0;
+  padding: 0.3rem 0;
+}
+
+.loads-container {
+  background-color: var(--crema);
+  border-radius: 8px;
+  padding: 0.5rem;
+  min-height: 100px;
+}
+
+.load {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: var(--blanco);
+  padding: 0.3rem 0.5rem;
+  border-radius: 5px;
+  margin-bottom: 0.3rem;
+  font-size: 0.85rem;
+}
+
+.load:last-of-type {
+  margin-bottom: 0;
+}
+
+.remove-btn {
+  background: none;
+  border: none;
+  color: var(--rojo-vino);
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 1rem;
+}
+
+.remove-btn:hover {
+  transform: scale(1.2);
+}
+
+.no-boxes {
+  text-align: center;
+  color: #999;
+  font-size: 0.8rem;
+  padding: 0.5rem;
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.8rem;
+  margin-top: 0.5rem;
+}
+
+.pagination .arrow {
+  background-color: var(--rojo-vino);
+  color: var(--blanco);
+  border: none;
+  border-radius: 5px;
+  width: 28px;
+  height: 28px;
+  font-size: 1.2rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s;
+}
+
+.pagination .arrow:hover:not(:disabled) {
+  background-color: #8a1f24;
+}
+
+.pagination .arrow:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+.pagination .page-number {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--texto);
+  min-width: 20px;
+  text-align: center;
+}
+
+.cheese-pagination {
+  margin-top: 1.5rem;
+}
+
+.add-load {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.add-load input {
+  flex: 1;
+  padding: 0.4rem;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  font-size: 0.85rem;
+}
+
+.kg-label {
+  font-size: 0.85rem;
+  color: var(--texto);
+}
+
+.btn-add {
+  background-color: var(--rojo-vino);
+  color: var(--blanco);
+  border: none;
+  border-radius: 6px;
+  padding: 0.5rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+  font-size: 0.9rem;
+}
+
+.btn-add:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.btn-add:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+.loading {
+  text-align: center;
+  padding: 2rem;
+  color: var(--texto);
+  font-size: 1.1rem;
+}

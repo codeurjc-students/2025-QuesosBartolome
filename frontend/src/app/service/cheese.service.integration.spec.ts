@@ -304,5 +304,156 @@ describe('CheeseService (integration)', () => {
     });
   });
 
+  it('should add a box to a cheese in the real API', (done) => {
+
+    loginService.login('German', 'password123').subscribe({
+      next: () => {
+
+        // Crear queso auxiliar
+        const cheeseToUpdate: CheeseDTO = {
+          name: 'CheeseAddBox',
+          price: 10,
+          description: 'Test add box',
+          manufactureDate: '2024-01-01',
+          expirationDate: '2025-01-01',
+          type: 'Curado',
+          boxes: [1.0, 2.0]
+        };
+
+        service.createCheese(cheeseToUpdate).subscribe({
+          next: (created: CheeseDTO) => {
+
+            expect(created.id).toBeTruthy();
+
+            service.addBox(created.id!, 3.5).subscribe({
+              next: (updated: CheeseDTO) => {
+                expect(updated.boxes.length).toBe(3);
+                expect(updated.boxes).toContain(3.5);
+                done();
+              },
+              error: (err) => {
+                fail('Add box failed: ' + err.message);
+                done();
+              }
+            });
+
+          },
+          error: (err) => {
+            fail('Create failed: ' + err.message);
+            done();
+          }
+        });
+
+      },
+      error: (err) => {
+        fail('Login failed: ' + err.message);
+        done();
+      }
+    });
+
+  });
+
+  it('should return 400 when adding invalid box weight', (done) => {
+
+    loginService.login('German', 'password123').subscribe({
+      next: () => {
+
+        service.addBox(1, -5).subscribe({
+          next: () => {
+            fail('Expected 400 error');
+            done();
+          },
+          error: (err) => {
+            expect(err.status).toBe(400);
+            done();
+          }
+        });
+
+      },
+      error: (err) => {
+        fail('Login failed: ' + err.message);
+        done();
+      }
+    });
+
+  });
+
+  it('should remove a box from a cheese in the real API', (done) => {
+
+    loginService.login('German', 'password123').subscribe({
+      next: () => {
+
+        // Crear queso auxiliar
+        const cheeseToUpdate: CheeseDTO = {
+          name: 'CheeseRemoveBox',
+          price: 10,
+          description: 'Test remove box',
+          manufactureDate: '2024-01-01',
+          expirationDate: '2025-01-01',
+          type: 'Curado',
+          boxes: [1.0, 2.0, 3.0]
+        };
+
+        service.createCheese(cheeseToUpdate).subscribe({
+          next: (created: CheeseDTO) => {
+
+            expect(created.id).toBeTruthy();
+
+            // Eliminar la caja en índice 1 (valor 2.0)
+            service.removeBox(created.id!, 1).subscribe({
+              next: (updated: CheeseDTO) => {
+                expect(updated.boxes.length).toBe(2);
+                expect(updated.boxes).not.toContain(2.0);
+                done();
+              },
+              error: (err) => {
+                fail('Remove box failed: ' + err.message);
+                done();
+              }
+            });
+
+          },
+          error: (err) => {
+            fail('Create failed: ' + err.message);
+            done();
+          }
+        });
+
+      },
+      error: (err) => {
+        fail('Login failed: ' + err.message);
+        done();
+      }
+    });
+
+  });
+
+  it('should return 404 when removing a box from non-existing cheese', (done) => {
+
+    loginService.login('German', 'password123').subscribe({
+      next: () => {
+
+        service.removeBox(999999, 0).subscribe({
+          next: () => {
+            fail('Expected 404 error');
+            done();
+          },
+          error: (err) => {
+            expect(err.status).toBe(404);
+            done();
+          }
+        });
+
+      },
+      error: (err) => {
+        fail('Login failed: ' + err.message);
+        done();
+      }
+    });
+
+  });
+
+
+
 
 });

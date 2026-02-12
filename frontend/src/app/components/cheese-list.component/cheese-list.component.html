@@ -9,40 +9,40 @@
     <nav class="menu">
       <ul>
 
-          <li (click)="goToAbout()">
-            Acerca de nosotros
+        <li (click)="goToAbout()">
+          Acerca de nosotros
+        </li>
+
+        <li (click)="goToMyOrder()" *ngIf="isLoggedIn && isUser()">
+          Mi pedido
+        </li>
+
+        <ng-container *ngIf="isLoggedIn && isAdmin()">
+
+          <li (click)="goToOrders()">
+            Pedidos
           </li>
 
-          <li (click)="goToMyOrder()" *ngIf="isLoggedIn && isUser()">
-            Mi pedido
+          <li>
+            Facturas
           </li>
 
-          <ng-container *ngIf="isLoggedIn && isAdmin()">
+          <li>
+            Gráficos
+          </li>
 
-            <li (click)="goToOrders()">
-              Pedidos
-            </li>
+          <li (click)="goToStock()">
+            Stock
+          </li>
 
-            <li>
-              Facturas
-            </li>
+          <li (click)="goToClients()">
+            Clientes
+          </li>
 
-            <li>
-              Gráficos
-            </li>
+        </ng-container>
 
-            <li>
-              Stock
-            </li>
-
-            <li (click)="goToClients()">
-              Clientes
-            </li>
-
-          </ng-container>
-
-        </ul>
-      </nav>
+      </ul>
+    </nav>
   </aside>
 
   <!-- MAIN -->
@@ -71,12 +71,13 @@
         </ng-template>
       </div>
 
-    </div> 
+    </div>
 
     <div class="card-grid">
       <div class="card shadow-sm" *ngFor="let cheese of cheeses" (click)="goToDetails(cheese.id!)">
         <div class="image-placeholder">
-          <img [src]="'https://localhost:443/api/v1/cheeses/' + cheese.id + '/image'" alt="Imagen de {{ cheese.name }}" />
+          <img [src]="'https://localhost:443/api/v1/cheeses/' + cheese.id + '/image'"
+            alt="Imagen de {{ cheese.name }}" />
         </div>
         <div class="card-body">
           <p>{{ cheese.name }}</p>
