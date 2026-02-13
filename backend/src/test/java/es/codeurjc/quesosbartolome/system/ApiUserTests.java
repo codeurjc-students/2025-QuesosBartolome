@@ -33,7 +33,7 @@ public class ApiUserTests {
                 .then()
                 .statusCode(401);
     }
-
+ 
     @Test
     void testGetCurrentUserAfterLogin() throws JSONException {
         // Register test user
