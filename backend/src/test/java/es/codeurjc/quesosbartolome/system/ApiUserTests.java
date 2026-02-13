@@ -89,12 +89,16 @@ public class ApiUserTests {
 
     @Test
     void testGetUserImageById() throws JSONException {
+        String uniqueName = "Ana_" + System.currentTimeMillis();
+        String uniqueEmail = "ana_" + System.currentTimeMillis() + "@example.com";
+        String uniqueNif = "12345" + (System.currentTimeMillis() % 10000) + "C";
+        
         JSONObject registerBody = new JSONObject();
-        registerBody.put("name", "Ana");
+        registerBody.put("name", uniqueName);
         registerBody.put("password", "clave456");
-        registerBody.put("gmail", "ana@example.com");
+        registerBody.put("gmail", uniqueEmail);
         registerBody.put("direction", "Calle Luna 2");
-        registerBody.put("nif", "12345678C");
+        registerBody.put("nif", uniqueNif);
         registerBody.put("image", JSONObject.NULL);
 
         var registerResponse = given()
@@ -129,13 +133,17 @@ public class ApiUserTests {
 
     @Test
     void testGetUserById() throws JSONException {
+        String uniqueName = "Luis_" + System.currentTimeMillis();
+        String uniqueEmail = "luis_" + System.currentTimeMillis() + "@example.com";
+        String uniqueNif = "11223" + (System.currentTimeMillis() % 10000) + "D";
+        
         // Registrar un usuario
         JSONObject registerBody = new JSONObject();
-        registerBody.put("name", "Luis");
+        registerBody.put("name", uniqueName);
         registerBody.put("password", "password789");
-        registerBody.put("gmail", "luis@example.com");
+        registerBody.put("gmail", uniqueEmail);
         registerBody.put("direction", "Calle Mayor 3");
-        registerBody.put("nif", "11223344D");
+        registerBody.put("nif", uniqueNif);
         registerBody.put("image", JSONObject.NULL);
 
         var registerResponse = given()
@@ -155,10 +163,10 @@ public class ApiUserTests {
                 .get("/api/v1/users/" + userId)
                 .then()
                 .statusCode(200)
-                .body("name", equalTo("Luis"))
-                .body("gmail", equalTo("luis@example.com"))
+                .body("name", equalTo(uniqueName))
+                .body("gmail", equalTo(uniqueEmail))
                 .body("direction", equalTo("Calle Mayor 3"))
-                .body("nif", equalTo("11223344D"))
+                .body("nif", equalTo(uniqueNif))
                 .body("id", equalTo(userId.intValue()));
     }
 
@@ -183,14 +191,17 @@ public class ApiUserTests {
 
     @Test
     void testGetAllUsersForbiddenForUser() throws JSONException {
+        String uniqueName = "normalUser_" + System.currentTimeMillis();
+        String uniqueEmail = "normal_" + System.currentTimeMillis() + "@example.com";
+        String uniqueNif = "11111" + (System.currentTimeMillis() % 10000) + "A";
 
         // Register USER
         JSONObject registerBody = new JSONObject();
-        registerBody.put("name", "normalUser");
+        registerBody.put("name", uniqueName);
         registerBody.put("password", "password");
-        registerBody.put("gmail", "normal@example.com");
+        registerBody.put("gmail", uniqueEmail);
         registerBody.put("direction", "Calle Normal");
-        registerBody.put("nif", "11111111A");
+        registerBody.put("nif", uniqueNif);
         registerBody.put("image", JSONObject.NULL);
 
         given()
@@ -202,7 +213,7 @@ public class ApiUserTests {
 
         // Login USER
         JSONObject loginBody = new JSONObject();
-        loginBody.put("username", "normalUser");
+        loginBody.put("username", uniqueName);
         loginBody.put("password", "password");
 
         var cookies = given()
