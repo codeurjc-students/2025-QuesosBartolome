@@ -1,8 +1,10 @@
 package es.codeurjc.quesosbartolome.service;
 
+import java.io.InputStream;
 import java.sql.Blob;
 import java.util.Optional;
 
+import org.hibernate.engine.jdbc.BlobProxy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -44,6 +46,18 @@ public class UserService {
                 userDTO.direction(),
                 userDTO.nif(),
                 "USER");
+
+        // Set default profile image
+        try {
+            InputStream defaultImageStream = getClass().getResourceAsStream("/images/default-profile.jpg");
+            if (defaultImageStream != null) {
+                byte[] defaultBytes = defaultImageStream.readAllBytes();
+                Blob defaultBlob = BlobProxy.generateProxy(defaultBytes);
+                user.setImage(defaultBlob);
+            }
+        } catch (Exception e) {
+            // If default image fails, continue without image
+        }
 
         repository.save(user);
 

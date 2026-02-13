@@ -49,8 +49,9 @@ public class ApiCheeseTests {
 
     /**
      * Create an auxiliary cheese temporarily for edit/delete tests
+     * 
      * @param cookies Admin authentication cookies
-     * @param name Name of the auxiliary cheese
+     * @param name    Name of the auxiliary cheese
      * @return ID of the created cheese
      */
     private Long createAuxiliaryCheese(io.restassured.http.Cookies cookies, String name) throws JSONException {
@@ -418,7 +419,6 @@ public class ApiCheeseTests {
     void testDeleteCheese_NoContent() throws JSONException {
         var cookies = login("German", "password123");
 
-        // Crear queso auxiliar para eliminar
         Long cheeseId = createAuxiliaryCheese(cookies, "QuesoParaEliminar");
 
         given()
@@ -428,4 +428,149 @@ public class ApiCheeseTests {
                 .then()
                 .statusCode(204);
     }
+
+    @Test
+    @Order(26)
+    void testAddBox_Unauthorized() {
+        given()
+                .contentType("application/json")
+                .body("{\"weight\": 2.5}")
+                .when()
+                .put("/api/v1/cheeses/1/boxes/add")
+                .then()
+                .statusCode(401);
+    }
+
+    @Test
+    @Order(27)
+    void testAddBox_Forbidden() throws Exception {
+        var cookies = login("Victor", "password123");
+
+        given()
+                .cookies(cookies)
+                .contentType("application/json")
+                .body("{\"weight\": 2.5}")
+                .when()
+                .put("/api/v1/cheeses/1/boxes/add")
+                .then()
+                .statusCode(403);
+    }
+
+    @Test
+    @Order(28)
+    void testAddBox_BadRequest() throws Exception {
+        var cookies = login("German", "password123");
+
+        given()
+                .cookies(cookies)
+                .contentType("application/json")
+                .body("{\"weight\": -1}")
+                .when()
+                .put("/api/v1/cheeses/1/boxes/add")
+                .then()
+                .statusCode(400);
+    }
+
+    @Test
+    @Order(29)
+    void testAddBox_NotFound() throws Exception {
+        var cookies = login("German", "password123");
+
+        given()
+                .cookies(cookies)
+                .contentType("application/json")
+                .body("{\"weight\": 2.5}")
+                .when()
+                .put("/api/v1/cheeses/999/boxes/add")
+                .then()
+                .statusCode(404);
+    }
+
+    @Test
+    @Order(30)
+    void testAddBox_Ok() throws Exception {
+        var cookies = login("German", "password123");
+
+        Long cheeseId = createAuxiliaryCheese(cookies, "QuesoAddBox");
+
+        JSONObject body = new JSONObject();
+        body.put("weight", 3.0);
+
+        given()
+                .cookies(cookies)
+                .contentType("application/json")
+                .body(body.toString())
+                .when()
+                .put("/api/v1/cheeses/" + cheeseId + "/boxes/add")
+                .then()
+                .statusCode(200)
+                .body("boxes", hasItem(3.0f));
+    }
+
+    @Test
+    @Order(31)
+    void testRemoveBox_Unauthorized() {
+        when()
+                .put("/api/v1/cheeses/1/boxes/remove/0")
+                .then()
+                .statusCode(401);
+    }
+
+    @Test
+    @Order(32)
+    void testRemoveBox_Forbidden() throws Exception {
+        var cookies = login("Victor", "password123");
+
+        given()
+                .cookies(cookies)
+                .when()
+                .put("/api/v1/cheeses/1/boxes/remove/0")
+                .then()
+                .statusCode(403);
+    }
+
+    @Test
+    @Order(33)
+    void testRemoveBox_BadRequest() throws Exception {
+        var cookies = login("German", "password123");
+
+        Long cheeseId = createAuxiliaryCheese(cookies, "QuesoRemoveBad");
+
+        given()
+                .cookies(cookies)
+                .when()
+                .put("/api/v1/cheeses/" + cheeseId + "/boxes/remove/5")
+                .then()
+                .statusCode(400);
+    }
+
+    @Test
+    @Order(34)
+    void testRemoveBox_NotFound() throws Exception {
+        var cookies = login("German", "password123");
+
+        given()
+                .cookies(cookies)
+                .when()
+                .put("/api/v1/cheeses/999/boxes/remove/0")
+                .then()
+                .statusCode(404);
+    }
+
+    @Test
+    @Order(35)
+    void testRemoveBox_Ok() throws Exception {
+        var cookies = login("German", "password123");
+
+        Long cheeseId = createAuxiliaryCheese(cookies, "QuesoRemoveOk");
+
+        given()
+                .cookies(cookies)
+                .when()
+                .put("/api/v1/cheeses/" + cheeseId + "/boxes/remove/0")
+                .then()
+                .statusCode(200)
+                .body("boxes.size()", equalTo(1));
+    }
+
 }

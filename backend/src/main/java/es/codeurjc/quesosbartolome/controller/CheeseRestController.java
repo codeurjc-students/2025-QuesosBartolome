@@ -194,4 +194,59 @@ public class CheeseRestController {
         return ResponseEntity.noContent().build();
     }
 
+    @PutMapping("/{id}/boxes/add")
+    public ResponseEntity<CheeseDTO> addBox(
+            @PathVariable Long id,
+            @RequestBody java.util.Map<String, Double> body,
+            HttpServletRequest request) {
+
+        Principal principal = request.getUserPrincipal();
+        if (principal == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        if (!userService.isAdmin(principal.getName())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+
+        Double weight = body.get("weight");
+        if (weight == null || weight <= 0) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
+
+        try {
+            CheeseDTO updated = cheeseService.addBox(id, weight);
+            return ResponseEntity.ok(updated);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+    }
+
+    @PutMapping("/{id}/boxes/remove/{boxIndex}")
+    public ResponseEntity<CheeseDTO> removeBox(
+            @PathVariable Long id,
+            @PathVariable int boxIndex,
+            HttpServletRequest request) {
+
+        Principal principal = request.getUserPrincipal();
+        if (principal == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        if (!userService.isAdmin(principal.getName())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+
+        try {
+            CheeseDTO updated = cheeseService.removeBox(id, boxIndex);
+            return ResponseEntity.ok(updated);
+        } catch (IllegalArgumentException e) {
+            if (e.getMessage().equals("Cheese not found")) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            }
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+
+        }
+    }
+
 }

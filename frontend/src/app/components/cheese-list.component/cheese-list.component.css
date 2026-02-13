@@ -8,7 +8,7 @@
 
 .dashboard-container {
   display: flex;
-  height: 100vh;
+  min-height: 100vh; /* permite crecer si hay más contenido */
   font-family: "Poppins", sans-serif;
   color: var(--texto);
 }
@@ -16,12 +16,14 @@
 /* SIDEBAR */
 .sidebar {
   width: 260px;
+  min-height: 100vh; /* se adapta al contenido */
   background-color: var(--rojo-vino);
   color: var(--blanco);
   display: flex;
   flex-direction: column;
   align-items: center;
   padding: 1.5rem 1rem;
+  flex-shrink: 0; /* evita deformaciones */
 }
 
 .logo img {
@@ -163,4 +165,36 @@
   background-color: var(--rojo-vino);
   color: var(--blanco);
   transform: translateY(-2px);
+}
+
+/* PAGINACIÓN */
+.pagination-container {
+  margin-top: 2rem;
+  padding: 1rem 0;
+}
+
+.pagination .page-link {
+  color: var(--rojo-vino);
+  border-color: var(--rojo-vino);
+  background-color: var(--blanco);
+  transition: all 0.2s ease;
+}
+
+.pagination .page-link:hover {
+  background-color: var(--rojo-vino);
+  color: var(--blanco);
+  border-color: var(--rojo-vino);
+}
+
+.pagination .page-item.active .page-link {
+  background-color: var(--rojo-vino);
+  border-color: var(--rojo-vino);
+  color: var(--blanco);
+}
+
+.pagination .page-item.disabled .page-link {
+  color: #6c757d;
+  pointer-events: none;
+  background-color: var(--gris-suave);
+  border-color: #dee2e6;
 }

@@ -64,8 +64,19 @@ public class CheeseService {
             cheese.setBoxes(new java.util.ArrayList<>());
         }
 
-        // image → null
-        cheese.setImage(null);
+        // Set default image
+        try {
+            InputStream defaultImageStream = getClass().getResourceAsStream("/images/queso-default.jpg");
+            if (defaultImageStream != null) {
+                byte[] defaultBytes = defaultImageStream.readAllBytes();
+                Blob defaultBlob = BlobProxy.generateProxy(defaultBytes);
+                cheese.setImage(defaultBlob);
+            } else {
+                cheese.setImage(null);
+            }
+        } catch (Exception e) {
+            cheese.setImage(null);
+        }
 
         Cheese saved = cheeseRepository.save(cheese);
         return cheeseMapper.toDTO(saved);
@@ -144,6 +155,48 @@ public class CheeseService {
 
         cheeseRepository.deleteById(id);
         return true;
+    }
+
+    public CheeseDTO addBox(Long id, Double weight) {
+        Optional<Cheese> cheeseOpt = cheeseRepository.findById(id);
+
+        if (cheeseOpt.isEmpty()) {
+            throw new IllegalArgumentException("Cheese not found");
+        }
+
+        Cheese cheese = cheeseOpt.get();
+
+        if (cheese.getBoxes() == null) {
+            cheese.setBoxes(new java.util.ArrayList<>());
+        }
+
+        cheese.getBoxes().add(weight);
+
+        Cheese updated = cheeseRepository.save(cheese);
+        return cheeseMapper.toDTO(updated);
+    }
+
+    public CheeseDTO removeBox(Long id, int boxIndex) {
+        Optional<Cheese> cheeseOpt = cheeseRepository.findById(id);
+
+        if (cheeseOpt.isEmpty()) {
+            throw new IllegalArgumentException("Cheese not found");
+        }
+
+        Cheese cheese = cheeseOpt.get();
+
+        if (cheese.getBoxes() == null || cheese.getBoxes().isEmpty()) {
+            throw new IllegalArgumentException("No boxes to remove");
+        }
+
+        if (boxIndex < 0 || boxIndex >= cheese.getBoxes().size()) {
+            throw new IllegalArgumentException("Invalid box index");
+        }
+
+        cheese.getBoxes().remove(boxIndex);
+
+        Cheese updated = cheeseRepository.save(cheese);
+        return cheeseMapper.toDTO(updated);
     }
 
 }

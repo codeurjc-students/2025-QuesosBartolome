@@ -9,51 +9,54 @@
     <nav class="menu">
       <ul>
 
-          <li (click)="goToAbout()">
-            Acerca de nosotros
+        <li (click)="goToAbout()">
+          Acerca de nosotros
+        </li>
+
+        <li (click)="goToMyOrder()" *ngIf="isLoggedIn && isUser()">
+          Mi pedido
+        </li>
+
+        <ng-container *ngIf="isLoggedIn && isAdmin()">
+
+          <li (click)="goToOrders()">
+            Pedidos
           </li>
 
-          <li (click)="goToMyOrder()" *ngIf="isLoggedIn && isUser()">
-            Mi pedido
+          <li>
+            Facturas
           </li>
 
-          <ng-container *ngIf="isLoggedIn && isAdmin()">
+          <li>
+            Gráficos
+          </li>
 
-            <li (click)="goToOrders()">
-              Pedidos
-            </li>
+          <li (click)="goToStock()">
+            Stock
+          </li>
 
-            <li>
-              Facturas
-            </li>
+          <li (click)="goToClients()">
+            Clientes
+          </li>
 
-            <li>
-              Gráficos
-            </li>
+        </ng-container>
 
-            <li>
-              Stock
-            </li>
-
-            <li (click)="goToClients()">
-              Clientes
-            </li>
-
-          </ng-container>
-
-        </ul>
-      </nav>
+      </ul>
+    </nav>
   </aside>
 
   <!-- MAIN -->
   <main class="main-content">
     <div class="top-bar">
       <div ngbDropdown>
-        <button class="btn btn-outline-danger dropdown-toggle" ngbDropdownToggle>Filtrar</button>
+        <button class="btn btn-outline-danger dropdown-toggle" ngbDropdownToggle>
+          {{ selectedType }}
+        </button>
         <ul ngbDropdownMenu>
-          <li ngbDropdownItem>Todos</li>
-          <li ngbDropdownItem>Curados</li>
-          <li ngbDropdownItem>Frescos</li>
+          <li ngbDropdownItem (click)="selectType('Todos')">Todos</li>
+          <li ngbDropdownItem (click)="selectType('Pasta prensada')">Pasta prensada</li>
+          <li ngbDropdownItem (click)="selectType('Cremoso')">Cremoso</li>
+          <li ngbDropdownItem (click)="selectType('Maduración fúngica')">Maduración fúngica</li>
         </ul>
       </div>
 
@@ -71,12 +74,13 @@
         </ng-template>
       </div>
 
-    </div> 
+    </div>
 
     <div class="card-grid">
-      <div class="card shadow-sm" *ngFor="let cheese of cheeses" (click)="goToDetails(cheese.id!)">
+      <div class="card shadow-sm" *ngFor="let cheese of paginatedCheeses" (click)="goToDetails(cheese.id!)">
         <div class="image-placeholder">
-          <img [src]="'https://localhost:443/api/v1/cheeses/' + cheese.id + '/image'" alt="Imagen de {{ cheese.name }}" />
+          <img [src]="'https://localhost:443/api/v1/cheeses/' + cheese.id + '/image'"
+            alt="Imagen de {{ cheese.name }}" />
         </div>
         <div class="card-body">
           <p>{{ cheese.name }}</p>
@@ -91,5 +95,36 @@
         </div>
       </div>
     </div>
+
+    <!-- Paginación -->
+    <div class="pagination-container" *ngIf="totalPages > 1">
+      <nav aria-label="Paginación de quesos">
+        <ul class="pagination justify-content-center">
+          <li class="page-item" [class.disabled]="currentPage === 1">
+            <button class="page-link" (click)="previousPage()" [disabled]="currentPage === 1">
+              Anterior
+            </button>
+          </li>
+
+          <li class="page-item" *ngFor="let page of getPageNumbers()" [class.active]="page === currentPage">
+            <button class="page-link" (click)="goToPage(page)">
+              {{ page }}
+            </button>
+          </li>
+
+          <li class="page-item" [class.disabled]="currentPage === totalPages">
+            <button class="page-link" (click)="nextPage()" [disabled]="currentPage === totalPages">
+              Siguiente
+            </button>
+          </li>
+        </ul>
+      </nav>
+      <p class="text-center text-muted mt-2">
+        Mostrando {{ (currentPage - 1) * itemsPerPage + 1 }} -
+        {{ Math.min(currentPage * itemsPerPage, filteredCheeses.length) }}
+        de {{ filteredCheeses.length }} quesos
+      </p>
+    </div>
+
   </main>
 </div>

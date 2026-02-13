@@ -133,4 +133,39 @@ describe('CheeseListComponent (unit)', () => {
     expect(mockLoginService.logout).toHaveBeenCalled();
     expect(mockRouter.navigate).toHaveBeenCalledWith(['/']);
   });
+
+  it('should filter cheeses by type when selectType is called', () => {
+    mockCheeseService.getAllCheeses.and.returnValue(of([
+      { id: 1, name: 'Semicurado', price: 10, description: '', type: 'Pasta prensada', manufactureDate: '', expirationDate: '', boxes: [] },
+      { id: 2, name: 'Azul', price: 12, description: '', type: 'Maduración fúngica', manufactureDate: '', expirationDate: '', boxes: [] },
+      { id: 3, name: 'Chevrett', price: 20, description: '', type: 'Cremoso', manufactureDate: '', expirationDate: '', boxes: [] }
+    ]));
+
+    fixture = TestBed.createComponent(CheeseListComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+
+    component.selectType('Cremoso');
+
+    expect(component.selectedType).toBe('Cremoso');
+    expect(component.filteredCheeses.length).toBe(1);
+    expect(component.filteredCheeses[0].name).toBe('Chevrett');
+  });
+
+  it('should show all cheeses when "Todos" filter is selected', () => {
+    mockCheeseService.getAllCheeses.and.returnValue(of([
+      { id: 1, name: 'Semicurado', price: 10, description: '', type: 'Pasta prensada', manufactureDate: '', expirationDate: '', boxes: [] },
+      { id: 2, name: 'Azul', price: 12, description: '', type: 'Maduración fúngica', manufactureDate: '', expirationDate: '', boxes: [] },
+      { id: 3, name: 'Chevrett', price: 20, description: '', type: 'Cremoso', manufactureDate: '', expirationDate: '', boxes: [] }
+    ]));
+
+    fixture = TestBed.createComponent(CheeseListComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+
+    component.selectType('Todos');
+
+    expect(component.selectedType).toBe('Todos');
+    expect(component.filteredCheeses.length).toBe(3);
+  });
 });

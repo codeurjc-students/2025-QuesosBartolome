@@ -1,0 +1,59 @@
+<div class="dashboard-container">
+
+  <main class="main-content">
+    <h1 class="section-title">Stock</h1>
+
+    <div *ngIf="loading" class="loading">Cargando...</div>
+
+    <div class="stock-grid" *ngIf="!loading">
+      <div class="stock-card" *ngFor="let item of cheeses">
+
+        <div class="image-placeholder">
+          <img [src]="item.imageUrl || 'https://via.placeholder.com/300x200'" [alt]="item.cheese.name" />
+        </div>
+        <h3 class="cheese-name">{{ item.cheese.name }}</h3>
+
+
+        <div class="loads-container">
+          <div class="load" *ngFor="let box of getPagedBoxes(item); let i = index">
+            <span>{{ box }} kg</span>
+            <button class="remove-btn" (click)="removeBox(item, i)">✕</button>
+          </div>
+
+          <div *ngIf="!item.cheese.boxes || item.cheese.boxes.length === 0" class="no-boxes">
+            No hay cajas
+          </div>
+
+          <div class="pagination" *ngIf="item.cheese.boxes && item.cheese.boxes.length > boxPageSize">
+            <button class="arrow" [disabled]="isPrevBoxPageDisabled(item)" (click)="prevBoxPage(item)">
+              ‹
+            </button>
+            <span class="page-number">{{ getCurrentBoxPageNumber(item) }}</span>
+            <button class="arrow" [disabled]="isNextBoxPageDisabled(item)" (click)="nextBoxPage(item)">
+              ›
+            </button>
+          </div>
+        </div>
+
+        <div class="add-load">
+          <input type="number" placeholder="Kg" [(ngModel)]="item.newBoxValue" min="0" (keyup.enter)="addBox(item)" />
+          <span class="kg-label">Kg</span>
+        </div>
+
+        <button class="btn-add" (click)="addBox(item)" [disabled]="!item.newBoxValue || item.newBoxValue <= 0">
+          Añadir
+        </button>
+      </div>
+    </div>
+
+    <div class="pagination cheese-pagination" *ngIf="!loading && totalCheeses > cheesePageSize">
+      <button class="arrow" [disabled]="isPrevCheesePageDisabled()" (click)="prevCheesePage()">
+        ‹
+      </button>
+      <span class="page-number">{{ currentCheesePage + 1 }}</span>
+      <button class="arrow" [disabled]="isNextCheesePageDisabled()" (click)="nextCheesePage()">
+        ›
+      </button>
+    </div>
+  </main>
+</div>

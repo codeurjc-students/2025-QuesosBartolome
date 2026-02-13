@@ -10,6 +10,7 @@ import { OrdersComponent } from './components/orders/orders.component';
 import { ClientsComponent } from './components/clients/clients.component';
 import { ErrorPageComponent } from './components/errorPage/errorPage.component';
 import { CheeseFormComponent } from './components/cheeseForm/cheeseForm.component';
+import { StockComponent } from './components/stock/stock.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: '/cheeses', pathMatch: 'full' },
@@ -21,6 +22,7 @@ export const routes: Routes = [
   { path: 'cheeses/:id', component: CheeseDetailsComponent },
   { path: 'cheeses/:id/edit', component: CheeseFormComponent },
   { path: 'newCheese', component: CheeseFormComponent},
+  { path: 'stock', component: StockComponent },
   { path: 'myorder', component: MyOrderComponent },
   { path: 'orders', component: OrdersComponent },
   { path: 'users', component: ClientsComponent },

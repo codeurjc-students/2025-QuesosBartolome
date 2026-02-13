@@ -113,7 +113,7 @@ public class DataBaseInitializer {
         Chevrett.setManufactureDate(Date.valueOf(LocalDate.now().minusWeeks(2)));
         Chevrett.setExpirationDate(Date.valueOf(LocalDate.now().plusMonths(1).plusWeeks(1)));
         Chevrett.setType("Cremoso");
-        Chevrett.setBoxes(inventoryB);
+        Chevrett.setBoxes(List.of());
         Chevrett.setImage(saveImage("images/queso-default.jpg"));
 
         // Create Cheese 5

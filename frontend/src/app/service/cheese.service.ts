@@ -60,4 +60,12 @@ export class CheeseService {
     return this.http.delete<void>(`${this.apiUrl}/${id}`, { withCredentials: true });
   }
 
+  addBox(id: number, boxWeight: number): Observable<CheeseDTO> {
+    return this.http.put<CheeseDTO>(`${this.apiUrl}/${id}/boxes/add`, { weight: boxWeight }, { withCredentials: true });
+  }
+
+  removeBox(id: number, boxIndex: number): Observable<CheeseDTO> {
+    return this.http.put<CheeseDTO>(`${this.apiUrl}/${id}/boxes/remove/${boxIndex}`, {}, { withCredentials: true });
+  }
+
 }

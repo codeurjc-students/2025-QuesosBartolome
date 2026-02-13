@@ -5,13 +5,19 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.api.MethodOrderer;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.test.annotation.DirtiesContext;
 
 import static io.restassured.RestAssured.*;
 import static org.hamcrest.Matchers.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, properties = "spring.profiles.active=test")
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_CLASS)
 public class ApiUserTests {
 
     @LocalServerPort
@@ -25,6 +31,7 @@ public class ApiUserTests {
     }
 
     @Test
+    @Order(1)
     void testGetCurrentUserUnauthorized() {
         // Without login, should return 401 Unauthorized
         given()
@@ -33,14 +40,15 @@ public class ApiUserTests {
                 .then()
                 .statusCode(401);
     }
-
+ 
     @Test
+    @Order(2)
     void testGetCurrentUserAfterLogin() throws JSONException {
         // Register test user
         JSONObject registerBody = new JSONObject();
-        registerBody.put("name", "Jorge");
+        registerBody.put("name", "JorgeTestUser");
         registerBody.put("password", "password123");
-        registerBody.put("gmail", "jorge@example.com");
+        registerBody.put("gmail", "jorge.test@example.com");
         registerBody.put("direction", "Calle Victoria 1");
         registerBody.put("nif", "87654321B");
         registerBody.put("image", JSONObject.NULL);
@@ -48,11 +56,13 @@ public class ApiUserTests {
         given()
                 .contentType("application/json")
                 .body(registerBody.toString())
-                .post("/api/v1/auth/register");
+                .post("/api/v1/auth/register")
+                .then()
+                .statusCode(201); // Verify registration was successful
 
         // Login
         JSONObject loginBody = new JSONObject();
-        loginBody.put("username", "Jorge");
+        loginBody.put("username", "JorgeTestUser");
         loginBody.put("password", "password123");
 
         // Store the cookies from the login response
@@ -72,8 +82,8 @@ public class ApiUserTests {
                 .get("/api/v1/users")
                 .then()
                 .statusCode(200)
-                .body("name", equalTo("Jorge"))
-                .body("gmail", equalTo("jorge@example.com"))
+                .body("name", equalTo("JorgeTestUser"))
+                .body("gmail", equalTo("jorge.test@example.com"))
                 .body("direction", equalTo("Calle Victoria 1"))
                 .body("nif", equalTo("87654321B"))
                 .body("id", notNullValue())
@@ -81,11 +91,12 @@ public class ApiUserTests {
     }
 
     @Test
+    @Order(3)
     void testGetUserImageById() throws JSONException {
         JSONObject registerBody = new JSONObject();
-        registerBody.put("name", "Ana");
+        registerBody.put("name", "AnaTestUser");
         registerBody.put("password", "clave456");
-        registerBody.put("gmail", "ana@example.com");
+        registerBody.put("gmail", "ana.test@example.com");
         registerBody.put("direction", "Calle Luna 2");
         registerBody.put("nif", "12345678C");
         registerBody.put("image", JSONObject.NULL);
@@ -106,10 +117,11 @@ public class ApiUserTests {
                 .when()
                 .get("/api/v1/users/" + userId + "/image")
                 .then()
-                .statusCode(204);
+                .statusCode(200);
     }
 
     @Test
+    @Order(4)
     void testGetUserImageByIdNotFound() throws JSONException {
         Long userId = 99999L; // Assuming this ID does not exist
 
@@ -121,12 +133,13 @@ public class ApiUserTests {
     }
 
     @Test
+    @Order(5)
     void testGetUserById() throws JSONException {
         // Registrar un usuario
         JSONObject registerBody = new JSONObject();
-        registerBody.put("name", "Luis");
+        registerBody.put("name", "LuisTestUser");
         registerBody.put("password", "password789");
-        registerBody.put("gmail", "luis@example.com");
+        registerBody.put("gmail", "luis.test@example.com");
         registerBody.put("direction", "Calle Mayor 3");
         registerBody.put("nif", "11223344D");
         registerBody.put("image", JSONObject.NULL);
@@ -148,14 +161,15 @@ public class ApiUserTests {
                 .get("/api/v1/users/" + userId)
                 .then()
                 .statusCode(200)
-                .body("name", equalTo("Luis"))
-                .body("gmail", equalTo("luis@example.com"))
+                .body("name", equalTo("LuisTestUser"))
+                .body("gmail", equalTo("luis.test@example.com"))
                 .body("direction", equalTo("Calle Mayor 3"))
                 .body("nif", equalTo("11223344D"))
                 .body("id", equalTo(userId.intValue()));
     }
 
     @Test
+    @Order(6)
     void testGetUserByIdNotFound() {
         given()
                 .when()
@@ -165,6 +179,7 @@ public class ApiUserTests {
     }
 
     @Test
+    @Order(7)
     void testGetAllUsersUnauthorized() {
 
         given()
@@ -175,13 +190,13 @@ public class ApiUserTests {
     }
 
     @Test
+    @Order(8)
     void testGetAllUsersForbiddenForUser() throws JSONException {
-
         // Register USER
         JSONObject registerBody = new JSONObject();
-        registerBody.put("name", "normalUser");
+        registerBody.put("name", "NormalTestUser");
         registerBody.put("password", "password");
-        registerBody.put("gmail", "normal@example.com");
+        registerBody.put("gmail", "normal.test@example.com");
         registerBody.put("direction", "Calle Normal");
         registerBody.put("nif", "11111111A");
         registerBody.put("image", JSONObject.NULL);
@@ -195,7 +210,7 @@ public class ApiUserTests {
 
         // Login USER
         JSONObject loginBody = new JSONObject();
-        loginBody.put("username", "normalUser");
+        loginBody.put("username", "NormalTestUser");
         loginBody.put("password", "password");
 
         var cookies = given()
@@ -217,6 +232,7 @@ public class ApiUserTests {
     }
 
     @Test
+    @Order(9)
 void testGetAllUsersAsAdmin() throws JSONException {
 
     // Login as ADMIN (German is admin by default)
@@ -245,6 +261,7 @@ void testGetAllUsersAsAdmin() throws JSONException {
 
 
     @Test
+    @Order(10)
 void testGetAllUsersWithPaginationAsAdmin() throws JSONException {
 
     // Login as ADMIN

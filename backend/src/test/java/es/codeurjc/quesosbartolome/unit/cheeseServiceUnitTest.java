@@ -296,4 +296,89 @@ class cheeseServiceUnitTest {
         assertThat(result).isTrue();
         verify(cheeseRepository).deleteById(1L);
     }
+
+    @Test
+    void addBoxThrowsWhenCheeseNotFound() {
+        when(cheeseRepository.findById(1L)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> cheeseService.addBox(1L, 2.5))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Cheese not found");
+    }
+
+    @Test
+    void addBoxCreatesListIfNullAndAddsBox() {
+        Cheese cheese = new Cheese(1L, "Queso", 10.0, "desc", "type", "2024-01-01", "2025-01-01");
+        cheese.setBoxes(null);
+
+        when(cheeseRepository.findById(1L)).thenReturn(Optional.of(cheese));
+        when(cheeseRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
+
+        CheeseDTO result = cheeseService.addBox(1L, 3.0);
+
+        assertThat(result.boxes()).containsExactly(3.0);
+        verify(cheeseRepository).save(cheese);
+    }
+
+    @Test
+    void addBoxAddsWeightToExistingList() {
+        Cheese cheese = new Cheese(1L, "Queso", 10.0, "desc", "type", "2024-01-01", "2025-01-01");
+        cheese.setBoxes(new java.util.ArrayList<>(List.of(1.0, 2.0)));
+
+        when(cheeseRepository.findById(1L)).thenReturn(Optional.of(cheese));
+        when(cheeseRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
+
+        CheeseDTO result = cheeseService.addBox(1L, 3.0);
+
+        assertThat(result.boxes()).containsExactly(1.0, 2.0, 3.0);
+        verify(cheeseRepository).save(cheese);
+    }
+
+    @Test
+    void removeBoxThrowsWhenCheeseNotFound() {
+        when(cheeseRepository.findById(1L)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> cheeseService.removeBox(1L, 0))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Cheese not found");
+    }
+
+    @Test
+    void removeBoxThrowsWhenNoBoxes() {
+        Cheese cheese = new Cheese(1L, "Queso", 10.0, "desc", "type", "2024-01-01", "2025-01-01");
+        cheese.setBoxes(new java.util.ArrayList<>());
+
+        when(cheeseRepository.findById(1L)).thenReturn(Optional.of(cheese));
+
+        assertThatThrownBy(() -> cheeseService.removeBox(1L, 0))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("No boxes to remove");
+    }
+
+    @Test
+    void removeBoxThrowsWhenIndexInvalid() {
+        Cheese cheese = new Cheese(1L, "Queso", 10.0, "desc", "type", "2024-01-01", "2025-01-01");
+        cheese.setBoxes(new java.util.ArrayList<>(List.of(1.0)));
+
+        when(cheeseRepository.findById(1L)).thenReturn(Optional.of(cheese));
+
+        assertThatThrownBy(() -> cheeseService.removeBox(1L, 5))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Invalid box index");
+    }
+
+    @Test
+    void removeBoxRemovesCorrectly() {
+        Cheese cheese = new Cheese(1L, "Queso", 10.0, "desc", "type", "2024-01-01", "2025-01-01");
+        cheese.setBoxes(new java.util.ArrayList<>(List.of(1.0, 2.0, 3.0)));
+
+        when(cheeseRepository.findById(1L)).thenReturn(Optional.of(cheese));
+        when(cheeseRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
+
+        CheeseDTO result = cheeseService.removeBox(1L, 1);
+
+        assertThat(result.boxes()).containsExactly(1.0, 3.0);
+        verify(cheeseRepository).save(cheese);
+    }
+
 }
