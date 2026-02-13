@@ -105,8 +105,8 @@ public class SecurityConfiguration {
                     .requestMatchers(HttpMethod.DELETE, "/api/v1/cheeses/*").hasAnyRole("ADMIN")
                     .requestMatchers(HttpMethod.PUT, "/api/v1/cheeses/*/boxes/add").hasAnyRole("ADMIN")
                     .requestMatchers(HttpMethod.PUT, "/api/v1/cheeses/*/boxes/remove/*").hasAnyRole("ADMIN")
-
-
+                    // Cualquier otra request requiere autenticación
+                    .anyRequest().authenticated()
 
             );
         http.cors(cors -> {});

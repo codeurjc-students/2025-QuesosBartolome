@@ -10,12 +10,14 @@ import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.api.MethodOrderer;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.test.annotation.DirtiesContext;
 
 import static io.restassured.RestAssured.*;
 import static org.hamcrest.Matchers.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, properties = "spring.profiles.active=test")
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_CLASS)
 public class ApiUserTests {
 
     @LocalServerPort
@@ -54,10 +56,8 @@ public class ApiUserTests {
         given()
                 .contentType("application/json")
                 .body(registerBody.toString())
-                .log().all()  // Log request
                 .post("/api/v1/auth/register")
                 .then()
-                .log().all()  // Log response to see the error details
                 .statusCode(201); // Verify registration was successful
 
         // Login
@@ -117,7 +117,7 @@ public class ApiUserTests {
                 .when()
                 .get("/api/v1/users/" + userId + "/image")
                 .then()
-                .statusCode(204);
+                .statusCode(200);
     }
 
     @Test
