@@ -64,8 +64,19 @@ public class CheeseService {
             cheese.setBoxes(new java.util.ArrayList<>());
         }
 
-        // image → null
-        cheese.setImage(null);
+        // Set default image
+        try {
+            InputStream defaultImageStream = getClass().getResourceAsStream("/images/queso-default.jpg");
+            if (defaultImageStream != null) {
+                byte[] defaultBytes = defaultImageStream.readAllBytes();
+                Blob defaultBlob = BlobProxy.generateProxy(defaultBytes);
+                cheese.setImage(defaultBlob);
+            } else {
+                cheese.setImage(null);
+            }
+        } catch (Exception e) {
+            cheese.setImage(null);
+        }
 
         Cheese saved = cheeseRepository.save(cheese);
         return cheeseMapper.toDTO(saved);

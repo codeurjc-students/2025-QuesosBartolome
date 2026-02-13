@@ -21,9 +21,23 @@ import { UserDTO } from '../../dto/user.dto';
 })
 export class CheeseListComponent implements OnInit {
   cheeses: CheeseDTO[] = [];
+  filteredCheeses: CheeseDTO[] = [];
+  paginatedCheeses: CheeseDTO[] = [];
+  
+  // Filtrado
+  selectedType: string = 'Todos';
+  cheeseTypes: string[] = ['Todos', 'Pasta prensada', 'Cremoso', 'Maduración fúngica'];
+  
+  // Paginación
+  currentPage: number = 1;
+  itemsPerPage: number = 10;
+  totalPages: number = 1;
 
   isLoggedIn: boolean = false;
   currentUser: UserDTO | null = null;
+
+  // Hacer Math accesible en el template
+  Math = Math;
 
   constructor(
     private cheeseService: CheeseService,
@@ -37,6 +51,7 @@ export class CheeseListComponent implements OnInit {
     this.cheeseService.getAllCheeses().subscribe({
       next: (list) => {
         this.cheeses = list;
+        this.applyFilter();
       },
       error: (err) => {
         console.error('Error loading cheeses', err)
@@ -121,6 +136,53 @@ export class CheeseListComponent implements OnInit {
     return this.currentUser?.rols?.includes("USER") ?? false;
   }
 
+  // Filtrado
+  selectType(type: string): void {
+    this.selectedType = type;
+    this.currentPage = 1; // Reset a la primera página al cambiar filtro
+    this.applyFilter();
+  }
 
+  applyFilter(): void {
+    if (this.selectedType === 'Todos') {
+      this.filteredCheeses = [...this.cheeses];
+    } else {
+      this.filteredCheeses = this.cheeses.filter(cheese => cheese.type === this.selectedType);
+    }
+    this.updatePagination();
+  }
+
+  // Paginación
+  updatePagination(): void {
+    this.totalPages = Math.ceil(this.filteredCheeses.length / this.itemsPerPage);
+    const startIndex = (this.currentPage - 1) * this.itemsPerPage;
+    const endIndex = startIndex + this.itemsPerPage;
+    this.paginatedCheeses = this.filteredCheeses.slice(startIndex, endIndex);
+  }
+
+  nextPage(): void {
+    if (this.currentPage < this.totalPages) {
+      this.currentPage++;
+      this.updatePagination();
+    }
+  }
+
+  previousPage(): void {
+    if (this.currentPage > 1) {
+      this.currentPage--;
+      this.updatePagination();
+    }
+  }
+
+  goToPage(page: number): void {
+    if (page >= 1 && page <= this.totalPages) {
+      this.currentPage = page;
+      this.updatePagination();
+    }
+  }
+
+  getPageNumbers(): number[] {
+    return Array.from({ length: this.totalPages }, (_, i) => i + 1);
+  }
 
 }
