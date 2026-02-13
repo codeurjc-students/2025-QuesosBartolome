@@ -5,6 +5,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.api.MethodOrderer;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 
@@ -12,6 +15,7 @@ import static io.restassured.RestAssured.*;
 import static org.hamcrest.Matchers.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, properties = "spring.profiles.active=test")
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class ApiUserTests {
 
     @LocalServerPort
@@ -25,6 +29,7 @@ public class ApiUserTests {
     }
 
     @Test
+    @Order(1)
     void testGetCurrentUserUnauthorized() {
         // Without login, should return 401 Unauthorized
         given()
@@ -35,19 +40,15 @@ public class ApiUserTests {
     }
  
     @Test
+    @Order(2)
     void testGetCurrentUserAfterLogin() throws JSONException {
-        // Use unique name to avoid conflicts
-        String uniqueName = "Jorge_" + System.currentTimeMillis();
-        String uniqueEmail = "jorge_" + System.currentTimeMillis() + "@example.com";
-        String uniqueNif = "87654" + (System.currentTimeMillis() % 10000) + "B";
-        
         // Register test user
         JSONObject registerBody = new JSONObject();
-        registerBody.put("name", uniqueName);
+        registerBody.put("name", "JorgeTestUser");
         registerBody.put("password", "password123");
-        registerBody.put("gmail", uniqueEmail);
+        registerBody.put("gmail", "jorge.test@example.com");
         registerBody.put("direction", "Calle Victoria 1");
-        registerBody.put("nif", uniqueNif);
+        registerBody.put("nif", "87654321B");
         registerBody.put("image", JSONObject.NULL);
 
         given()
@@ -59,7 +60,7 @@ public class ApiUserTests {
 
         // Login
         JSONObject loginBody = new JSONObject();
-        loginBody.put("username", uniqueName);
+        loginBody.put("username", "JorgeTestUser");
         loginBody.put("password", "password123");
 
         // Store the cookies from the login response
@@ -79,26 +80,23 @@ public class ApiUserTests {
                 .get("/api/v1/users")
                 .then()
                 .statusCode(200)
-                .body("name", equalTo(uniqueName))
-                .body("gmail", equalTo(uniqueEmail))
+                .body("name", equalTo("JorgeTestUser"))
+                .body("gmail", equalTo("jorge.test@example.com"))
                 .body("direction", equalTo("Calle Victoria 1"))
-                .body("nif", equalTo(uniqueNif))
+                .body("nif", equalTo("87654321B"))
                 .body("id", notNullValue())
                 .body("password", notNullValue());
     }
 
     @Test
+    @Order(3)
     void testGetUserImageById() throws JSONException {
-        String uniqueName = "Ana_" + System.currentTimeMillis();
-        String uniqueEmail = "ana_" + System.currentTimeMillis() + "@example.com";
-        String uniqueNif = "12345" + (System.currentTimeMillis() % 10000) + "C";
-        
         JSONObject registerBody = new JSONObject();
-        registerBody.put("name", uniqueName);
+        registerBody.put("name", "AnaTestUser");
         registerBody.put("password", "clave456");
-        registerBody.put("gmail", uniqueEmail);
+        registerBody.put("gmail", "ana.test@example.com");
         registerBody.put("direction", "Calle Luna 2");
-        registerBody.put("nif", uniqueNif);
+        registerBody.put("nif", "12345678C");
         registerBody.put("image", JSONObject.NULL);
 
         var registerResponse = given()
@@ -121,6 +119,7 @@ public class ApiUserTests {
     }
 
     @Test
+    @Order(4)
     void testGetUserImageByIdNotFound() throws JSONException {
         Long userId = 99999L; // Assuming this ID does not exist
 
@@ -132,18 +131,15 @@ public class ApiUserTests {
     }
 
     @Test
+    @Order(5)
     void testGetUserById() throws JSONException {
-        String uniqueName = "Luis_" + System.currentTimeMillis();
-        String uniqueEmail = "luis_" + System.currentTimeMillis() + "@example.com";
-        String uniqueNif = "11223" + (System.currentTimeMillis() % 10000) + "D";
-        
         // Registrar un usuario
         JSONObject registerBody = new JSONObject();
-        registerBody.put("name", uniqueName);
+        registerBody.put("name", "LuisTestUser");
         registerBody.put("password", "password789");
-        registerBody.put("gmail", uniqueEmail);
+        registerBody.put("gmail", "luis.test@example.com");
         registerBody.put("direction", "Calle Mayor 3");
-        registerBody.put("nif", uniqueNif);
+        registerBody.put("nif", "11223344D");
         registerBody.put("image", JSONObject.NULL);
 
         var registerResponse = given()
@@ -163,14 +159,15 @@ public class ApiUserTests {
                 .get("/api/v1/users/" + userId)
                 .then()
                 .statusCode(200)
-                .body("name", equalTo(uniqueName))
-                .body("gmail", equalTo(uniqueEmail))
+                .body("name", equalTo("LuisTestUser"))
+                .body("gmail", equalTo("luis.test@example.com"))
                 .body("direction", equalTo("Calle Mayor 3"))
-                .body("nif", equalTo(uniqueNif))
+                .body("nif", equalTo("11223344D"))
                 .body("id", equalTo(userId.intValue()));
     }
 
     @Test
+    @Order(6)
     void testGetUserByIdNotFound() {
         given()
                 .when()
@@ -180,6 +177,7 @@ public class ApiUserTests {
     }
 
     @Test
+    @Order(7)
     void testGetAllUsersUnauthorized() {
 
         given()
@@ -190,18 +188,15 @@ public class ApiUserTests {
     }
 
     @Test
+    @Order(8)
     void testGetAllUsersForbiddenForUser() throws JSONException {
-        String uniqueName = "normalUser_" + System.currentTimeMillis();
-        String uniqueEmail = "normal_" + System.currentTimeMillis() + "@example.com";
-        String uniqueNif = "11111" + (System.currentTimeMillis() % 10000) + "A";
-
         // Register USER
         JSONObject registerBody = new JSONObject();
-        registerBody.put("name", uniqueName);
+        registerBody.put("name", "NormalTestUser");
         registerBody.put("password", "password");
-        registerBody.put("gmail", uniqueEmail);
+        registerBody.put("gmail", "normal.test@example.com");
         registerBody.put("direction", "Calle Normal");
-        registerBody.put("nif", uniqueNif);
+        registerBody.put("nif", "11111111A");
         registerBody.put("image", JSONObject.NULL);
 
         given()
@@ -213,7 +208,7 @@ public class ApiUserTests {
 
         // Login USER
         JSONObject loginBody = new JSONObject();
-        loginBody.put("username", uniqueName);
+        loginBody.put("username", "NormalTestUser");
         loginBody.put("password", "password");
 
         var cookies = given()
@@ -235,6 +230,7 @@ public class ApiUserTests {
     }
 
     @Test
+    @Order(9)
 void testGetAllUsersAsAdmin() throws JSONException {
 
     // Login as ADMIN (German is admin by default)
@@ -263,6 +259,7 @@ void testGetAllUsersAsAdmin() throws JSONException {
 
 
     @Test
+    @Order(10)
 void testGetAllUsersWithPaginationAsAdmin() throws JSONException {
 
     // Login as ADMIN
