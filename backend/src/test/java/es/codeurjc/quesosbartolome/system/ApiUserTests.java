@@ -54,8 +54,10 @@ public class ApiUserTests {
         given()
                 .contentType("application/json")
                 .body(registerBody.toString())
+                .log().all()  // Log request
                 .post("/api/v1/auth/register")
                 .then()
+                .log().all()  // Log response to see the error details
                 .statusCode(201); // Verify registration was successful
 
         // Login
