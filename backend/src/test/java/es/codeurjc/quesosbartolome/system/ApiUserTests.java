@@ -36,23 +36,30 @@ public class ApiUserTests {
  
     @Test
     void testGetCurrentUserAfterLogin() throws JSONException {
+        // Use unique name to avoid conflicts
+        String uniqueName = "Jorge_" + System.currentTimeMillis();
+        String uniqueEmail = "jorge_" + System.currentTimeMillis() + "@example.com";
+        String uniqueNif = "87654" + (System.currentTimeMillis() % 10000) + "B";
+        
         // Register test user
         JSONObject registerBody = new JSONObject();
-        registerBody.put("name", "Jorge");
+        registerBody.put("name", uniqueName);
         registerBody.put("password", "password123");
-        registerBody.put("gmail", "jorge@example.com");
+        registerBody.put("gmail", uniqueEmail);
         registerBody.put("direction", "Calle Victoria 1");
-        registerBody.put("nif", "87654321B");
+        registerBody.put("nif", uniqueNif);
         registerBody.put("image", JSONObject.NULL);
 
         given()
                 .contentType("application/json")
                 .body(registerBody.toString())
-                .post("/api/v1/auth/register");
+                .post("/api/v1/auth/register")
+                .then()
+                .statusCode(201); // Verify registration was successful
 
         // Login
         JSONObject loginBody = new JSONObject();
-        loginBody.put("username", "Jorge");
+        loginBody.put("username", uniqueName);
         loginBody.put("password", "password123");
 
         // Store the cookies from the login response
@@ -72,10 +79,10 @@ public class ApiUserTests {
                 .get("/api/v1/users")
                 .then()
                 .statusCode(200)
-                .body("name", equalTo("Jorge"))
-                .body("gmail", equalTo("jorge@example.com"))
+                .body("name", equalTo(uniqueName))
+                .body("gmail", equalTo(uniqueEmail))
                 .body("direction", equalTo("Calle Victoria 1"))
-                .body("nif", equalTo("87654321B"))
+                .body("nif", equalTo(uniqueNif))
                 .body("id", notNullValue())
                 .body("password", notNullValue());
     }
