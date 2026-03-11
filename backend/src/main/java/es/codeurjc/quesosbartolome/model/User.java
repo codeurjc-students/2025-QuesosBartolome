@@ -29,7 +29,7 @@ public class User {
     private Blob image;
 
     @OneToMany(mappedBy = "user")
-    private List<Review> reviews;
+    private List<Review> reviews = new ArrayList<>();
 
     @ElementCollection(fetch = FetchType.EAGER)
     private List<String> rols;

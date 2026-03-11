@@ -37,7 +37,7 @@ public class SecurityConfiguration {
     private UnauthorizedHandlerJwt unauthorizedHandlerJwt;
 
     @Autowired
-	public RepositoryUserDetailsService userDetailsService;
+    public RepositoryUserDetailsService userDetailsService;
 
     @Autowired
     private CustomAccessDeniedHandler customAccessDeniedHandler;
@@ -52,7 +52,7 @@ public class SecurityConfiguration {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true);
-        config.setAllowedOrigins(List.of("http://localhost:4200","http://localhost:9876"));
+        config.setAllowedOrigins(List.of("http://localhost:4200", "http://localhost:9876"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         source.registerCorsConfiguration("/**", config);
@@ -60,56 +60,60 @@ public class SecurityConfiguration {
     }
 
     @Bean
-	public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
-		return authConfig.getAuthenticationManager();
-	}
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
+        return authConfig.getAuthenticationManager();
+    }
 
-	@Bean
-	public DaoAuthenticationProvider authenticationProvider() {
-		DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
+    @Bean
+    public DaoAuthenticationProvider authenticationProvider() {
+        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
 
-		authProvider.setUserDetailsService(userDetailsService);
-		authProvider.setPasswordEncoder(passwordEncoder());
+        authProvider.setUserDetailsService(userDetailsService);
+        authProvider.setPasswordEncoder(passwordEncoder());
 
-		return authProvider;
-	}
+        return authProvider;
+    }
 
     @Bean
     @Order(1)
     public SecurityFilterChain apiSecurity(HttpSecurity http) throws Exception {
 
         http
-            .securityMatcher("/api/**")
-            .exceptionHandling(handling -> handling
-                .authenticationEntryPoint(unauthorizedHandlerJwt)
-                .accessDeniedHandler(customAccessDeniedHandler))
-            .authorizeHttpRequests(auth -> auth
-                    // Endpoints públicos
-                    .requestMatchers(HttpMethod.POST, "/api/v1/auth/**").permitAll()
-                    .requestMatchers(HttpMethod.GET, "/api/v1/cheeses/**").permitAll()
-                    .requestMatchers(HttpMethod.GET, "/api/v1/cheeses").permitAll()
-                    .requestMatchers(HttpMethod.GET, "/api/v1/users/{id:[0-9]+}").permitAll()
-                    .requestMatchers(HttpMethod.GET, "/api/v1/users/*/image").permitAll()
+                .securityMatcher("/api/**")
+                .exceptionHandling(handling -> handling
+                        .authenticationEntryPoint(unauthorizedHandlerJwt)
+                        .accessDeniedHandler(customAccessDeniedHandler))
+                .authorizeHttpRequests(auth -> auth
+                        // Endpoints públicos
+                        .requestMatchers(HttpMethod.POST, "/api/v1/auth/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/cheeses/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/cheeses").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/users/{id:[0-9]+}").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/users/*/image").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/reviews/**").permitAll()
 
-                    // Endpoint de perfil
-                    .requestMatchers(HttpMethod.GET, "/api/v1/users").authenticated()
-                    .requestMatchers(HttpMethod.GET, "/api/v1/cart").hasAnyRole("USER")
-                    .requestMatchers(HttpMethod.PUT, "/api/v1/cart/**").hasAnyRole("USER")
-                    .requestMatchers(HttpMethod.POST, "/api/v1/orders/confirm").hasAnyRole("USER")
-                    .requestMatchers(HttpMethod.GET, "/api/v1/orders").hasAnyRole("ADMIN")
-                    .requestMatchers(HttpMethod.GET, "/api/v1/users/all").hasAnyRole("ADMIN")
-                    .requestMatchers(HttpMethod.POST, "/api/v1/cheeses/new").hasAnyRole("ADMIN")
-                    .requestMatchers(HttpMethod.POST, "/api/v1/cheeses/*/image").hasAnyRole("ADMIN")
-                    .requestMatchers(HttpMethod.PUT, "/api/v1/cheeses/*").hasAnyRole("ADMIN")
-                    .requestMatchers(HttpMethod.PUT, "/api/v1/cheeses/*/image").hasAnyRole("ADMIN")
-                    .requestMatchers(HttpMethod.DELETE, "/api/v1/cheeses/*").hasAnyRole("ADMIN")
-                    .requestMatchers(HttpMethod.PUT, "/api/v1/cheeses/*/boxes/add").hasAnyRole("ADMIN")
-                    .requestMatchers(HttpMethod.PUT, "/api/v1/cheeses/*/boxes/remove/*").hasAnyRole("ADMIN")
-                    // Cualquier otra request requiere autenticación
-                    .anyRequest().authenticated()
+                        // Endpoint de perfil
+                        .requestMatchers(HttpMethod.GET, "/api/v1/users").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/cart").hasAnyRole("USER")
+                        .requestMatchers(HttpMethod.PUT, "/api/v1/cart/**").hasAnyRole("USER")
+                        .requestMatchers(HttpMethod.POST, "/api/v1/orders/confirm").hasAnyRole("USER")
+                        .requestMatchers(HttpMethod.GET, "/api/v1/orders").hasAnyRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/v1/users/all").hasAnyRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/v1/cheeses/new").hasAnyRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/v1/cheeses/*/image").hasAnyRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/v1/cheeses/*").hasAnyRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/v1/cheeses/*/image").hasAnyRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/v1/cheeses/*").hasAnyRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/v1/cheeses/*/boxes/add").hasAnyRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/v1/cheeses/*/boxes/remove/*").hasAnyRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/v1/reviews").hasAnyRole("USER")
+                        .requestMatchers(HttpMethod.DELETE, "/api/v1/reviews/*").hasAnyRole("USER", "ADMIN")
+                        // Cualquier otra request requiere autenticación
+                        .anyRequest().authenticated()
 
-            );
-        http.cors(cors -> {});
+                );
+        http.cors(cors -> {
+        });
         // Disable CSRF protection (it is difficult to implement in REST APIs)
         http.csrf(csrf -> csrf.disable());
         // Disable Form login Authentication
@@ -120,7 +124,6 @@ public class SecurityConfiguration {
         // Add the JWT filter before the standard authentication filter
         http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
 
-        
         return http.build();
     }
 }

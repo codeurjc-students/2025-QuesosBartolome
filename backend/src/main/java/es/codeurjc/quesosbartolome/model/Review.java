@@ -19,12 +19,13 @@ public class Review {
 
     @ManyToOne
     @JoinColumn(name = "user")
-    private User user;  
+    private User user;
 
     @ManyToOne
-    private Cheese cheese; 
+    private Cheese cheese;
 
-    public Review() {}
+    public Review() {
+    }
 
     public Review(Integer rating, String comment, User user, Cheese cheese) {
         this.rating = rating;
@@ -36,6 +37,10 @@ public class Review {
     // Getters y Setters
     public Long getId() {
         return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public Integer getRating() {
