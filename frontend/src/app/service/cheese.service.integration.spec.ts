@@ -72,8 +72,9 @@ describe('CheeseService (integration)', () => {
     loginService.login('German', 'password123').subscribe({
       next: () => {
 
+        const uniqueName = 'TestCheese_' + Date.now();
         const newCheese: CheeseDTO = {
-          name: 'TestCheese',
+          name: uniqueName,
           price: 9.99,
           description: 'Cheese created in integration test',
           manufactureDate: '2024-01-24',
@@ -86,7 +87,7 @@ describe('CheeseService (integration)', () => {
           next: (created: CheeseDTO) => {
             expect(created).toBeTruthy();
             expect(created.id).toBeGreaterThan(0);
-            expect(created.name).toBe('TestCheese');
+            expect(created.name).toBe(uniqueName);
             done();
           },
           error: (err) => {
@@ -109,8 +110,9 @@ describe('CheeseService (integration)', () => {
     loginService.login('German', 'password123').subscribe({
       next: () => {
 
+        const uniqueName = 'CheeseWithImage_' + Date.now();
         const newCheese: CheeseDTO = {
-          name: 'CheeseWithImage',
+          name: uniqueName,
           price: 10,
           description: 'Cheese for image upload test',
           manufactureDate: '2024-01-24',
@@ -309,9 +311,9 @@ describe('CheeseService (integration)', () => {
     loginService.login('German', 'password123').subscribe({
       next: () => {
 
-        // Crear queso auxiliar
+        const uniqueName = 'CheeseAddBox_' + Date.now();
         const cheeseToUpdate: CheeseDTO = {
-          name: 'CheeseAddBox',
+          name: uniqueName,
           price: 10,
           description: 'Test add box',
           manufactureDate: '2024-01-01',
@@ -383,9 +385,9 @@ describe('CheeseService (integration)', () => {
     loginService.login('German', 'password123').subscribe({
       next: () => {
 
-        // Crear queso auxiliar
+        const uniqueName = 'CheeseRemoveBox_' + Date.now();
         const cheeseToUpdate: CheeseDTO = {
-          name: 'CheeseRemoveBox',
+          name: uniqueName,
           price: 10,
           description: 'Test remove box',
           manufactureDate: '2024-01-01',

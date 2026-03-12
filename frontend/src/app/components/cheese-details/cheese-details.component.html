@@ -1,5 +1,12 @@
 <div class="details-container" *ngIf="cheese">
 
+  <button 
+    *ngIf="isLoggedIn && isUser" 
+    class="btn-review-toggle" 
+    (click)="toggleReviewForm()">
+    {{ showReviewForm ? 'Cancelar' : 'Valorar' }}
+  </button>
+
   <div class="top-section">
 
     <div class="image-box">
@@ -52,8 +59,89 @@
 
   </div>
 
+  <section class="create-review-section" *ngIf="showReviewForm">
+    <h3>Escribe tu reseña</h3>
+    <form class="review-form">
+      <div class="form-group">
+        <label for="rating">Puntuación (0-5):</label>
+        <input 
+          type="number" 
+          id="rating" 
+          [(ngModel)]="newRating" 
+          name="rating"
+          min="0" 
+          max="5" 
+          step="1"
+          class="form-control"
+          required
+        />
+      </div>
+      
+      <div class="form-group">
+        <label for="comment">Comentario:</label>
+        <textarea 
+          id="comment" 
+          [(ngModel)]="newComment" 
+          name="comment"
+          class="form-control"
+          rows="4"
+          placeholder="Escribe tu opinión sobre este queso..."
+          required
+        ></textarea>
+      </div>
+      
+      <div class="form-actions">
+        <button type="button" class="btn btn-submit" (click)="submitReview()">Enviar Reseña</button>
+        <button type="button" class="btn btn-cancel" (click)="cancelReview()">Cancelar</button>
+      </div>
+    </form>
+  </section>
+
   <section class="reviews-section">
-    <h2>Reseñas</h2>
+    <h2>Reseñas ({{ totalReviews }})</h2>
+    
+    <div class="reviews-container" *ngIf="reviews.length > 0">
+      <div class="review-card" *ngFor="let review of reviews">
+        <div class="review-header">
+          <div class="user-info" (click)="goToUserProfile(review.user.id)" style="cursor: pointer;">
+            <img 
+              [src]="getUserImageUrl(review.user.id)" 
+              alt="Foto de {{ review.user.name }}"
+              class="user-avatar"
+              (error)="$any($event.target).src='assets/default-profile.png'"
+            />
+            <span class="user-name">{{ review.user.name }}</span>
+          </div>
+          <div class="rating">
+            <span class="star" *ngFor="let star of getStars(review.rating)">{{ star }}</span>
+          </div>
+        </div>
+        <p class="review-comment">{{ review.comment }}</p>
+        <div class="review-actions" *ngIf="isAdmin">
+          <button class="btn-delete-review" (click)="deleteReviewFromCheese(review.id)">Eliminar</button>
+        </div>
+      </div>
+
+      <div class="pagination-controls" *ngIf="totalPages > 1">
+        <button 
+          class="btn-pagination" 
+          [disabled]="currentPage === 0"
+          (click)="previousPage()">
+          ← Anterior
+        </button>
+        <span class="page-info">Página {{ currentPage + 1 }} de {{ totalPages }}</span>
+        <button 
+          class="btn-pagination" 
+          [disabled]="currentPage >= totalPages - 1"
+          (click)="nextPage()">
+          Siguiente →
+        </button>
+      </div>
+    </div>
+
+    <div class="no-reviews" *ngIf="reviews.length === 0">
+      <p>No hay reseñas para este queso todavía.</p>
+    </div>
   </section>
 
 </div>

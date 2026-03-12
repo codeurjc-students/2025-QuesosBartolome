@@ -32,7 +32,9 @@ public interface CheeseMapper {
         @Mapping(source = "manufactureDate", target = "manufactureDate"),
         @Mapping(source = "expirationDate", target = "expirationDate"),
         @Mapping(source = "type", target = "type"),
-        @Mapping(source = "boxes", target = "boxes")
+        @Mapping(source = "boxes", target = "boxes"),
+        @Mapping(target = "image", ignore = true),
+        @Mapping(target = "reviews", ignore = true)
     })
     Cheese toDomain(CheeseDTO cheeseDTO);
 }

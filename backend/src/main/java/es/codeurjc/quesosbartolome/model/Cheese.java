@@ -5,6 +5,7 @@ import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
@@ -34,7 +35,7 @@ public class Cheese {
     @Lob
     private Blob image;
     
-    @OneToMany(mappedBy = "cheese")
+    @OneToMany(mappedBy = "cheese", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Review> reviews = new ArrayList<>();
     
 

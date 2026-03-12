@@ -28,7 +28,11 @@ public interface UserMapper {
         @Mapping(source = "gmail", target = "gmail"),
         @Mapping(source = "direction", target = "direction"),
         @Mapping(source = "nif", target = "nif"),
-        @Mapping(source = "rols", target = "rols")
+        @Mapping(source = "rols", target = "rols"),
+        @Mapping(target = "image", ignore = true),
+        @Mapping(target = "reviews", ignore = true),
+        @Mapping(target = "cart", ignore = true),
+        @Mapping(target = "orders", ignore = true)
     })
     User toDomain(UserDTO userDTO);
 }

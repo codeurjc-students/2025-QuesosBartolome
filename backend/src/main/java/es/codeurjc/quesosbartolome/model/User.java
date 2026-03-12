@@ -28,8 +28,8 @@ public class User {
     private String nif;
     private Blob image;
 
-    @OneToMany(mappedBy = "user")
-    private List<Review> reviews;
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Review> reviews = new ArrayList<>();
 
     @ElementCollection(fetch = FetchType.EAGER)
     private List<String> rols;
@@ -37,7 +37,7 @@ public class User {
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private Cart cart;
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Order> orders = new ArrayList<>();
 
     public User() {

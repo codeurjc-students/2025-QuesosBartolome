@@ -18,6 +18,7 @@ export const routes: Routes = [
   { path: 'auth/login', component: LoginComponent },
   { path: 'auth/register', component: RegisterComponent },
   { path: 'user', component: UserPageComponent },
+  { path: 'user/:id', component: UserPageComponent },
   { path: 'about-us', component: AboutUsComponent },
   { path: 'cheeses/:id', component: CheeseDetailsComponent },
   { path: 'cheeses/:id/edit', component: CheeseFormComponent },

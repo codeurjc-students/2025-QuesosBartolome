@@ -1,16 +1,20 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CheeseService } from '../../service/cheese.service';
 import { CheeseDTO } from '../../dto/cheese.dto';
 import { UserDTO } from '../../dto/user.dto';
 import { UserService } from '../../service/user.service';
 import { CartService } from '../../service/cart.service';
+import { ReviewService } from '../../service/review.service';
+import { ReviewDTO } from '../../dto/review.dto';
+import { Page } from '../../dto/page.dto';
 
 @Component({
   selector: 'app-cheese-details',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './cheese-details.component.html',
   styleUrls: ['./cheese-details.component.css']
 })
@@ -22,17 +26,29 @@ export class CheeseDetailsComponent implements OnInit {
   isLoggedIn: boolean = false;
   currentUser: UserDTO | null = null;
 
+  reviews: ReviewDTO[] = [];
+  currentPage: number = 0;
+  totalPages: number = 0;
+  totalReviews: number = 0;
+  reviewsPerPage: number = 3;
+
+  showReviewForm: boolean = false;
+  newRating: number = 5;
+  newComment: string = '';
+
   constructor(
     private route: ActivatedRoute,
     private cheeseService: CheeseService,
     private userService: UserService,
     private router: Router,
-    private cartService: CartService
+    private cartService: CartService,
+    private reviewService: ReviewService
   ) { }
 
   ngOnInit(): void {
     const id = Number(this.route.snapshot.paramMap.get('id'));
 
+    this.loadReviews(id, 0);
     this.loadCheese(id);
 
     // Check if user is logged in
@@ -154,6 +170,108 @@ export class CheeseDetailsComponent implements OnInit {
         }
       });
     }
+  }
+  loadReviews(cheeseId: number, page: number): void {
+    this.reviewService.getReviewsByCheeseId(cheeseId, page, this.reviewsPerPage).subscribe({
+      next: (data: Page<ReviewDTO>) => {
+        this.reviews = data.content;
+        this.currentPage = data.number;
+        this.totalPages = data.totalPages;
+        this.totalReviews = data.totalElements;
+      },
+      error: err => console.error('Error loading reviews', err)
+    });
+  }
+
+  nextPage(): void {
+    if (this.currentPage < this.totalPages - 1) {
+      this.loadReviews(this.cheese.id!, this.currentPage + 1);
+    }
+  }
+
+  previousPage(): void {
+    if (this.currentPage > 0) {
+      this.loadReviews(this.cheese.id!, this.currentPage - 1);
+    }
+  }
+
+  getStars(rating: number): string[] {
+    const stars: string[] = [];
+    for (let i = 1; i <= 5; i++) {
+      stars.push(i <= rating ? '★' : '☆');
+    }
+    return stars;
+  }
+
+  getUserImageUrl(userId: number): string {
+    return `https://localhost:443/api/v1/users/${userId}/image`;
+  }
+
+  goToUserProfile(userId: number): void {
+    this.router.navigate(['/user', userId]);
+  }
+
+  toggleReviewForm(): void {
+    this.showReviewForm = !this.showReviewForm;
+    if (!this.showReviewForm) {
+      // Reset form when closing
+      this.newRating = 5;
+      this.newComment = '';
+    }
+  }
+
+  submitReview(): void {
+    // Validate rating
+    if (this.newRating < 0 || this.newRating > 5) {
+      alert('La puntuación debe estar entre 0 y 5');
+      return;
+    }
+
+    // Validate comment
+    if (!this.newComment || this.newComment.trim() === '') {
+      alert('El comentario es obligatorio');
+      return;
+    }
+
+    // Create review
+    this.reviewService.createReview(this.newRating, this.newComment.trim(), this.cheese.id!).subscribe({
+      next: () => {
+        alert('Reseña creada correctamente');
+        this.showReviewForm = false;
+        this.newRating = 5;
+        this.newComment = '';
+        // Reload reviews
+        this.loadReviews(this.cheese.id!, 0);
+      },
+      error: (err) => {
+        console.error('Error creating review:', err);
+        alert('Error al crear la reseña');
+      }
+    });
+  }
+
+  cancelReview(): void {
+    this.showReviewForm = false;
+    this.newRating = 5;
+    this.newComment = '';
+  }
+
+  deleteReviewFromCheese(reviewId: number): void {
+    if (!confirm('¿Estás seguro de que quieres eliminar esta reseña?')) {
+      return;
+    }
+
+    this.reviewService.deleteReview(reviewId).subscribe({
+      next: () => {
+        alert('Reseña eliminada correctamente');
+        // Reload reviews after deletion
+        this.loadReviews(this.cheese.id!, this.currentPage);
+      },
+      error: (err) => {
+        console.error('Error deleting review', err);
+        alert('No se pudo eliminar la reseña');
+      }
+    });
   }
 
 }

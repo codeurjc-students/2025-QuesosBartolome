@@ -34,20 +34,51 @@
         <input type="text" [(ngModel)]="user.nif" class="form-control" disabled/>
       </div>
 
-      <div class="btn-row">
+      <div class="btn-row" *ngIf="isOwnProfile">
         <button class="btn btn-danger" (click)="changePassword()">Cambiar Contraseña</button>
         <button class="btn btn-danger" (click)="editProfile()">Editar</button>
       </div>
     </div>
   </div>
 
-  <!-- MIS VALORACIONES -->
-  <h2 class="section-title">Mis valoraciones</h2>
+  <div *ngIf="!isUserAdmin">
+    <h2 class="section-title">{{ isOwnProfile ? 'Mis valoraciones' : 'Valoraciones de ' + user.name }} ({{ totalReviews }})</h2>
 
-  <div class="ratings-grid">
-    <div class="rating-card card shadow-sm" *ngFor="let item of placeholderRatings">
-      <h3></h3>
-      <p class="placeholder-desc">Aquí irá la valoración del usuario…</p>
+    <div class="reviews-container" *ngIf="reviews.length > 0">
+    <div class="review-card" *ngFor="let review of reviews">
+      <div class="review-header">
+        <div class="cheese-info" (click)="goToCheese(review.cheese.id)" style="cursor: pointer;">
+          <span class="cheese-name">{{ review.cheese.name }}</span>
+        </div>
+        <div class="rating">
+          <span class="star" *ngFor="let star of getStars(review.rating)">{{ star }}</span>
+        </div>
+      </div>
+      <p class="review-comment">{{ review.comment }}</p>
+      <div class="review-actions" *ngIf="isOwnProfile">
+        <button class="btn btn-delete" (click)="deleteReview(review.id)">Eliminar</button>
+      </div>
+    </div>
+
+    <div class="pagination-controls" *ngIf="totalPages > 1">
+      <button 
+        class="btn-pagination" 
+        [disabled]="currentPage === 0"
+        (click)="previousPage()">
+        ← Anterior
+      </button>
+      <span class="page-info">Página {{ currentPage + 1 }} de {{ totalPages }}</span>
+      <button 
+        class="btn-pagination" 
+        [disabled]="currentPage >= totalPages - 1"
+        (click)="nextPage()">
+        Siguiente →
+      </button>
+    </div>
+  </div>
+
+    <div class="no-reviews" *ngIf="reviews.length === 0">
+      <p>{{ isOwnProfile ? 'No has hecho ninguna reseña todavía.' : 'Este usuario no ha hecho reseñas todavía.' }}</p>
     </div>
   </div>
 
