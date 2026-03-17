@@ -34,6 +34,19 @@ export class UserPageComponent implements OnInit {
 
   imageUrl: string | null = null;
 
+  isEditMode: boolean = false;
+  isPasswordMode: boolean = false;
+  editSnapshot: UserDTO | null = null;
+  selectedImageFile: File | null = null;
+  previewImageUrl: string | null = null;
+  passwordForm = {
+    currentPassword: '',
+    newPassword: '',
+    confirmPassword: ''
+  };
+  passwordError: string = '';
+  passwordSuccess: string = '';
+
   reviews: ReviewDTO[] = [];
   currentPage: number = 0;
   totalPages: number = 0;
@@ -174,10 +187,140 @@ export class UserPageComponent implements OnInit {
   }
 
   changePassword() {
-    alert("Abrir modal para cambiar contraseña");
+    this.isEditMode = false;
+    this.selectedImageFile = null;
+    if (this.previewImageUrl) {
+      URL.revokeObjectURL(this.previewImageUrl);
+      this.previewImageUrl = null;
+    }
+    this.resetPasswordForm();
+    this.isPasswordMode = true;
   }
 
   editProfile() {
-    alert("Editar perfil habilitado");
+    this.isPasswordMode = false;
+    this.passwordError = '';
+    this.passwordSuccess = '';
+    // Save a snapshot to restore on cancel
+    this.editSnapshot = { ...this.user };
+    this.selectedImageFile = null;
+    this.previewImageUrl = null;
+    this.isEditMode = true;
+  }
+
+  cancelEdit() {
+    if (this.editSnapshot) {
+      this.user = { ...this.editSnapshot };
+    }
+    this.selectedImageFile = null;
+    if (this.previewImageUrl) {
+      URL.revokeObjectURL(this.previewImageUrl);
+      this.previewImageUrl = null;
+    }
+    this.isEditMode = false;
+  }
+
+  cancelPasswordChange() {
+    this.resetPasswordForm();
+    this.isPasswordMode = false;
+  }
+
+  onAvatarClick() {
+    if (!this.isEditMode) return;
+    const input = document.getElementById('avatarFileInput') as HTMLInputElement;
+    if (input) input.click();
+  }
+
+  onImageSelected(event: Event) {
+    const input = event.target as HTMLInputElement;
+    if (!input.files || input.files.length === 0) return;
+    const file = input.files[0];
+    this.selectedImageFile = file;
+    if (this.previewImageUrl) {
+      URL.revokeObjectURL(this.previewImageUrl);
+    }
+    this.previewImageUrl = URL.createObjectURL(file);
+  }
+
+  confirmEdit() {
+    const updateData: Partial<UserDTO> = {
+      name: this.user.name,
+      gmail: this.user.gmail,
+      direction: this.user.direction,
+      nif: this.user.nif
+    };
+
+    this.userService.updateUser(this.user.id, updateData).subscribe({
+      next: (updated) => {
+        if (this.selectedImageFile) {
+          this.userService.updateUserImage(this.user.id, this.selectedImageFile).subscribe({
+            next: () => this.reloadAfterEdit(),
+            error: (err) => {
+              console.error('Error updating image', err);
+              this.reloadAfterEdit();
+            }
+          });
+        } else {
+          this.reloadAfterEdit();
+        }
+      },
+      error: (err) => {
+        console.error('Error updating profile', err);
+        alert('No se pudo guardar el perfil. Inténtalo de nuevo.');
+      }
+    });
+  }
+
+  confirmPasswordChange() {
+    this.passwordError = '';
+    this.passwordSuccess = '';
+
+    if (!this.passwordForm.currentPassword || !this.passwordForm.newPassword || !this.passwordForm.confirmPassword) {
+      this.passwordError = 'Debes completar todos los campos.';
+      return;
+    }
+
+    if (this.passwordForm.newPassword !== this.passwordForm.confirmPassword) {
+      this.passwordError = 'Las nuevas contraseñas no coinciden.';
+      return;
+    }
+
+    if (this.passwordForm.newPassword.length < 8) {
+      this.passwordError = 'La nueva contraseña debe tener al menos 8 caracteres.';
+      return;
+    }
+
+    this.userService.changePassword(this.user.id, this.passwordForm).subscribe({
+      next: () => {
+        this.resetPasswordForm();
+        this.isPasswordMode = false;
+        alert('Contraseña actualizada correctamente.');
+      },
+      error: (err) => {
+        console.error('Error updating password', err);
+        this.passwordError = 'No se pudo cambiar la contraseña. Revisa la contraseña actual.';
+      }
+    });
+  }
+
+  reloadAfterEdit() {
+    this.isEditMode = false;
+    this.selectedImageFile = null;
+    if (this.previewImageUrl) {
+      URL.revokeObjectURL(this.previewImageUrl);
+      this.previewImageUrl = null;
+    }
+    // Reload user data and image
+    this.loadUserById(this.user.id);
+  }
+
+  private resetPasswordForm() {
+    this.passwordForm = {
+      currentPassword: '',
+      newPassword: '',
+      confirmPassword: ''
+    };
+    this.passwordError = '';
+    this.passwordSuccess = '';
   }
 }

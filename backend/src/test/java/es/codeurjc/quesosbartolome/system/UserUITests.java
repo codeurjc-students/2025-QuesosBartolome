@@ -14,6 +14,7 @@ import org.openqa.selenium.support.ui.*;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest(classes = es.codeurjc.quesosbartolome.QuesosbartolomeApplication.class)
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class UserUITests {
 
         private WebDriver driver;
@@ -60,9 +61,32 @@ public class UserUITests {
                 submitButton.click();
 
                 Alert alert = wait.until(ExpectedConditions.alertIsPresent());
+                String alertText = alert.getText();
                 alert.accept();
+                if (alertText.contains("incorrectas") || alertText.toLowerCase().contains("error")) {
+                        throw new AssertionError("Login failed for '" + username + "': " + alertText);
+                }
         }
 
+        private WebElement openOwnProfile() {
+                WebElement profileButton = wait.until(ExpectedConditions
+                                .elementToBeClickable(By.cssSelector("button[aria-label='Mi perfil']")));
+                profileButton.click();
+                return wait.until(ExpectedConditions
+                                .visibilityOfElementLocated(By.cssSelector(".profile-container")));
+        }
+
+        private WebElement inputByLabel(WebElement container, String labelText) {
+                return container.findElement(By.xpath(".//label[text()='" + labelText + "']/following-sibling::input"));
+        }
+
+        private void forceClick(WebElement element) {
+                ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block: 'center'});", element);
+                wait.until(ExpectedConditions.visibilityOf(element));
+                ((JavascriptExecutor) driver).executeScript("arguments[0].click();", element);
+        }
+
+        @Order(1)
         @Test
         public void testUserProfileVisibleAfterLogin() {
                 login("Victor", "password123");
@@ -98,6 +122,7 @@ public class UserUITests {
                                 "Avatar should be default or a generated blob");
         }
 
+        @Order(2)
         @Test
         public void testAdminSeesClients() {
                 // Login as ADMIN
@@ -144,6 +169,109 @@ public class UserUITests {
                 WebElement banButton = victorRow.findElement(By.cssSelector("button.btn-ban"));
                 assertNotNull(banButton);
                 assertEquals("Banear", banButton.getText());
+        }
+
+        @Order(3)
+        @Test
+        public void testEditProfileSuccess() {
+                login("Victor", "password123");
+                WebElement profileContainer = openOwnProfile();
+
+                String oldDirection = inputByLabel(profileContainer, "Dirección").getDomProperty("value");
+                String newDirection = oldDirection + " Test";
+
+                forceClick(profileContainer
+                                .findElement(By.xpath(".//button[contains(text(),'Editar') and not(contains(text(),'Confirmar'))]")));
+
+                WebElement directionField = inputByLabel(profileContainer, "Dirección");
+                directionField.clear();
+                directionField.sendKeys(newDirection);
+
+                forceClick(profileContainer.findElement(By.xpath(".//button[contains(text(),'Confirmar edición')]")));
+
+                wait.until(ExpectedConditions.textToBePresentInElementValue(
+                                By.xpath("//label[text()='Dirección']/following-sibling::input"), newDirection));
+                assertEquals(newDirection, inputByLabel(profileContainer, "Dirección").getDomProperty("value"));
+
+                // Restore old value to avoid side effects
+                forceClick(profileContainer
+                                .findElement(By.xpath(".//button[contains(text(),'Editar') and not(contains(text(),'Confirmar'))]")));
+                WebElement directionRestore = inputByLabel(profileContainer, "Dirección");
+                directionRestore.clear();
+                directionRestore.sendKeys(oldDirection);
+                forceClick(profileContainer.findElement(By.xpath(".//button[contains(text(),'Confirmar edición')]")));
+                wait.until(ExpectedConditions.textToBePresentInElementValue(
+                                By.xpath("//label[text()='Dirección']/following-sibling::input"), oldDirection));
+        }
+
+        @Order(4)
+        @Test
+        public void testEditProfileCancelKeepsOriginalData() {
+                login("Victor", "password123");
+                WebElement profileContainer = openOwnProfile();
+
+                String originalDirection = inputByLabel(profileContainer, "Dirección").getDomProperty("value");
+
+                forceClick(profileContainer
+                                .findElement(By.xpath(".//button[contains(text(),'Editar') and not(contains(text(),'Confirmar'))]")));
+
+                WebElement directionField = inputByLabel(profileContainer, "Dirección");
+                directionField.clear();
+                directionField.sendKeys("DireccionQueNoDebeGuardarse");
+
+                forceClick(profileContainer.findElement(By.xpath(".//button[contains(text(),'Cancelar edición')]")));
+
+                assertEquals(originalDirection, inputByLabel(profileContainer, "Dirección").getDomProperty("value"));
+        }
+
+        @Order(5)
+        @Test
+        public void testChangePasswordMismatchShowsValidationError() {
+                login("Victor", "password123");
+                WebElement profileContainer = openOwnProfile();
+
+                forceClick(profileContainer.findElement(By.xpath(".//button[contains(text(),'Cambiar Contraseña')]")));
+
+                inputByLabel(profileContainer, "Contraseña actual").sendKeys("password123");
+                inputByLabel(profileContainer, "Nueva contraseña").sendKeys("newPassword123");
+                inputByLabel(profileContainer, "Repite la nueva contraseña").sendKeys("differentPassword123");
+
+                forceClick(profileContainer.findElement(By.xpath(".//button[contains(text(),'Confirmar cambio')]")));
+
+                WebElement error = wait.until(ExpectedConditions
+                                .visibilityOfElementLocated(By.cssSelector(".form-message.error")));
+                assertTrue(error.getText().contains("no coinciden"));
+        }
+
+        @Order(6)
+        @Test
+        public void testChangePasswordSuccessThenLoginWithNewPassword() {
+                login("Victor", "password123");
+                WebElement profileContainer = openOwnProfile();
+
+                forceClick(profileContainer.findElement(By.xpath(".//button[contains(text(),'Cambiar Contraseña')]")));
+
+                inputByLabel(profileContainer, "Contraseña actual").sendKeys("password123");
+                inputByLabel(profileContainer, "Nueva contraseña").sendKeys("password1234");
+                inputByLabel(profileContainer, "Repite la nueva contraseña").sendKeys("password1234");
+
+                forceClick(profileContainer.findElement(By.xpath(".//button[contains(text(),'Confirmar cambio')]")));
+
+                Alert successAlert = wait.until(ExpectedConditions.alertIsPresent());
+                assertTrue(successAlert.getText().contains("actualizada"));
+                successAlert.accept();
+
+                // Restore old password in the same session — no logout/re-login needed.
+                // The component resets isPasswordMode to false on success, so click the button again.
+                forceClick(wait.until(ExpectedConditions
+                                .elementToBeClickable(By.xpath("//button[contains(text(),'Cambiar Contraseña')]"))));
+                inputByLabel(profileContainer, "Contraseña actual").sendKeys("password1234");
+                inputByLabel(profileContainer, "Nueva contraseña").sendKeys("password123");
+                inputByLabel(profileContainer, "Repite la nueva contraseña").sendKeys("password123");
+                forceClick(profileContainer.findElement(By.xpath(".//button[contains(text(),'Confirmar cambio')]")));
+                Alert restoreAlert = wait.until(ExpectedConditions.alertIsPresent());
+                assertTrue(restoreAlert.getText().contains("actualizada"));
+                restoreAlert.accept();
         }
 
 }

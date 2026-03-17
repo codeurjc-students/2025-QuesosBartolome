@@ -1,42 +1,84 @@
 <div class="profile-container">
 
-  <!-- FOTO + FORM -->
   <div class="profile-header">
     
-    <!-- AVATAR -->
-    <div class="avatar-box">
+    <div class="avatar-box" [class.avatar-editable]="isEditMode" (click)="onAvatarClick()">
       <img 
-        [src]="imageUrl || 'assets/avatar-default.jpg'" 
+        [src]="(isEditMode && previewImageUrl) ? previewImageUrl : (imageUrl || 'assets/avatar-default.jpg')" 
         alt="Avatar del usuario"
       />
+      <div class="avatar-overlay" *ngIf="isEditMode">
+        <span>Cambiar foto</span>
+      </div>
     </div>
+    <input
+      id="avatarFileInput"
+      type="file"
+      accept="image/*"
+      style="display:none"
+      (change)="onImageSelected($event)"
+    />
 
-    <!-- FORMULARIO -->
     <div class="profile-form card shadow-sm">
+
+      <div *ngIf="!isPasswordMode">
 
       <div class="form-group">
         <label>Nombre</label>
-        <input type="text" [(ngModel)]="user.name" class="form-control" disabled/>
+        <input type="text" [(ngModel)]="user.name" class="form-control" [disabled]="!isEditMode"/>
       </div>
 
       <div class="form-group">
         <label>Gmail</label>
-        <input type="email" [(ngModel)]="user.gmail" class="form-control" disabled/>
+        <input type="email" [(ngModel)]="user.gmail" class="form-control" [disabled]="!isEditMode"/>
       </div>
 
       <div class="form-group">
         <label>Dirección</label>
-        <input type="text" [(ngModel)]="user.direction" class="form-control" disabled/>
+        <input type="text" [(ngModel)]="user.direction" class="form-control" [disabled]="!isEditMode"/>
       </div>
 
       <div class="form-group">
         <label>NIF</label>
-        <input type="text" [(ngModel)]="user.nif" class="form-control" disabled/>
+        <input type="text" [(ngModel)]="user.nif" class="form-control" [disabled]="!isEditMode"/>
       </div>
 
-      <div class="btn-row" *ngIf="isOwnProfile">
+      <div class="btn-row" *ngIf="isOwnProfile && !isEditMode">
         <button class="btn btn-danger" (click)="changePassword()">Cambiar Contraseña</button>
         <button class="btn btn-danger" (click)="editProfile()">Editar</button>
+      </div>
+
+      <div class="btn-row" *ngIf="isOwnProfile && isEditMode">
+        <button class="btn btn-danger" (click)="confirmEdit()">Confirmar edición</button>
+        <button class="btn btn-secondary" (click)="cancelEdit()">Cancelar edición</button>
+      </div>
+      </div>
+
+      <div *ngIf="isPasswordMode">
+        <h3 class="password-title">Cambiar contraseña</h3>
+
+        <div class="form-group">
+          <label>Contraseña actual</label>
+          <input type="password" [(ngModel)]="passwordForm.currentPassword" class="form-control" />
+        </div>
+
+        <div class="form-group">
+          <label>Nueva contraseña</label>
+          <input type="password" [(ngModel)]="passwordForm.newPassword" class="form-control" />
+        </div>
+
+        <div class="form-group">
+          <label>Repite la nueva contraseña</label>
+          <input type="password" [(ngModel)]="passwordForm.confirmPassword" class="form-control" />
+        </div>
+
+        <p class="form-message error" *ngIf="passwordError">{{ passwordError }}</p>
+        <p class="form-message success" *ngIf="passwordSuccess">{{ passwordSuccess }}</p>
+
+        <div class="btn-row" *ngIf="isOwnProfile">
+          <button class="btn btn-danger" (click)="confirmPasswordChange()">Confirmar cambio</button>
+          <button class="btn btn-secondary" (click)="cancelPasswordChange()">Cancelar</button>
+        </div>
       </div>
     </div>
   </div>

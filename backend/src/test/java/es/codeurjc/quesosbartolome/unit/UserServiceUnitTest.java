@@ -1,5 +1,6 @@
 package es.codeurjc.quesosbartolome.unit;
 
+import es.codeurjc.quesosbartolome.dto.PasswordChangeDTO;
 import es.codeurjc.quesosbartolome.dto.UserDTO;
 import es.codeurjc.quesosbartolome.dto.UserMapper;
 import es.codeurjc.quesosbartolome.model.User;
@@ -19,6 +20,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.sql.Blob;
 import java.util.List;
@@ -261,6 +263,208 @@ class UserServiceTest {
 
                 assertThat(result).isTrue();
                 verify(userRepository).findByName("admin");
+        }
+
+        @Test
+        void shouldUpdateUserCorrectly() {
+
+                // Given
+                User existing = new User(
+                                "oldName",
+                                "pwd",
+                                "old@gmail.com",
+                                "Old Street",
+                                "00000000A");
+
+                when(userRepository.findById(1L)).thenReturn(Optional.of(existing));
+
+                UserDTO updateDTO = new UserDTO(
+                                null, "newName",
+                                "pwd",
+                                "new@gmail.com",
+                                "New Street",
+                                "11111111B", null);
+
+                // When
+                Optional<UserDTO> result = userService.updateUser(1L, updateDTO);
+
+                // Then
+                assertThat(result).isPresent();
+                assertThat(result.get().name()).isEqualTo("newName");
+                assertThat(result.get().gmail()).isEqualTo("new@gmail.com");
+                assertThat(result.get().direction()).isEqualTo("New Street");
+                assertThat(result.get().nif()).isEqualTo("11111111B");
+
+                verify(userRepository).save(existing);
+        }
+
+        @Test
+        void shouldReturnEmptyWhenUpdatingNonExistingUser() {
+
+                when(userRepository.findById(99L)).thenReturn(Optional.empty());
+
+                UserDTO dto = new UserDTO(null, "name", "pwd", "mail", "dir", "nif", null);
+
+                Optional<UserDTO> result = userService.updateUser(99L, dto);
+
+                assertThat(result).isEmpty();
+        }
+
+        @Test
+        void shouldReturnFalseWhenUserDoesNotExist_changePassword() {
+
+                when(userRepository.findById(50L)).thenReturn(Optional.empty());
+
+                PasswordChangeDTO dto = new PasswordChangeDTO("old", "newPassword", "newPassword");
+
+                boolean result = userService.changePassword(50L, dto);
+
+                assertThat(result).isFalse();
+        }
+
+        @Test
+        void shouldReturnFalseWhenDtoIsNull_changePassword() {
+
+                when(userRepository.findById(1L)).thenReturn(Optional.of(new User()));
+
+                boolean result = userService.changePassword(1L, null);
+
+                assertThat(result).isFalse();
+        }
+
+        @Test
+        void shouldReturnFalseWhenFieldsAreNull_changePassword() {
+
+                when(userRepository.findById(1L)).thenReturn(Optional.of(new User()));
+
+                PasswordChangeDTO dto = new PasswordChangeDTO(null, null, null);
+
+                boolean result = userService.changePassword(1L, dto);
+
+                assertThat(result).isFalse();
+        }
+
+        @Test
+        void shouldReturnFalseWhenNewPasswordsDoNotMatch_changePassword() {
+
+                when(userRepository.findById(1L)).thenReturn(Optional.of(new User()));
+
+                PasswordChangeDTO dto = new PasswordChangeDTO("old", "new1", "new2");
+
+                boolean result = userService.changePassword(1L, dto);
+
+                assertThat(result).isFalse();
+        }
+
+        @Test
+        void shouldReturnFalseWhenNewPasswordTooShort_changePassword() {
+
+                when(userRepository.findById(1L)).thenReturn(Optional.of(new User()));
+
+                PasswordChangeDTO dto = new PasswordChangeDTO("old", "short", "short");
+
+                boolean result = userService.changePassword(1L, dto);
+
+                assertThat(result).isFalse();
+        }
+
+        @Test
+        void shouldReturnFalseWhenCurrentPasswordDoesNotMatch_changePassword() {
+
+                User user = new User();
+                user.setPassword("encodedOld");
+
+                when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+                when(passwordEncoder.matches("wrongOld", "encodedOld")).thenReturn(false);
+
+                PasswordChangeDTO dto = new PasswordChangeDTO("wrongOld", "newPassword", "newPassword");
+
+                boolean result = userService.changePassword(1L, dto);
+
+                assertThat(result).isFalse();
+        }
+
+        @Test
+        void shouldChangePasswordSuccessfully() {
+
+                User user = new User();
+                user.setPassword("encodedOld");
+
+                when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+                when(passwordEncoder.matches("oldPassword", "encodedOld")).thenReturn(true);
+                when(passwordEncoder.encode("newPassword")).thenReturn("encodedNew");
+
+                PasswordChangeDTO dto = new PasswordChangeDTO("oldPassword", "newPassword", "newPassword");
+
+                boolean result = userService.changePassword(1L, dto);
+
+                assertThat(result).isTrue();
+                assertThat(user.getPassword()).isEqualTo("encodedNew");
+
+                verify(userRepository).save(user);
+        }
+
+        @Test
+        void shouldReturnFalseWhenUpdatingImageOfNonExistingUser() throws Exception {
+
+                when(userRepository.findById(99L)).thenReturn(Optional.empty());
+
+                MultipartFile file = mock(MultipartFile.class);
+
+                boolean result = userService.updateUserImage(99L, file);
+
+                assertThat(result).isFalse();
+        }
+
+        @Test
+        void shouldUpdateUserImageSuccessfully() throws Exception {
+
+                // Given
+                User user = new User("juan", "pwd", "juan@gmail.com", "Calle X", "12345678A");
+                user.setId(1L);
+
+                MultipartFile file = mock(MultipartFile.class);
+
+                byte[] imageBytes = "fakeImageData".getBytes();
+
+                when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+                when(file.getInputStream()).thenReturn(new java.io.ByteArrayInputStream(imageBytes));
+                when(file.getSize()).thenReturn((long) imageBytes.length);
+
+                // When
+                boolean result = userService.updateUserImage(1L, file);
+
+                // Then
+                assertThat(result).isTrue();
+                assertThat(user.getImage()).isNotNull();
+
+                verify(userRepository).save(user);
+        }
+
+        @Test
+        void shouldStoreBlobWithCorrectSize_updateUserImage() throws Exception {
+
+                // Given
+                User user = new User("lola", "pwd", "lola@gmail.com", "Calle Y", "87654321B");
+                user.setId(2L);
+
+                MultipartFile file = mock(MultipartFile.class);
+
+                byte[] bytes = new byte[] { 1, 2, 3, 4, 5 };
+
+                when(userRepository.findById(2L)).thenReturn(Optional.of(user));
+                when(file.getInputStream()).thenReturn(new java.io.ByteArrayInputStream(bytes));
+                when(file.getSize()).thenReturn((long) bytes.length);
+
+                // When
+                boolean result = userService.updateUserImage(2L, file);
+
+                // Then
+                assertThat(result).isTrue();
+                assertThat(user.getImage()).isNotNull();
+                assertThat(user.getImage().length()).isEqualTo(bytes.length);
+
+                verify(userRepository).save(user);
         }
 
 }

@@ -22,13 +22,31 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  overflow: hidden;      
+  overflow: hidden;
+  position: relative;
 }
 
 .avatar-box img {
   width: 100%;
   height: 100%;
   object-fit: cover;
+}
+
+.avatar-editable {
+  cursor: pointer;
+}
+
+.avatar-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #fff;
+  font-weight: 600;
+  font-size: 1rem;
+  pointer-events: none;
 }
 
 
@@ -54,6 +72,31 @@ label {
   border: none;
   border-radius: var(--radius);
   padding: 0.6rem 0.8rem;
+}
+
+.form-control:not(:disabled) {
+  background-color: var(--blanco);
+  border: 1.5px solid var(--texto);
+  outline: none;
+}
+
+.password-title {
+  margin: 0 0 1rem;
+  font-size: 1.4rem;
+}
+
+.form-message {
+  margin: 0.75rem 0 0;
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+.form-message.error {
+  color: #c82333;
+}
+
+.form-message.success {
+  color: #218838;
 }
 
 .btn-row {
