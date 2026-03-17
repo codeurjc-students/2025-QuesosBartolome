@@ -28,4 +28,18 @@ export class UserService {
   getAllUsers(page: number, size: number): Observable<Page<UserDTO>> {
     return this.http.get<Page<UserDTO>>(`${this.apiUrl}/all?page=${page}&size=${size}`, { withCredentials: true });
   }
+
+  updateUser(id: number, user: Partial<UserDTO>): Observable<UserDTO> {
+    return this.http.put<UserDTO>(`${this.apiUrl}/${id}`, user, { withCredentials: true });
+  }
+
+  updateUserImage(id: number, file: File): Observable<void> {
+    const formData = new FormData();
+    formData.append('file', file);
+    return this.http.put<void>(`${this.apiUrl}/${id}/image`, formData, { withCredentials: true });
+  }
+
+  changePassword(id: number, payload: { currentPassword: string; newPassword: string; confirmPassword: string }): Observable<void> {
+    return this.http.put<void>(`${this.apiUrl}/${id}/password`, payload, { withCredentials: true });
+  }
 }

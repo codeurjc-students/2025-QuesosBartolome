@@ -32,6 +32,32 @@ describe('UserService (integration with real login)', () => {
     });
   }
 
+  function registerUser(userData: any): Promise<void> {
+    return new Promise((resolve, reject) => {
+      loginService.register(userData).subscribe({
+        next: () => resolve(),
+        error: (err) => reject('Register failed: ' + err.message)
+      });
+    });
+  }
+
+  async function createAndLoginTempUser(base: string, password: string): Promise<{ username: string; password: string }> {
+    const suffix = Date.now().toString().slice(-6);
+    const username = `${base}${suffix}`;
+
+    const userData = {
+      name: username,
+      password,
+      gmail: `${username.toLowerCase()}@example.com`,
+      direction: 'Calle Test 1',
+      nif: '12345678A'
+    };
+
+    await registerUser(userData);
+    await loginAs(username, password);
+    return { username, password };
+  }
+
   it('should return 401 when user is not authenticated', (done) => {
     loginService.logout().subscribe({
       next: () => {
@@ -171,5 +197,171 @@ describe('UserService (integration with real login)', () => {
       done();
     });
   });
+
+  it('should update user profile after login', (done) => {
+    createAndLoginTempUser('UpdateUser', 'password123').then(() => {
+
+      service.getCurrentUser().subscribe({
+        next: (user) => {
+
+          const updatePayload = {
+            name: 'VictorUpdated',
+            gmail: 'victor.updated@example.com',
+            direction: 'Nueva dirección 123',
+            nif: '99999999Z'
+          };
+
+          service.updateUser(user.id, updatePayload).subscribe({
+            next: (updated) => {
+              expect(updated).toBeTruthy();
+              expect(updated.name).toBe('VictorUpdated');
+              expect(updated.gmail).toBe('victor.updated@example.com');
+              expect(updated.direction).toBe('Nueva dirección 123');
+              expect(updated.nif).toBe('99999999Z');
+              done();
+            },
+            error: (err) => {
+              fail('Failed to update user: ' + err.message);
+              done();
+            }
+          });
+
+        },
+        error: (err) => {
+          fail('Failed to get current user: ' + err.message);
+          done();
+        }
+      });
+
+    }).catch(err => {
+      fail(err);
+      done();
+    });
+  });
+
+  it('should update user image after login', (done) => {
+    createAndLoginTempUser('ImageUser', 'password123').then(() => {
+
+      service.getCurrentUser().subscribe({
+        next: (user) => {
+
+          const fakeFile = new File(['fakeImageData'], 'avatar.png', { type: 'image/png' });
+
+          service.updateUserImage(user.id, fakeFile).subscribe({
+            next: () => {
+
+              // Verify image was updated by fetching it again
+              service.getUserImage(user.id).subscribe({
+                next: (blob) => {
+                  expect(blob).toBeTruthy();
+                  expect(blob.size).toBeGreaterThan(0);
+                  done();
+                },
+                error: (err) => {
+                  fail('Failed to fetch updated image: ' + err.message);
+                  done();
+                }
+              });
+
+            },
+            error: (err) => {
+              fail('Failed to update user image: ' + err.message);
+              done();
+            }
+          });
+
+        },
+        error: (err) => {
+          fail('Failed to get current user: ' + err.message);
+          done();
+        }
+      });
+
+    }).catch(err => {
+      fail(err);
+      done();
+    });
+  });
+
+  it('should change password successfully', (done) => {
+    createAndLoginTempUser('PassUser', 'password123').then(({ username }) => {
+
+      service.getCurrentUser().subscribe({
+        next: (user) => {
+
+          const payload = {
+            currentPassword: 'password123',
+            newPassword: 'newPassword123',
+            confirmPassword: 'newPassword123'
+          };
+
+          service.changePassword(user.id, payload).subscribe({
+            next: () => {
+
+              // Try logging in with the new password
+              loginAs(username, 'newPassword123').then(() => {
+                done();
+              }).catch(err => {
+                fail('Login with new password failed: ' + err);
+                done();
+              });
+
+            },
+            error: (err) => {
+              fail('Failed to change password: ' + err.message);
+              done();
+            }
+          });
+
+        },
+        error: (err) => {
+          fail('Failed to get current user: ' + err.message);
+          done();
+        }
+      });
+
+    }).catch(err => {
+      fail(err);
+      done();
+    });
+  });
+
+  it('should return error when current password is incorrect', (done) => {
+    createAndLoginTempUser('WrongPass', 'password123').then(() => {
+
+      service.getCurrentUser().subscribe({
+        next: (user) => {
+
+          const payload = {
+            currentPassword: 'wrongPassword',
+            newPassword: 'newPassword123',
+            confirmPassword: 'newPassword123'
+          };
+
+          service.changePassword(user.id, payload).subscribe({
+            next: () => {
+              fail('Password change should not succeed with wrong current password');
+              done();
+            },
+            error: (err) => {
+              expect(err.status).toBe(400);
+              done();
+            }
+          });
+
+        },
+        error: (err) => {
+          fail('Failed to get current user: ' + err.message);
+          done();
+        }
+      });
+
+    }).catch(err => {
+      fail(err);
+      done();
+    });
+  });
+
+
 
 });

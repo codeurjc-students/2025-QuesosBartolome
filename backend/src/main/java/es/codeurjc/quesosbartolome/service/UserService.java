@@ -10,7 +10,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import es.codeurjc.quesosbartolome.dto.PasswordChangeDTO;
 import es.codeurjc.quesosbartolome.dto.UserDTO;
 import es.codeurjc.quesosbartolome.dto.UserMapper;
 import es.codeurjc.quesosbartolome.model.User;
@@ -86,6 +88,71 @@ public class UserService {
     public Page<UserDTO> findAllUsersWithUserRole(Pageable pageable) {
         return repository.findByRolsContaining("USER", pageable)
                 .map(user -> mapper.toDTO(user));
+    }
+
+    public Optional<UserDTO> updateUser(Long id, UserDTO dto) {
+        Optional<User> userOpt = repository.findById(id);
+        if (userOpt.isEmpty()) {
+            return Optional.empty();
+        }
+
+        User user = userOpt.get();
+        if (dto.name() != null && !dto.name().isBlank()) {
+            user.setName(dto.name());
+        }
+        if (dto.gmail() != null) {
+            user.setGmail(dto.gmail());
+        }
+        if (dto.direction() != null) {
+            user.setDirection(dto.direction());
+        }
+        if (dto.nif() != null) {
+            user.setNif(dto.nif());
+        }
+
+        repository.save(user);
+        return Optional.of(mapper.toDTO(user));
+    }
+
+    public boolean changePassword(Long id, PasswordChangeDTO dto) {
+        Optional<User> userOpt = repository.findById(id);
+        if (userOpt.isEmpty() || dto == null) {
+            return false;
+        }
+
+        if (dto.currentPassword() == null || dto.newPassword() == null || dto.confirmPassword() == null) {
+            return false;
+        }
+
+        if (!dto.newPassword().equals(dto.confirmPassword())) {
+            return false;
+        }
+
+        if (dto.newPassword().length() < 8) {
+            return false;
+        }
+
+        User user = userOpt.get();
+        if (!passwordEncoder.matches(dto.currentPassword(), user.getPassword())) {
+            return false;
+        }
+
+        user.setPassword(passwordEncoder.encode(dto.newPassword()));
+        repository.save(user);
+        return true;
+    }
+
+    public boolean updateUserImage(Long id, MultipartFile file) throws Exception {
+        Optional<User> userOpt = repository.findById(id);
+        if (userOpt.isEmpty()) {
+            return false;
+        }
+
+        User user = userOpt.get();
+        Blob blob = BlobProxy.generateProxy(file.getInputStream(), file.getSize());
+        user.setImage(blob);
+        repository.save(user);
+        return true;
     }
 
     public boolean isAdmin(String username) {

@@ -106,6 +106,9 @@ public class SecurityConfiguration {
                         .requestMatchers(HttpMethod.DELETE, "/api/v1/cheeses/*").hasAnyRole("ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/api/v1/cheeses/*/boxes/add").hasAnyRole("ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/api/v1/cheeses/*/boxes/remove/*").hasAnyRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/v1/users/*").hasAnyRole("USER")
+                        .requestMatchers(HttpMethod.PUT, "/api/v1/users/*/image").hasAnyRole("USER")
+                        .requestMatchers(HttpMethod.PUT, "/api/v1/users/*/password").hasAnyRole("USER")
                         .requestMatchers(HttpMethod.POST, "/api/v1/reviews").hasAnyRole("USER")
                         .requestMatchers(HttpMethod.DELETE, "/api/v1/reviews/*").hasAnyRole("USER", "ADMIN")
                         // Cualquier otra request requiere autenticación

@@ -40,7 +40,7 @@ public class ApiUserTests {
                 .then()
                 .statusCode(401);
     }
- 
+
     @Test
     @Order(2)
     void testGetCurrentUserAfterLogin() throws JSONException {
@@ -233,62 +233,519 @@ public class ApiUserTests {
 
     @Test
     @Order(9)
-void testGetAllUsersAsAdmin() throws JSONException {
+    void testGetAllUsersAsAdmin() throws JSONException {
 
-    // Login as ADMIN (German is admin by default)
-    JSONObject loginBody = new JSONObject();
-    loginBody.put("username", "German");
-    loginBody.put("password", "password123");
+        // Login as ADMIN (German is admin by default)
+        JSONObject loginBody = new JSONObject();
+        loginBody.put("username", "German");
+        loginBody.put("password", "password123");
 
-    var cookies = given()
-        .contentType("application/json")
-        .body(loginBody.toString())
-        .post("/api/v1/auth/login")
-        .then()
-        .statusCode(200)
-        .extract()
-        .detailedCookies();
+        var cookies = given()
+                .contentType("application/json")
+                .body(loginBody.toString())
+                .post("/api/v1/auth/login")
+                .then()
+                .statusCode(200)
+                .extract()
+                .detailedCookies();
 
-    given()
-        .cookies(cookies)
-        .when()
-        .get("/api/v1/users/all")
-        .then()
-        .statusCode(200)
-        .body("content", notNullValue())
-        .body("totalElements", greaterThanOrEqualTo(0));
-}
-
+        given()
+                .cookies(cookies)
+                .when()
+                .get("/api/v1/users/all")
+                .then()
+                .statusCode(200)
+                .body("content", notNullValue())
+                .body("totalElements", greaterThanOrEqualTo(0));
+    }
 
     @Test
     @Order(10)
-void testGetAllUsersWithPaginationAsAdmin() throws JSONException {
+    void testGetAllUsersWithPaginationAsAdmin() throws JSONException {
 
-    // Login as ADMIN
-    JSONObject loginBody = new JSONObject();
-    loginBody.put("username", "German");
-    loginBody.put("password", "password123");
+        // Login as ADMIN
+        JSONObject loginBody = new JSONObject();
+        loginBody.put("username", "German");
+        loginBody.put("password", "password123");
 
-    var cookies = given()
-        .contentType("application/json")
-        .body(loginBody.toString())
-        .post("/api/v1/auth/login")
-        .then()
-        .statusCode(200)
-        .extract()
-        .detailedCookies();
+        var cookies = given()
+                .contentType("application/json")
+                .body(loginBody.toString())
+                .post("/api/v1/auth/login")
+                .then()
+                .statusCode(200)
+                .extract()
+                .detailedCookies();
 
-    given()
-        .cookies(cookies)
-        .queryParam("page", 0)
-        .queryParam("size", 2)
-        .when()
-        .get("/api/v1/users/all")
-        .then()
-        .statusCode(200)
-        .body("content.size()", lessThanOrEqualTo(2))
-        .body("size", equalTo(2));
-}
+        given()
+                .cookies(cookies)
+                .queryParam("page", 0)
+                .queryParam("size", 2)
+                .when()
+                .get("/api/v1/users/all")
+                .then()
+                .statusCode(200)
+                .body("content.size()", lessThanOrEqualTo(2))
+                .body("size", equalTo(2));
+    }
 
+    @Test
+    @Order(11)
+    void testUpdateUserUnauthorized() throws JSONException {
+
+        JSONObject body = new JSONObject();
+        body.put("name", "NewName");
+
+        given()
+                .contentType("application/json")
+                .body(body.toString())
+                .when()
+                .put("/api/v1/users/1")
+                .then()
+                .statusCode(401);
+    }
+
+    @Test
+    @Order(12)
+    void testUpdateUserForbidden() throws JSONException {
+
+        // Register A
+        JSONObject regA = new JSONObject();
+        regA.put("name", "UserA");
+        regA.put("password", "passwordA");
+        regA.put("gmail", "a@test.com");
+        regA.put("direction", "Street A");
+        regA.put("nif", "11111111A");
+        regA.put("image", JSONObject.NULL);
+
+        var resA = given()
+                .contentType("application/json")
+                .body(regA.toString())
+                .post("/api/v1/auth/register")
+                .then()
+                .statusCode(201)
+                .extract()
+                .response();
+
+        Number idANum = resA.path("id");
+        Long idA = idANum.longValue();
+
+        // Register B
+        JSONObject regB = new JSONObject();
+        regB.put("name", "UserB");
+        regB.put("password", "passwordB");
+        regB.put("gmail", "b@test.com");
+        regB.put("direction", "Street B");
+        regB.put("nif", "22222222B");
+        regB.put("image", JSONObject.NULL);
+
+        given()
+                .contentType("application/json")
+                .body(regB.toString())
+                .post("/api/v1/auth/register")
+                .then()
+                .statusCode(201);
+
+        // Login B
+        JSONObject loginB = new JSONObject();
+        loginB.put("username", "UserB");
+        loginB.put("password", "passwordB");
+
+        var cookiesB = given()
+                .contentType("application/json")
+                .body(loginB.toString())
+                .post("/api/v1/auth/login")
+                .then()
+                .statusCode(200)
+                .extract()
+                .detailedCookies();
+
+        // B tries to update A → forbidden
+        JSONObject update = new JSONObject();
+        update.put("name", "HackedName");
+
+        given()
+                .cookies(cookiesB)
+                .contentType("application/json")
+                .body(update.toString())
+                .when()
+                .put("/api/v1/users/" + idA)
+                .then()
+                .statusCode(403);
+    }
+
+    @Test
+    @Order(13)
+    void testUpdateUserSuccess() throws JSONException {
+
+        JSONObject reg = new JSONObject();
+        reg.put("name", "UpdateUser");
+        reg.put("password", "password123");
+        reg.put("gmail", "update@test.com");
+        reg.put("direction", "Old Street");
+        reg.put("nif", "33333333C");
+        reg.put("image", JSONObject.NULL);
+
+        var res = given()
+                .contentType("application/json")
+                .body(reg.toString())
+                .post("/api/v1/auth/register")
+                .then()
+                .statusCode(201)
+                .extract()
+                .response();
+
+        Number idNum = res.path("id");
+        Long id = idNum.longValue();
+
+        JSONObject login = new JSONObject();
+        login.put("username", "UpdateUser");
+        login.put("password", "password123");
+
+        var cookies = given()
+                .contentType("application/json")
+                .body(login.toString())
+                .post("/api/v1/auth/login")
+                .then()
+                .statusCode(200)
+                .extract()
+                .detailedCookies();
+
+        // Update
+        JSONObject update = new JSONObject();
+        update.put("name", "UpdatedName");
+        update.put("gmail", "newmail@test.com");
+        update.put("direction", "New Street");
+        update.put("nif", "44444444D");
+
+        given()
+                .cookies(cookies)
+                .contentType("application/json")
+                .body(update.toString())
+                .when()
+                .put("/api/v1/users/" + id)
+                .then()
+                .statusCode(200)
+                .body("name", equalTo("UpdatedName"))
+                .body("gmail", equalTo("newmail@test.com"))
+                .body("direction", equalTo("New Street"))
+                .body("nif", equalTo("44444444D"));
+    }
+
+    @Test
+    @Order(14)
+    void testUpdateUserImageUnauthorized() {
+
+        given()
+                .multiPart("file", "photo.png", "fake".getBytes())
+                .when()
+                .put("/api/v1/users/1/image")
+                .then()
+                .statusCode(401);
+    }
+
+    @Test
+    @Order(15)
+    void testUpdateUserImageForbidden() throws JSONException {
+
+        JSONObject regA = new JSONObject();
+        regA.put("name", "ImgA");
+        regA.put("password", "pwdA1234");
+        regA.put("gmail", "a@img.com");
+        regA.put("direction", "Street A");
+        regA.put("nif", "11111111A");
+        regA.put("image", JSONObject.NULL);
+
+        var resA = given()
+                .contentType("application/json")
+                .body(regA.toString())
+                .post("/api/v1/auth/register")
+                .then()
+                .statusCode(201)
+                .extract()
+                .response();
+
+        Number idANum = resA.path("id");
+        Long idA = idANum.longValue();
+
+        JSONObject regB = new JSONObject();
+        regB.put("name", "ImgB");
+        regB.put("password", "pwdB1234");
+        regB.put("gmail", "b@img.com");
+        regB.put("direction", "Street B");
+        regB.put("nif", "22222222B");
+        regB.put("image", JSONObject.NULL);
+
+        given()
+                .contentType("application/json")
+                .body(regB.toString())
+                .post("/api/v1/auth/register")
+                .then()
+                .statusCode(201);
+
+        JSONObject loginB = new JSONObject();
+        loginB.put("username", "ImgB");
+        loginB.put("password", "pwdB1234");
+
+        var cookiesB = given()
+                .contentType("application/json")
+                .body(loginB.toString())
+                .post("/api/v1/auth/login")
+                .then()
+                .statusCode(200)
+                .extract()
+                .detailedCookies();
+
+        // B tries to upload image for A → forbidden
+        given()
+                .cookies(cookiesB)
+                .multiPart("file", "photo.png", "fake".getBytes())
+                .when()
+                .put("/api/v1/users/" + idA + "/image")
+                .then()
+                .statusCode(403);
+    }
+
+    @Test
+    @Order(16)
+    void testUpdateUserImageSuccess() throws JSONException {
+
+        JSONObject reg = new JSONObject();
+        reg.put("name", "ImgUser");
+        reg.put("password", "pwd12345");
+        reg.put("gmail", "img@test.com");
+        reg.put("direction", "Street Img");
+        reg.put("nif", "55555555A");
+        reg.put("image", JSONObject.NULL);
+
+        var res = given()
+                .contentType("application/json")
+                .body(reg.toString())
+                .post("/api/v1/auth/register")
+                .then()
+                .statusCode(201)
+                .extract()
+                .response();
+
+        Number idNum = res.path("id");
+        Long id = idNum.longValue();
+
+        JSONObject login = new JSONObject();
+        login.put("username", "ImgUser");
+        login.put("password", "pwd12345");
+
+        var cookies = given()
+                .contentType("application/json")
+                .body(login.toString())
+                .post("/api/v1/auth/login")
+                .then()
+                .statusCode(200)
+                .extract()
+                .detailedCookies();
+
+        // Upload image
+        given()
+                .cookies(cookies)
+                .multiPart("file", "photo.png", "fakeImageData".getBytes())
+                .when()
+                .put("/api/v1/users/" + id + "/image")
+                .then()
+                .statusCode(200);
+    }
+
+    @Test
+    @Order(17)
+    void testChangePasswordUnauthorized() throws JSONException {
+
+        JSONObject body = new JSONObject();
+        body.put("currentPassword", "old");
+        body.put("newPassword", "newPassword123");
+        body.put("confirmPassword", "newPassword123");
+
+        given()
+                .contentType("application/json")
+                .body(body.toString())
+                .when()
+                .put("/api/v1/users/1/password")
+                .then()
+                .statusCode(401);
+    }
+
+    @Test
+    @Order(18)
+    void testChangePasswordForbidden() throws JSONException {
+
+        // Register A
+        JSONObject regA = new JSONObject();
+        regA.put("name", "PassA");
+        regA.put("password", "pwdA1234");
+        regA.put("gmail", "a@pass.com");
+        regA.put("direction", "Street A");
+        regA.put("nif", "11111111A");
+        regA.put("image", JSONObject.NULL);
+
+        var resA = given()
+                .contentType("application/json")
+                .body(regA.toString())
+                .post("/api/v1/auth/register")
+                .then()
+                .statusCode(201)
+                .extract()
+                .response();
+
+        Number idANum = resA.path("id");
+        Long idA = idANum.longValue();
+
+        // Register B
+        JSONObject regB = new JSONObject();
+        regB.put("name", "PassB");
+        regB.put("password", "pwdB1234");
+        regB.put("gmail", "b@pass.com");
+        regB.put("direction", "Street B");
+        regB.put("nif", "22222222B");
+        regB.put("image", JSONObject.NULL);
+
+        given()
+                .contentType("application/json")
+                .body(regB.toString())
+                .post("/api/v1/auth/register")
+                .then()
+                .statusCode(201);
+
+        // Login B
+        JSONObject loginB = new JSONObject();
+        loginB.put("username", "PassB");
+        loginB.put("password", "pwdB1234");
+
+        var cookiesB = given()
+                .contentType("application/json")
+                .body(loginB.toString())
+                .post("/api/v1/auth/login")
+                .then()
+                .statusCode(200)
+                .extract()
+                .detailedCookies();
+
+        // B tries to change password of A → forbidden
+        JSONObject body = new JSONObject();
+        body.put("currentPassword", "pwdA1234");
+        body.put("newPassword", "newPass123");
+        body.put("confirmPassword", "newPass123");
+
+        given()
+                .cookies(cookiesB)
+                .contentType("application/json")
+                .body(body.toString())
+                .when()
+                .put("/api/v1/users/" + idA + "/password")
+                .then()
+                .statusCode(403);
+    }
+
+    @Test
+    @Order(19)
+    void testChangePasswordWrongCurrentPassword() throws JSONException {
+
+        JSONObject reg = new JSONObject();
+        reg.put("name", "WrongPassUser");
+        reg.put("password", "correctPwd");
+        reg.put("gmail", "wrongpass@test.com");
+        reg.put("direction", "Street");
+        reg.put("nif", "99999999X");
+        reg.put("image", JSONObject.NULL);
+
+        var res = given()
+                .contentType("application/json")
+                .body(reg.toString())
+                .post("/api/v1/auth/register")
+                .then()
+                .statusCode(201)
+                .extract()
+                .response();
+
+        Number idNum = res.path("id");
+        Long id = idNum.longValue();
+
+        JSONObject login = new JSONObject();
+        login.put("username", "WrongPassUser");
+        login.put("password", "correctPwd");
+
+        var cookies = given()
+                .contentType("application/json")
+                .body(login.toString())
+                .post("/api/v1/auth/login")
+                .then()
+                .statusCode(200)
+                .extract()
+                .detailedCookies();
+
+        // Wrong current password
+        JSONObject body = new JSONObject();
+        body.put("currentPassword", "wrongPwd");
+        body.put("newPassword", "newPassword123");
+        body.put("confirmPassword", "newPassword123");
+
+        given()
+                .cookies(cookies)
+                .contentType("application/json")
+                .body(body.toString())
+                .when()
+                .put("/api/v1/users/" + id + "/password")
+                .then()
+                .statusCode(400);
+    }
+
+    @Test
+    @Order(20)
+    void testChangePasswordSuccess() throws JSONException {
+
+        JSONObject reg = new JSONObject();
+        reg.put("name", "PassSuccess");
+        reg.put("password", "oldPassword");
+        reg.put("gmail", "passsuccess@test.com");
+        reg.put("direction", "Street");
+        reg.put("nif", "12312312Z");
+        reg.put("image", JSONObject.NULL);
+
+        var res = given()
+                .contentType("application/json")
+                .body(reg.toString())
+                .post("/api/v1/auth/register")
+                .then()
+                .statusCode(201)
+                .extract()
+                .response();
+
+        Number idNum = res.path("id");
+        Long id = idNum.longValue();
+
+        JSONObject login = new JSONObject();
+        login.put("username", "PassSuccess");
+        login.put("password", "oldPassword");
+
+        var cookies = given()
+                .contentType("application/json")
+                .body(login.toString())
+                .post("/api/v1/auth/login")
+                .then()
+                .statusCode(200)
+                .extract()
+                .detailedCookies();
+
+        // Change password
+        JSONObject body = new JSONObject();
+        body.put("currentPassword", "oldPassword");
+        body.put("newPassword", "newPassword123");
+        body.put("confirmPassword", "newPassword123");
+
+        given()
+                .cookies(cookies)
+                .contentType("application/json")
+                .body(body.toString())
+                .when()
+                .put("/api/v1/users/" + id + "/password")
+                .then()
+                .statusCode(200);
+    }
 
 }
