@@ -42,4 +42,8 @@ export class UserService {
   changePassword(id: number, payload: { currentPassword: string; newPassword: string; confirmPassword: string }): Observable<void> {
     return this.http.put<void>(`${this.apiUrl}/${id}/password`, payload, { withCredentials: true });
   }
+
+  toggleUserBan(id: number): Observable<UserDTO> {
+    return this.http.put<UserDTO>(`${this.apiUrl}/${id}/ban`, {}, { withCredentials: true });
+  }
 }

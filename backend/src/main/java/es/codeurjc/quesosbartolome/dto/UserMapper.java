@@ -16,7 +16,8 @@ public interface UserMapper {
         @Mapping(source = "gmail", target = "gmail"),
         @Mapping(source = "direction", target = "direction"),
         @Mapping(source = "nif", target = "nif"),
-        @Mapping(source = "rols", target = "rols")
+        @Mapping(source = "rols", target = "rols"),
+        @Mapping(source = "banned", target = "banned")
     })
     UserDTO toDTO(User user);
 
@@ -29,6 +30,7 @@ public interface UserMapper {
         @Mapping(source = "direction", target = "direction"),
         @Mapping(source = "nif", target = "nif"),
         @Mapping(source = "rols", target = "rols"),
+        @Mapping(source = "banned", target = "banned"),
         @Mapping(target = "image", ignore = true),
         @Mapping(target = "reviews", ignore = true),
         @Mapping(target = "cart", ignore = true),

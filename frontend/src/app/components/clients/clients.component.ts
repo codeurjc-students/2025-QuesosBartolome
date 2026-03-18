@@ -15,7 +15,7 @@ export class ClientsComponent implements OnInit {
 
     users: UserDTO[] = [];
 
-    imageUrl: string | null = null;
+    imageUrls: Record<number, string> = {};
 
     currentPage = 0;
     pageSize = 10;
@@ -30,6 +30,7 @@ export class ClientsComponent implements OnInit {
         this.userService.getAllUsers(this.currentPage, this.pageSize).subscribe({
             next: (data) => {
                 this.users = data.content;
+                this.imageUrls = {};
                 this.users.forEach(user => this.loadUserImage(user));
             },
             error: (err) => {
@@ -44,17 +45,20 @@ export class ClientsComponent implements OnInit {
     loadUserImage(user: UserDTO) {
         this.userService.getUserImage(user.id).subscribe({
             next: (blob) => {
-                console.log('Blob de imagen recibido para el usuario', blob);
                 if (blob && blob.size > 0) {
-                    this.imageUrl = URL.createObjectURL(blob);
+                    this.imageUrls[user.id] = URL.createObjectURL(blob);
                 } else {
-                    this.imageUrl = null;
+                    this.imageUrls[user.id] = 'assets/avatar-default.jpg';
                 }
             },
             error: () => {
-                this.imageUrl = null;
+                this.imageUrls[user.id] = 'assets/avatar-default.jpg';
             }
         });
+    }
+
+    getUserImageUrl(userId: number): string {
+        return this.imageUrls[userId] || 'assets/avatar-default.jpg';
     }
 
     nextPage() {
@@ -69,8 +73,29 @@ export class ClientsComponent implements OnInit {
         }
     }
 
-    banUser(userId: number) {
-        console.log('Banear usuario:', userId);
+    goToUserProfile(userId: number): void {
+        this.router.navigate(['/user', userId]);
+    }
+
+    banUser(user: UserDTO) {
+        const shouldBan = !user.banned;
+        const action = shouldBan ? 'banear' : 'desbanear';
+
+        if (!confirm(`¿Seguro que quieres ${action} a ${user.name}?`)) {
+            return;
+        }
+
+        this.userService.toggleUserBan(user.id).subscribe({
+            next: (updatedUser) => {
+                user.banned = updatedUser.banned;
+            },
+            error: (err) => {
+                alert('No se pudo actualizar el estado de baneo del usuario.');
+                if (err.status >= 500) {
+                    this.router.navigate(['/error']);
+                }
+            }
+        });
 
     }
 }

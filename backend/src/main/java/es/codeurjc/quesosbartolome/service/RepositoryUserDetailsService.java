@@ -32,7 +32,7 @@ public class RepositoryUserDetailsService implements UserDetailsService {
 		}
 
 		return new org.springframework.security.core.userdetails.User(user.getName(), 
-				user.getPassword(), roles);
+				user.getPassword(), !user.isBanned(), true, true, true, roles);
 
 	}
 }

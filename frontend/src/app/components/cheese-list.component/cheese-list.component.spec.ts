@@ -70,7 +70,8 @@ describe('CheeseListComponent (unit)', () => {
       gmail: 'admin@gmail.com',
       direction: 'Calle Falsa 123',
       nif: '12345678A',
-      rols: ['ADMIN']
+      rols: ['ADMIN'],
+      banned: false
     };
 
     mockUserService.getCurrentUser.and.returnValue(of(adminUser));
@@ -95,7 +96,8 @@ describe('CheeseListComponent (unit)', () => {
       gmail: 'pepito@gmail.com',
       direction: 'Calle Falsa 123',
       nif: '12345678A',
-      rols: ['USER']
+      rols: ['USER'],
+      banned: false
     };
 
     mockUserService.getCurrentUser.and.returnValue(of(mockUser));

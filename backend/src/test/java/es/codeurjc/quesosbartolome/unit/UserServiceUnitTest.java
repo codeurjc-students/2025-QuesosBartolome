@@ -283,7 +283,7 @@ class UserServiceTest {
                                 "pwd",
                                 "new@gmail.com",
                                 "New Street",
-                                "11111111B", null);
+                                "11111111B", null, false);
 
                 // When
                 Optional<UserDTO> result = userService.updateUser(1L, updateDTO);
@@ -303,7 +303,7 @@ class UserServiceTest {
 
                 when(userRepository.findById(99L)).thenReturn(Optional.empty());
 
-                UserDTO dto = new UserDTO(null, "name", "pwd", "mail", "dir", "nif", null);
+                UserDTO dto = new UserDTO(null, "name", "pwd", "mail", "dir", "nif", null, false);
 
                 Optional<UserDTO> result = userService.updateUser(99L, dto);
 
@@ -463,6 +463,80 @@ class UserServiceTest {
                 assertThat(result).isTrue();
                 assertThat(user.getImage()).isNotNull();
                 assertThat(user.getImage().length()).isEqualTo(bytes.length);
+
+                verify(userRepository).save(user);
+        }
+
+        @Test
+        void shouldReturnEmptyWhenTogglingBanOfNonExistingUser() {
+
+                // Given
+                when(userRepository.findById(99L)).thenReturn(Optional.empty());
+
+                // When
+                Optional<UserDTO> result = userService.toggleUserBan(99L);
+
+                // Then
+                assertThat(result).isEmpty();
+                verify(userRepository).findById(99L);
+        }
+
+        @Test
+        void shouldBanUserWhenCurrentlyNotBanned() {
+
+                // Given
+                User user = new User("juan", "pwd", "juan@gmail.com", "Calle X", "12345678A");
+                user.setId(1L);
+                user.setBanned(false);
+
+                when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+
+                // When
+                Optional<UserDTO> result = userService.toggleUserBan(1L);
+
+                // Then
+                assertThat(result).isPresent();
+                assertThat(user.isBanned()).isTrue();
+
+                verify(userRepository).save(user);
+        }
+
+        @Test
+        void shouldUnbanUserWhenCurrentlyBanned() {
+
+                // Given
+                User user = new User("lola", "pwd", "lola@gmail.com", "Calle Y", "87654321B");
+                user.setId(2L);
+                user.setBanned(true);
+
+                when(userRepository.findById(2L)).thenReturn(Optional.of(user));
+
+                // When
+                Optional<UserDTO> result = userService.toggleUserBan(2L);
+
+                // Then
+                assertThat(result).isPresent();
+                assertThat(user.isBanned()).isFalse();
+
+                verify(userRepository).save(user);
+        }
+
+        @Test
+        void shouldReturnUpdatedDTOAfterToggleBan() {
+
+                // Given
+                User user = new User("ana", "pwd", "ana@gmail.com", "Calle Z", "99999999C");
+                user.setId(3L);
+                user.setBanned(false);
+
+                when(userRepository.findById(3L)).thenReturn(Optional.of(user));
+
+                // When
+                Optional<UserDTO> result = userService.toggleUserBan(3L);
+
+                // Then
+                assertThat(result).isPresent();
+                assertThat(result.get().banned()).isTrue();
 
                 verify(userRepository).save(user);
         }

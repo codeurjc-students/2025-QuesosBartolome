@@ -87,7 +87,8 @@ describe('UserPageComponent (unit)', () => {
       gmail: 'juan@example.com',
       direction: 'Calle Falsa 123',
       nif: '12345678A',
-      rols: ['USER']
+      rols: ['USER'],
+      banned: false
     };
 
     const mockBlob = new Blob(['fake'], { type: 'image/png' });
@@ -111,7 +112,8 @@ describe('UserPageComponent (unit)', () => {
       gmail: 'ana@example.com',
       direction: 'Calle Luna 2',
       nif: '87654321B',
-      rols: ['USER']
+      rols: ['USER'],
+      banned: false
     };
 
     const emptyBlob = new Blob([], { type: 'image/png' });
@@ -132,7 +134,8 @@ describe('UserPageComponent (unit)', () => {
       gmail: 'luis@example.com',
       direction: 'Calle Mayor 3',
       nif: '11223344C',
-      rols: ['USER']
+      rols: ['USER'],
+      banned: false
     };
 
     mockUserService.getCurrentUser.and.returnValue(of(mockUser));
@@ -151,7 +154,8 @@ describe('UserPageComponent (unit)', () => {
       gmail: 'a@a.com',
       direction: 'x',
       nif: 'y',
-      rols: ['USER']
+      rols: ['USER'],
+      banned: false
     };
 
     mockUserService.getCurrentUser.and.returnValue(of(mockUser));
@@ -173,7 +177,8 @@ describe('UserPageComponent (unit)', () => {
       gmail: 'a@a.com',
       direction: 'x',
       nif: 'y',
-      rols: ['ADMIN']
+      rols: ['ADMIN'],
+      banned: false
     };
 
     mockUserService.getCurrentUser.and.returnValue(of(mockAdmin));
@@ -240,169 +245,199 @@ describe('UserPageComponent (unit)', () => {
   });
 
   it('should enter edit mode when editProfile() is called', () => {
-  component.user = {
-    id: 1, name: 'Juan', password: '', gmail: 'a@a.com',
-    direction: 'x', nif: 'y', rols: []
-  };
+    component.user = {
+      id: 1, name: 'Juan', password: '', gmail: 'a@a.com',
+      direction: 'x', nif: 'y', rols: [], banned: false
+    };
 
-  component.editProfile();
+    component.editProfile();
 
-  expect(component.isEditMode).toBeTrue();
-  expect(component.editSnapshot).toEqual(component.user);
-});
-
-it('should restore snapshot when cancelEdit() is called', () => {
-  component.user = {
-    id: 1, name: 'Juan', password: '', gmail: 'a@a.com',
-    direction: 'x', nif: 'y', rols: []
-  };
-
-  component.editProfile();
-  component.user.name = 'NuevoNombre';
-
-  component.cancelEdit();
-
-  expect(component.user.name).toBe('Juan');
-  expect(component.isEditMode).toBeFalse();
-});
-
-it('should call updateUser when confirmEdit() is executed', () => {
-  mockUserService.updateUser = jasmine.createSpy().and.returnValue(of({
-    id: 1, name: 'Juan', gmail: 'nuevo@mail.com', direction: 'x', nif: 'y', password: '', rols: []
-  }));
-
-  mockUserService.updateUserImage = jasmine.createSpy().and.returnValue(of(void 0));
-  spyOn(component, 'reloadAfterEdit');
-
-  component.user = {
-    id: 1, name: 'Juan', password: '', gmail: 'nuevo@mail.com',
-    direction: 'x', nif: 'y', rols: []
-  };
-
-  component.confirmEdit();
-
-  expect(mockUserService.updateUser).toHaveBeenCalledWith(1, {
-    name: 'Juan',
-    gmail: 'nuevo@mail.com',
-    direction: 'x',
-    nif: 'y'
+    expect(component.isEditMode).toBeTrue();
+    expect(component.editSnapshot).toEqual(component.user);
   });
-  expect(component.reloadAfterEdit).toHaveBeenCalled();
-});
 
-it('should call updateUserImage if a new image is selected', () => {
-  const fakeFile = new File(['123'], 'avatar.png', { type: 'image/png' });
-  component.selectedImageFile = fakeFile;
+  it('should restore snapshot when cancelEdit() is called', () => {
+    component.user = {
+      id: 1, name: 'Juan', password: '', gmail: 'a@a.com',
+      direction: 'x', nif: 'y', rols: [], banned: false
+    };
 
-  mockUserService.updateUser = jasmine.createSpy().and.returnValue(of(component.user));
-  mockUserService.updateUserImage = jasmine.createSpy().and.returnValue(of(void 0));
-  spyOn(component, 'reloadAfterEdit');
+    component.editProfile();
+    component.user.name = 'NuevoNombre';
 
-  component.user = {
-    id: 1, name: 'Juan', password: '', gmail: 'a@a.com',
-    direction: 'x', nif: 'y', rols: []
-  };
+    component.cancelEdit();
 
-  component.confirmEdit();
+    expect(component.user.name).toBe('Juan');
+    expect(component.isEditMode).toBeFalse();
+  });
 
-  expect(mockUserService.updateUserImage).toHaveBeenCalledWith(1, fakeFile);
-  expect(component.reloadAfterEdit).toHaveBeenCalled();
-});
+  it('should call updateUser when confirmEdit() is executed', () => {
+    mockUserService.updateUser = jasmine.createSpy().and.returnValue(of({
+      id: 1, name: 'Juan', gmail: 'nuevo@mail.com', direction: 'x', nif: 'y', password: '', rols: [], banned: false
+    }));
 
-it('should alert when updateUser fails', () => {
-  spyOn(window, 'alert');
+    mockUserService.updateUserImage = jasmine.createSpy().and.returnValue(of(void 0));
+    spyOn(component, 'reloadAfterEdit');
 
-  mockUserService.updateUser = jasmine.createSpy().and.returnValue(
-    throwError(() => ({ status: 500 }))
-  );
+    component.user = {
+      id: 1, name: 'Juan', password: '', gmail: 'nuevo@mail.com',
+      direction: 'x', nif: 'y', rols: [], banned: false
+    };
 
-  component.user = {
-    id: 1, name: 'Juan', password: '', gmail: 'a@a.com',
-    direction: 'x', nif: 'y', rols: []
-  };
+    component.confirmEdit();
 
-  component.confirmEdit();
+    expect(mockUserService.updateUser).toHaveBeenCalledWith(1, {
+      name: 'Juan',
+      gmail: 'nuevo@mail.com',
+      direction: 'x',
+      nif: 'y'
+    });
+    expect(component.reloadAfterEdit).toHaveBeenCalled();
+  });
 
-  expect(window.alert).toHaveBeenCalledWith('No se pudo guardar el perfil. Inténtalo de nuevo.');
-});
+  it('should call updateUserImage if a new image is selected', () => {
+    const fakeFile = new File(['123'], 'avatar.png', { type: 'image/png' });
+    component.selectedImageFile = fakeFile;
 
-it('should enter password mode when changePassword() is called', () => {
-  component.changePassword();
+    mockUserService.updateUser = jasmine.createSpy().and.returnValue(of(component.user));
+    mockUserService.updateUserImage = jasmine.createSpy().and.returnValue(of(void 0));
+    spyOn(component, 'reloadAfterEdit');
 
-  expect(component.isPasswordMode).toBeTrue();
-  expect(component.passwordForm.currentPassword).toBe('');
-});
+    component.user = {
+      id: 1, name: 'Juan', password: '', gmail: 'a@a.com',
+      direction: 'x', nif: 'y', rols: [], banned: false
+    };
 
-it('should show error if password fields are incomplete', () => {
-  component.passwordForm = {
-    currentPassword: '',
-    newPassword: '',
-    confirmPassword: ''
-  };
+    component.confirmEdit();
 
-  component.confirmPasswordChange();
+    expect(mockUserService.updateUserImage).toHaveBeenCalledWith(1, fakeFile);
+    expect(component.reloadAfterEdit).toHaveBeenCalled();
+  });
 
-  expect(component.passwordError).toBe('Debes completar todos los campos.');
-});
+  it('should alert when updateUser fails', () => {
+    spyOn(window, 'alert');
 
-it('should show error if new passwords do not match', () => {
-  component.passwordForm = {
-    currentPassword: 'old',
-    newPassword: '12345678',
-    confirmPassword: '87654321'
-  };
+    mockUserService.updateUser = jasmine.createSpy().and.returnValue(
+      throwError(() => ({ status: 500 }))
+    );
 
-  component.confirmPasswordChange();
+    component.user = {
+      id: 1, name: 'Juan', password: '', gmail: 'a@a.com',
+      direction: 'x', nif: 'y', rols: [], banned: false
+    };
 
-  expect(component.passwordError).toBe('Las nuevas contraseñas no coinciden.');
-});
+    component.confirmEdit();
 
-it('should show error if new password is too short', () => {
-  component.passwordForm = {
-    currentPassword: 'old',
-    newPassword: '123',
-    confirmPassword: '123'
-  };
+    expect(window.alert).toHaveBeenCalledWith('No se pudo guardar el perfil. Inténtalo de nuevo.');
+  });
 
-  component.confirmPasswordChange();
+  it('should enter password mode when changePassword() is called', () => {
+    component.changePassword();
 
-  expect(component.passwordError).toBe('La nueva contraseña debe tener al menos 8 caracteres.');
-});
+    expect(component.isPasswordMode).toBeTrue();
+    expect(component.passwordForm.currentPassword).toBe('');
+  });
 
-it('should call changePassword when confirmPasswordChange() is valid', () => {
-  mockUserService.changePassword = jasmine.createSpy().and.returnValue(of(void 0));
-  spyOn(window, 'alert');
+  it('should show error if password fields are incomplete', () => {
+    component.passwordForm = {
+      currentPassword: '',
+      newPassword: '',
+      confirmPassword: ''
+    };
 
-  component.user.id = 1;
-  const expectedPayload = {
-    currentPassword: 'oldPassword',
-    newPassword: 'newPassword123',
-    confirmPassword: 'newPassword123'
-  };
-  component.passwordForm = { ...expectedPayload };
+    component.confirmPasswordChange();
 
-  component.confirmPasswordChange();
+    expect(component.passwordError).toBe('Debes completar todos los campos.');
+  });
 
-  expect(mockUserService.changePassword).toHaveBeenCalledWith(1, expectedPayload);
-  expect(window.alert).toHaveBeenCalledWith('Contraseña actualizada correctamente.');
-});
+  it('should show error if new passwords do not match', () => {
+    component.passwordForm = {
+      currentPassword: 'old',
+      newPassword: '12345678',
+      confirmPassword: '87654321'
+    };
 
-it('should show error if changePassword fails', () => {
-  mockUserService.changePassword = jasmine.createSpy().and.returnValue(
-    throwError(() => ({ status: 400 }))
-  );
+    component.confirmPasswordChange();
 
-  component.user.id = 1;
-  component.passwordForm = {
-    currentPassword: 'wrong',
-    newPassword: 'newPassword123',
-    confirmPassword: 'newPassword123'
-  };
+    expect(component.passwordError).toBe('Las nuevas contraseñas no coinciden.');
+  });
 
-  component.confirmPasswordChange();
+  it('should show error if new password is too short', () => {
+    component.passwordForm = {
+      currentPassword: 'old',
+      newPassword: '123',
+      confirmPassword: '123'
+    };
 
-  expect(component.passwordError).toBe('No se pudo cambiar la contraseña. Revisa la contraseña actual.');
-});
+    component.confirmPasswordChange();
+
+    expect(component.passwordError).toBe('La nueva contraseña debe tener al menos 8 caracteres.');
+  });
+
+  it('should call changePassword when confirmPasswordChange() is valid', () => {
+    mockUserService.changePassword = jasmine.createSpy().and.returnValue(of(void 0));
+    spyOn(window, 'alert');
+
+    component.user.id = 1;
+    const expectedPayload = {
+      currentPassword: 'oldPassword',
+      newPassword: 'newPassword123',
+      confirmPassword: 'newPassword123'
+    };
+    component.passwordForm = { ...expectedPayload };
+
+    component.confirmPasswordChange();
+
+    expect(mockUserService.changePassword).toHaveBeenCalledWith(1, expectedPayload);
+    expect(window.alert).toHaveBeenCalledWith('Contraseña actualizada correctamente.');
+  });
+
+  it('should show error if changePassword fails', () => {
+    mockUserService.changePassword = jasmine.createSpy().and.returnValue(
+      throwError(() => ({ status: 400 }))
+    );
+
+    component.user.id = 1;
+    component.passwordForm = {
+      currentPassword: 'wrong',
+      newPassword: 'newPassword123',
+      confirmPassword: 'newPassword123'
+    };
+
+    component.confirmPasswordChange();
+
+    expect(component.passwordError).toBe('No se pudo cambiar la contraseña. Revisa la contraseña actual.');
+  });
+
+  it('should display banned badge and notice when user is banned', () => {
+    const bannedUser: UserDTO = {
+      id: 1,
+      name: 'Juan',
+      password: '',
+      gmail: 'juan@test.com',
+      direction: 'Calle Falsa',
+      nif: '12345678A',
+      rols: ['USER'],
+      banned: true
+    };
+
+    mockUserService.getCurrentUser.and.returnValue(of(bannedUser));
+    mockUserService.getUserImage.and.returnValue(of(new Blob(['fake'])));
+
+    fixture.detectChanges();
+
+    const badge = fixture.debugElement.query(By.css('.banned-badge'));
+    expect(badge).toBeTruthy();
+    expect(badge.nativeElement.textContent.trim()).toBe('BANEADO');
+
+    const notice = fixture.debugElement.query(By.css('.banned-notice'));
+    expect(notice).toBeTruthy();
+    expect(notice.nativeElement.textContent.trim()).toBe('Este usuario esta baneado.');
+
+    const avatarBox = fixture.debugElement.query(By.css('.avatar-box'));
+    expect(avatarBox.nativeElement.classList).toContain('avatar-banned');
+  });
+
 
 
 });

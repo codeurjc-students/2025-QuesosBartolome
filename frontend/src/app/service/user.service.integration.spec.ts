@@ -203,21 +203,22 @@ describe('UserService (integration with real login)', () => {
 
       service.getCurrentUser().subscribe({
         next: (user) => {
+          const suffix = Date.now().toString();
 
           const updatePayload = {
             name: 'VictorUpdated',
-            gmail: 'victor.updated@example.com',
+            gmail: `victor.updated.${suffix}@example.com`,
             direction: 'Nueva dirección 123',
-            nif: '99999999Z'
+            nif: user.nif
           };
 
           service.updateUser(user.id, updatePayload).subscribe({
             next: (updated) => {
               expect(updated).toBeTruthy();
               expect(updated.name).toBe('VictorUpdated');
-              expect(updated.gmail).toBe('victor.updated@example.com');
+              expect(updated.gmail).toBe(updatePayload.gmail);
               expect(updated.direction).toBe('Nueva dirección 123');
-              expect(updated.nif).toBe('99999999Z');
+              expect(updated.nif).toBe(user.nif);
               done();
             },
             error: (err) => {
@@ -362,6 +363,89 @@ describe('UserService (integration with real login)', () => {
     });
   });
 
+  it('should toggle user ban status successfully after login', (done) => {
+    loginAs('German', 'password123').then(() => {
+
+      createAndLoginTempUser('BanTarget', 'password123').then(({ username }) => {
+
+        service.getCurrentUser().subscribe({
+          next: (targetUser) => {
+
+            loginAs('German', 'password123').then(() => {
+
+              service.toggleUserBan(targetUser.id).subscribe({
+                next: (updated) => {
+                  expect(updated).toBeTruthy();
+                  expect(updated.id).toBe(targetUser.id);
+                  expect(typeof updated.banned).toBe('boolean');
+                  done();
+                },
+                error: (err) => {
+                  fail('toggleUserBan failed: ' + err.message);
+                  done();
+                }
+              });
+
+            });
+
+          }
+        });
+
+      });
+
+    });
+  });
+
+  it('should return 403 when a non-admin user tries to ban someone', (done) => {
+    createAndLoginTempUser('NonAdminBan', 'password123').then(() => {
+
+      service.toggleUserBan(1).subscribe({
+        next: () => {
+          fail('Non-admin should not be able to ban users');
+          done();
+        },
+        error: (err) => {
+          expect(err.status).toBe(403);
+          done();
+        }
+      });
+
+    }).catch(err => {
+      fail(err);
+      done();
+    });
+  });
+
+  it('should return 401 when trying to ban without authentication', (done) => {
+
+    loginService.logout().subscribe({
+      next: () => {
+        service.toggleUserBan(1).subscribe({
+          next: () => {
+            fail('Request should not succeed without authentication');
+            done();
+          },
+          error: (err) => {
+            expect(err.status).toBe(401);
+            done();
+          }
+        });
+      },
+      error: () => {
+        service.toggleUserBan(1).subscribe({
+          next: () => {
+            fail('Request should not succeed without authentication');
+            done();
+          },
+          error: (err) => {
+            expect(err.status).toBe(401);
+            done();
+          }
+        });
+      }
+    });
+
+  });
 
 
 });

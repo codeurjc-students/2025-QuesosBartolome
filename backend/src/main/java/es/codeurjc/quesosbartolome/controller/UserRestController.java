@@ -201,4 +201,19 @@ public class UserRestController {
         return ResponseEntity.ok().build();
     }
 
+    @PutMapping("/{id}/ban")
+    public ResponseEntity<UserDTO> toggleBanUser(@PathVariable Long id, HttpServletRequest request) {
+        Principal principal = request.getUserPrincipal();
+        if (principal == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        if (!userService.isAdmin(principal.getName())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+
+        Optional<UserDTO> updated = userService.toggleUserBan(id);
+        return updated.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
 }

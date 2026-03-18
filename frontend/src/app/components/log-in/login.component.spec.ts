@@ -4,7 +4,6 @@ import { LoginComponent } from './login.component';
 import { LoginService } from '../../service/login.service';
 import { Router } from '@angular/router';
 
-
 describe('LoginComponent (unit)', () => {
 
   let component: LoginComponent;
@@ -53,6 +52,47 @@ describe('LoginComponent (unit)', () => {
     component.login();
 
     expect(mockLoginService.login).toHaveBeenCalled();
+    expect(mockRouter.navigate).not.toHaveBeenCalled();
+  });
+
+
+  it('should show backend error message when provided', () => {
+
+    spyOn(window, 'alert');
+
+    mockLoginService.login.and.returnValue(
+      throwError(() => ({
+        status: 403,
+        error: { message: 'No puedes iniciar sesion: tu cuenta esta baneada.' }
+      }))
+    );
+
+    component.username = 'German';
+    component.password = 'password123';
+
+    component.login();
+
+    expect(window.alert).toHaveBeenCalledWith('No puedes iniciar sesion: tu cuenta esta baneada.');
+    expect(mockRouter.navigate).not.toHaveBeenCalled();
+  });
+
+  it('should show generic error message when backend message is missing', () => {
+
+    spyOn(window, 'alert');
+
+    mockLoginService.login.and.returnValue(
+      throwError(() => ({
+        status: 401,
+        error: {}
+      }))
+    );
+
+    component.username = 'User';
+    component.password = 'wrong';
+
+    component.login();
+
+    expect(window.alert).toHaveBeenCalledWith('Credenciales incorrectas.');
     expect(mockRouter.navigate).not.toHaveBeenCalled();
   });
 

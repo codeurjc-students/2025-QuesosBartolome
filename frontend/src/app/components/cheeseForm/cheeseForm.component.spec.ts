@@ -40,7 +40,8 @@ describe('CheeseFormComponent (unit)', () => {
             gmail: 'admin@gmail.com',
             direction: 'Calle Falsa 123',
             nif: '12345678A',
-            rols: ['ADMIN']
+            rols: ['ADMIN'],
+            banned: false
         }));
 
         await TestBed.configureTestingModule({
@@ -66,7 +67,8 @@ it('should redirect to /error if user is not admin', () => {
         gmail: 'user@gmail.com',
         direction: 'Fake Street 123',
         nif: '12345678Z',
-        rols: ['USER']
+        rols: ['USER'],
+        banned: false
     }));
 
     component.ngOnInit();

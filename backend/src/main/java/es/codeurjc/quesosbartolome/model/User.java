@@ -26,6 +26,7 @@ public class User {
     private String gmail;
     private String direction;
     private String nif;
+    private boolean banned;
     private Blob image;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -49,6 +50,7 @@ public class User {
         this.gmail = gmail;
         this.direction = direction;
         this.nif = nif;
+        this.banned = false;
         this.rols = rols != null ? new ArrayList<>(List.of(rols)) : new ArrayList<>();
         this.cart = new Cart(this);
     }
@@ -100,6 +102,14 @@ public class User {
 
     public void setNif(String nif) {
         this.nif = nif;
+    }
+
+    public boolean isBanned() {
+        return banned;
+    }
+
+    public void setBanned(boolean banned) {
+        this.banned = banned;
     }
 
     public Blob getImage() {
