@@ -46,7 +46,6 @@ public class RegisterUITests {
     public void testRegisterUser() throws InterruptedException {
         driver.get("http://localhost:4200/auth/register");
 
-        // Espera a que los campos estén visibles
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("nombre")));
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("password")));
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("confirm-password")));
@@ -54,10 +53,8 @@ public class RegisterUITests {
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("direccion")));
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("nif")));
 
-        // Usuario único para cada ejecución
         String unique = "User" + System.currentTimeMillis();
 
-        // Rellenar formulario
         driver.findElement(By.id("nombre")).sendKeys(unique);
         driver.findElement(By.id("password")).sendKeys("password123");
         driver.findElement(By.id("confirm-password")).sendKeys("password123");
@@ -65,10 +62,8 @@ public class RegisterUITests {
         driver.findElement(By.id("direccion")).sendKeys("Calle Falsa 123");
         driver.findElement(By.id("nif")).sendKeys("12945678A");
 
-        
         WebElement submitButton = wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("button[type='submit']")));
 
-        
         Thread.sleep(200);
 
         submitButton.click();
