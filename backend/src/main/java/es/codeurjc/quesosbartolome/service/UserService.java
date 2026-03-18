@@ -48,6 +48,7 @@ public class UserService {
                 userDTO.direction(),
                 userDTO.nif(),
                 "USER");
+        user.setBanned(false);
 
         // Set default profile image
         try {
@@ -164,6 +165,18 @@ public class UserService {
 
         User user = userOpt.get();
         return user.getRols() != null && user.getRols().contains("ADMIN");
+    }
+
+    public Optional<UserDTO> toggleUserBan(Long id) {
+        Optional<User> userOpt = repository.findById(id);
+        if (userOpt.isEmpty()) {
+            return Optional.empty();
+        }
+
+        User user = userOpt.get();
+        user.setBanned(!user.isBanned());
+        repository.save(user);
+        return Optional.of(mapper.toDTO(user));
     }
 
 }

@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -40,6 +41,9 @@ public class UserLoginService {
 		
 		String username = loginRequest.getUsername();
 		UserDetails user = userDetailsService.loadUserByUsername(username);
+		if (!user.isEnabled()) {
+			throw new DisabledException("User is disabled");
+		}
 
 		HttpHeaders responseHeaders = new HttpHeaders();
 		var newAccessToken = jwtTokenProvider.generateAccessToken(user);
@@ -57,6 +61,9 @@ public class UserLoginService {
 		try {
 			var claims = jwtTokenProvider.validateToken(refreshToken);
 			UserDetails user = userDetailsService.loadUserByUsername(claims.getSubject());
+			if (!user.isEnabled()) {
+				throw new DisabledException("User is disabled");
+			}
 
 			var newAccessToken = jwtTokenProvider.generateAccessToken(user);
 			response.addCookie(buildTokenCookie(TokenType.ACCESS, newAccessToken));

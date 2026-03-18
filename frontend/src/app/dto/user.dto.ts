@@ -6,4 +6,5 @@ export interface UserDTO {
     direction: string;
     nif: string;
     rols: string[];
+    banned: boolean;
 }

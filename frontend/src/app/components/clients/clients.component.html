@@ -4,7 +4,7 @@
 
   <div class="users-card">
 
-    <!-- HEADER -->
+
     <div class="users-header header-highlight">
       <span>id</span>
       <span></span>
@@ -12,17 +12,17 @@
       <span>Email</span>
       <span>Dirección</span>
       <span>NIF</span>
+      <span>Estado</span>
       <span></span>
     </div>
 
-    <!-- ROWS -->
-    <div class="users-row" *ngFor="let user of users; let i = index">
+    <div class="users-row" [class.user-banned]="user.banned" (click)="goToUserProfile(user.id)" *ngFor="let user of users; let i = index">
       <span>{{ user.id }}</span>
 
-      <!-- Imagen -->
       <img
         class="avatar"
-        [src]="imageUrl || 'assets/avatar-default.jpg'"
+        [class.avatar-banned]="user.banned"
+        [src]="getUserImageUrl(user.id)"
         alt="avatar"
       />
 
@@ -31,14 +31,19 @@
       <span>{{ user.direction }}</span>
       <span>{{ user.nif }}</span>
 
-      <button class="btn-ban" (click)="banUser(user.id)">
-        Banear
+      <span>
+        <span class="status-pill" [class.status-pill-banned]="user.banned">
+          {{ user.banned ? 'BANEADO' : 'ACTIVO' }}
+        </span>
+      </span>
+
+      <button class="btn-ban" [class.btn-unban]="user.banned" (click)="$event.stopPropagation(); banUser(user)">
+        {{ user.banned ? 'Desbanear' : 'Banear' }}
       </button>
     </div>
 
   </div>
 
-  <!-- PAGINACIÓN -->
   <div class="pagination">
     <button class="arrow" (click)="prevPage()">‹</button>
     <span class="page-number">{{ currentPage + 1 }}</span>

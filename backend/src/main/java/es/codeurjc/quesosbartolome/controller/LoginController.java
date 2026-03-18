@@ -5,6 +5,8 @@ package es.codeurjc.quesosbartolome.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -33,8 +35,15 @@ public class LoginController {
 	public ResponseEntity<AuthResponse> login(
 			@RequestBody LoginRequest loginRequest,
 			HttpServletResponse response) {
-		
-		return userLoginService.login(response, loginRequest);
+        try {
+            return userLoginService.login(response, loginRequest);
+        } catch (DisabledException ex) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(new AuthResponse(Status.FAILURE, "No puedes iniciar sesion: tu cuenta esta baneada."));
+        } catch (BadCredentialsException ex) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new AuthResponse(Status.FAILURE, "Credenciales incorrectas."));
+        }
 	}
 
     @PostMapping("/refresh")

@@ -29,7 +29,12 @@ export class LoginComponent {
       },
       error: (err) => {
         console.error("Error en login:", err);
-        alert("Credenciales incorrectas.");
+        const backendMessage = err?.error?.message;
+        if (backendMessage) {
+          alert(backendMessage);
+        } else {
+          alert("Credenciales incorrectas.");
+        }
         if (err.status >= 500) {
           this.router.navigate(['/error']);
         }

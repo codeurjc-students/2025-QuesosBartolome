@@ -61,7 +61,8 @@ const mockCheeseBasic: CheeseBasicDTO = {
     gmail: 'pepito@gmail.com',
     direction: 'Calle Falsa 123',
     nif: '12345678A',
-    rols: ['USER']
+    rols: ['USER'],
+    banned: false
   };
 
   beforeEach(async () => {

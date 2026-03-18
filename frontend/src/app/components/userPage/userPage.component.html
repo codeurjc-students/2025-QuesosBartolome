@@ -2,7 +2,7 @@
 
   <div class="profile-header">
     
-    <div class="avatar-box" [class.avatar-editable]="isEditMode" (click)="onAvatarClick()">
+    <div class="avatar-box" [class.avatar-editable]="isEditMode" [class.avatar-banned]="user.banned" (click)="onAvatarClick()">
       <img 
         [src]="(isEditMode && previewImageUrl) ? previewImageUrl : (imageUrl || 'assets/avatar-default.jpg')" 
         alt="Avatar del usuario"
@@ -10,6 +10,7 @@
       <div class="avatar-overlay" *ngIf="isEditMode">
         <span>Cambiar foto</span>
       </div>
+      <div class="banned-badge" *ngIf="user.banned">BANEADO</div>
     </div>
     <input
       id="avatarFileInput"
@@ -20,6 +21,7 @@
     />
 
     <div class="profile-form card shadow-sm">
+      <p class="banned-notice" *ngIf="user.banned">Este usuario esta baneado.</p>
 
       <div *ngIf="!isPasswordMode">
 

@@ -22,7 +22,7 @@
 .users-header,
 .users-row {
   display: grid;
-  grid-template-columns: 60px 80px 1.5fr 2fr 2fr 1fr 120px;
+  grid-template-columns: 60px 80px 1.4fr 2fr 2fr 1fr 140px 120px;
   align-items: center;
   padding: 12px 0;
 }
@@ -36,6 +36,16 @@
 
 .users-row {
   border-bottom: 1px solid var(--gris-suave);
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.users-row:hover {
+  background: #f7f7f7;
+}
+
+.users-row.user-banned {
+  background: #fff0f0;
 }
 
 .users-row:last-child {
@@ -56,6 +66,29 @@
   border: 2px solid #222;
 }
 
+.avatar-banned {
+  border-color: #c1121f;
+}
+
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 90px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: #eef7ef;
+  color: #1f7a1f;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.status-pill-banned {
+  background: #ffe2e5;
+  color: #8f0011;
+}
+
 /* BOTÓN BANEADO */
 .btn-ban {
   background: #000;
@@ -70,6 +103,16 @@
 .btn-ban:hover {
   background: #fff;
   color: #000;
+}
+
+.btn-unban {
+  background: #c1121f;
+  border-color: #c1121f;
+}
+
+.btn-unban:hover {
+  background: #fff;
+  color: #c1121f;
 }
 
 /* PAGINACIÓN */

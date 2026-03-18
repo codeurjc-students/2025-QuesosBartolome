@@ -38,6 +38,11 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 			var claims = jwtTokenProvider.validateToken(request, true);
 			var userDetails = userDetailsService.loadUserByUsername(claims.getSubject());
 
+			if (!userDetails.isEnabled()) {
+				filterChain.doFilter(request, response);
+				return;
+			}
+
 			UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
 						userDetails, null, userDetails.getAuthorities());
 				

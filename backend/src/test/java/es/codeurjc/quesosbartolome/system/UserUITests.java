@@ -274,4 +274,40 @@ public class UserUITests {
                 restoreAlert.accept();
         }
 
+        @Order(7)
+        @Test
+        public void testAdminBansUserAndProfileShowsBannedMessage() {
+                login("German", "password123");
+
+                driver.get("http://localhost:4200/users");
+
+                WebElement userRow = wait.until(ExpectedConditions.visibilityOfElementLocated(
+                                By.xpath("//div[contains(@class,'users-row')][.//span[normalize-space()='User']]")));
+
+                WebElement banButton = userRow.findElement(By.cssSelector("button.btn-ban"));
+
+                if (banButton.getText().trim().equalsIgnoreCase("Desbanear")) {
+                        forceClick(banButton);
+                        Alert unbanConfirm = wait.until(ExpectedConditions.alertIsPresent());
+                        unbanConfirm.accept();
+                        wait.until(ExpectedConditions.textToBePresentInElement(banButton, "Banear"));
+                }
+
+                forceClick(banButton);
+                Alert banConfirm = wait.until(ExpectedConditions.alertIsPresent());
+                banConfirm.accept();
+
+                wait.until(ExpectedConditions.visibilityOfElementLocated(
+                                By.xpath("//div[contains(@class,'users-row')][.//span[normalize-space()='User']]//span[contains(@class,'status-pill') and normalize-space()='BANEADO']")));
+
+                WebElement bannedUserRow = wait.until(ExpectedConditions.elementToBeClickable(
+                                By.xpath("//div[contains(@class,'users-row')][.//span[normalize-space()='User']]")));
+                forceClick(bannedUserRow);
+
+                WebElement bannedMessage = wait.until(ExpectedConditions.visibilityOfElementLocated(
+                                By.cssSelector(".banned-notice")));
+
+                assertTrue(bannedMessage.getText().toLowerCase().contains("baneado"));
+        }
+
 }

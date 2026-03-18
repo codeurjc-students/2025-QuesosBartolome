@@ -24,7 +24,8 @@ export class UserPageComponent implements OnInit {
     gmail: '',
     direction: '',
     nif: '',
-    rols: []
+    rols: [],
+    banned: false
   };
 
   currentUser: UserDTO | null = null;
