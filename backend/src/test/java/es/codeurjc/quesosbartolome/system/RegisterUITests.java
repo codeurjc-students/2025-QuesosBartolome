@@ -54,13 +54,14 @@ public class RegisterUITests {
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("nif")));
 
         String unique = "User" + System.currentTimeMillis();
+        String nif = (System.currentTimeMillis() % 100000000) + "A";
 
         driver.findElement(By.id("nombre")).sendKeys(unique);
         driver.findElement(By.id("password")).sendKeys("password123");
         driver.findElement(By.id("confirm-password")).sendKeys("password123");
         driver.findElement(By.id("email")).sendKeys(unique + "@test.com");
         driver.findElement(By.id("direccion")).sendKeys("Calle Falsa 123");
-        driver.findElement(By.id("nif")).sendKeys("12945678A");
+        driver.findElement(By.id("nif")).sendKeys(nif);
 
         WebElement submitButton = wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("button[type='submit']")));
 
