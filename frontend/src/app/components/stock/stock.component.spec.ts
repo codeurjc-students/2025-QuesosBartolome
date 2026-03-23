@@ -3,7 +3,6 @@ import { of, throwError } from 'rxjs';
 import { StockComponent } from './stock.component';
 import { CheeseService } from '../../service/cheese.service';
 import { Router } from '@angular/router';
-import { DebugElement } from '@angular/core';
 import { By } from '@angular/platform-browser';
 import { CheeseDTO } from '../../dto/cheese.dto';
 
@@ -144,6 +143,27 @@ describe('StockComponent (unit)', () => {
 
         component.nextCheesePage();
         expect(component.currentCheesePage).toBe(1);
+    });
+
+    it('should not navigate past last cheese page', () => {
+        component.totalCheeses = 6;
+        component.cheesePageSize = 3;
+        component.currentCheesePage = 1;
+
+        spyOn(component, 'loadCheeses');
+
+        component.nextCheesePage();
+
+        expect(component.currentCheesePage).toBe(1);
+        expect(component.loadCheeses).not.toHaveBeenCalled();
+        expect(component.isNextCheesePageDisabled()).toBeTrue();
+    });
+
+    it('should compute totalCheesePages correctly', () => {
+        component.totalCheeses = 7;
+        component.cheesePageSize = 3;
+
+        expect(component.totalCheesePages).toBe(3);
     });
 
     it('should navigate to /error when server fails', () => {

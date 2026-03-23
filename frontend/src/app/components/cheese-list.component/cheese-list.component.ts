@@ -97,6 +97,9 @@ export class CheeseListComponent implements OnInit {
   goToOrders(): void {
     this.router.navigate(['/orders']);
   }
+  goToInvoices(): void {
+    this.router.navigate(['/invoices']);
+  }
   goToClients(): void {
     this.router.navigate(['/users']);
   }

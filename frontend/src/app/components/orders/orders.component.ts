@@ -18,8 +18,9 @@ export class OrdersComponent implements OnInit {
 
   currentPage = 0;
   pageSize = 10;
+  totalPages = 0;
 
-  constructor(private orderService: OrderService, private router: Router) {}
+  constructor(private orderService: OrderService, private router: Router) { }
 
   ngOnInit(): void {
     this.loadOrders();
@@ -29,9 +30,7 @@ export class OrdersComponent implements OnInit {
     this.orderService.getAllOrders(this.currentPage, this.pageSize).subscribe({
       next: (data) => {
         this.orders = data.content;
-        console.log('Pedidos cargados:', this.orders);
-        console.log(data.content);
-        console.log(data);
+        this.totalPages = data.totalPages;
         this.loading = false;
       },
       error: (err) => {
@@ -45,18 +44,20 @@ export class OrdersComponent implements OnInit {
   }
 
   nextPage() {
-    this.currentPage++;
-    this.loadOrders();
+    if (this.currentPage < this.totalPages - 1) {
+      this.currentPage++;
+      this.loadOrders();
+    }
   }
 
   prevPage() {
-    if (this.currentPage >= 1) {
+    if (this.currentPage > 0) {
       this.currentPage--;
       this.loadOrders();
     }
   }
 
   processOrder(orderId: number) {
-    console.log('Procesar pedido:', orderId);
+    this.router.navigate(['/orders', orderId, 'preview']);
   }
 }

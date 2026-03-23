@@ -19,6 +19,7 @@ export class ClientsComponent implements OnInit {
 
     currentPage = 0;
     pageSize = 10;
+    totalPages = 0;
 
     constructor(private userService: UserService, private router: Router) { }
 
@@ -30,6 +31,7 @@ export class ClientsComponent implements OnInit {
         this.userService.getAllUsers(this.currentPage, this.pageSize).subscribe({
             next: (data) => {
                 this.users = data.content;
+                this.totalPages = data.totalPages;
                 this.imageUrls = {};
                 this.users.forEach(user => this.loadUserImage(user));
             },
@@ -62,8 +64,10 @@ export class ClientsComponent implements OnInit {
     }
 
     nextPage() {
-        this.currentPage++;
-        this.loadUsers();
+        if (this.currentPage < this.totalPages - 1) {
+            this.currentPage++;
+            this.loadUsers();
+        }
     }
 
     prevPage() {

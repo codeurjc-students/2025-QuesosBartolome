@@ -28,6 +28,7 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -53,13 +54,13 @@ class OrderServiceUnitTest {
         o2.setId(2L);
 
         Page<Order> page = new PageImpl<>(List.of(o1, o2));
-        when(orderRepository.findByOrderDateNotNull(any(Pageable.class))).thenReturn(page);
+        when(orderRepository.findByProcessedFalse(any(Pageable.class))).thenReturn(page);
 
         Page<OrderDTO> result = orderService.getAllOrders(Pageable.unpaged());
 
         assertThat(result).hasSize(2);
         assertThat(result.map(OrderDTO::id).toList()).contains(1L, 2L);
-        verify(orderRepository).findByOrderDateNotNull(any(Pageable.class));
+        verify(orderRepository).findByProcessedFalse(any(Pageable.class));
     }
 
     @Test
@@ -161,4 +162,81 @@ class OrderServiceUnitTest {
         verify(orderRepository).save(any(Order.class));
         verify(userRepository).save(user);
     }
+
+    @Test
+    void getOrderByIdReturnsDTOWhenFoundAndNotProcessed() {
+        Order order = new Order();
+        order.setId(10L);
+        order.setProcessed(false);
+
+        when(orderRepository.findByIdAndProcessedFalse(10L))
+                .thenReturn(Optional.of(order));
+
+        Optional<OrderDTO> result = orderService.getOrderById(10L);
+
+        assertThat(result).isPresent();
+        assertThat(result.get().id()).isEqualTo(10L);
+        verify(orderRepository).findByIdAndProcessedFalse(10L);
+    }
+
+    @Test
+    void getOrderByIdReturnsEmptyWhenNotFound() {
+        when(orderRepository.findByIdAndProcessedFalse(20L))
+                .thenReturn(Optional.empty());
+
+        Optional<OrderDTO> result = orderService.getOrderById(20L);
+
+        assertThat(result).isEmpty();
+        verify(orderRepository).findByIdAndProcessedFalse(20L);
+    }
+
+    @Test
+    void rejectOrderThrowsWhenOrderNotFound() {
+        when(orderRepository.findById(99L)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> orderService.rejectOrder(99L))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("Order not found");
+
+        verify(orderRepository).findById(99L);
+    }
+
+    @Test
+    void rejectOrderThrowsWhenAlreadyProcessed() {
+        Order order = new Order();
+        order.setId(5L);
+        order.setProcessed(true);
+
+        when(orderRepository.findById(5L)).thenReturn(Optional.of(order));
+
+        assertThatThrownBy(() -> orderService.rejectOrder(5L))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("Order already processed");
+
+        verify(orderRepository).findById(5L);
+    }
+
+    @Test
+    void rejectOrderMarksAsProcessedAndReturnsDTO() {
+        Order order = new Order();
+        order.setId(7L);
+        order.setProcessed(false);
+
+        when(orderRepository.findById(7L)).thenReturn(Optional.of(order));
+        when(orderRepository.save(any(Order.class))).thenAnswer(inv -> {
+            Order o = inv.getArgument(0);
+            o.setId(7L);
+            return o;
+        });
+
+        OrderDTO dto = orderService.rejectOrder(7L);
+
+        assertThat(dto).isNotNull();
+        assertThat(dto.id()).isEqualTo(7L);
+        assertThat(order.isProcessed()).isTrue();
+
+        verify(orderRepository).findById(7L);
+        verify(orderRepository).save(order);
+    }
+
 }

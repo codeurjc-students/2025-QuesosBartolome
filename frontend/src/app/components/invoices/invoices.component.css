@@ -1,17 +1,17 @@
-.orders-container {
+.invoices-container {
   display: flex;
   flex-direction: column;
   align-items: center;
   padding: 40px 0;
 }
 
-.orders-container h1 {
+.invoices-container h1 {
   width: 80%;
   margin-bottom: 20px;
   font-size: 2rem;
 }
 
-.orders-card {
+.invoices-card {
   width: 80%;
   background: var(--blanco);
   padding: 20px;
@@ -19,10 +19,10 @@
   box-shadow: var(--shadow);
 }
 
-.orders-header,
-.orders-row {
+.invoices-header,
+.invoices-row {
   display: grid;
-  grid-template-columns: 60px 1.5fr 1fr 100px 120px 120px 120px;
+  grid-template-columns: 1.4fr 1.2fr 1fr 1fr 140px;
   align-items: center;
   padding: 12px 0;
 }
@@ -34,17 +34,22 @@
   border-radius: 8px;
 }
 
-.orders-row {
+.invoices-row {
   border-bottom: 1px solid var(--gris-suave);
 }
 
-.orders-row:last-child {
+.invoices-row:last-child {
   border-bottom: none;
 }
 
-.orders-header span,
-.orders-row span {
+.invoices-header span,
+.invoices-row span {
   padding-left: 10px;
+}
+
+.invno {
+  font-weight: 600;
+  color: var(--rojo-vino);
 }
 
 .badge {
@@ -57,7 +62,7 @@
   width: fit-content;
 }
 
-.btn-process {
+.btn-download {
   background: #000;
   color: #fff;
   border: 2px solid #000;
@@ -67,12 +72,17 @@
   transition: all 0.3s ease;
 }
 
-.btn-process:hover {
+.btn-download:hover {
   background: #fff;
   color: #000;
 }
 
-/* PAGINACIÓN */
+.empty-state {
+  text-align: center;
+  color: #666;
+  padding: 18px 0;
+}
+
 .pagination {
   display: flex;
   align-items: center;
@@ -104,4 +114,24 @@
 .page-number {
   font-size: 1.2rem;
   font-weight: bold;
+}
+
+@media (max-width: 960px) {
+  .invoices-container h1,
+  .invoices-card {
+    width: 95%;
+  }
+
+  .invoices-header,
+  .invoices-row {
+    grid-template-columns: 1.3fr 1fr 1fr;
+    gap: 6px;
+  }
+
+  .invoices-header span:nth-child(4),
+  .invoices-header span:nth-child(5),
+  .invoices-row span:nth-child(4),
+  .invoices-row button {
+    display: none;
+  }
 }

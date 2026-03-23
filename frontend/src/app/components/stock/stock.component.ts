@@ -39,6 +39,15 @@ export class StockComponent implements OnInit {
     this.loadCheeses();
   }
 
+  get totalCheesePages(): number {
+    return Math.ceil(this.totalCheeses / this.cheesePageSize);
+  }
+
+  getBoxTotalPages(cheeseStock: CheeseStock): number {
+    const boxes = cheeseStock.cheese.boxes || [];
+    return Math.ceil(boxes.length / this.boxPageSize);
+  }
+
   loadCheeses() {
     this.loading = true;
     this.cheeseService.getAllCheeses().subscribe({

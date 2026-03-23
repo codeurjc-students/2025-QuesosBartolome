@@ -88,4 +88,98 @@ beforeEach(() => {
     });
   });
 
+  it('should retrieve order by id after creating order (admin access)', (done) => {
+    loginService.login('Victor', 'password123').subscribe({
+      next: () => {
+        cartService.addCheeseToOrder(1, 1, 1).subscribe({
+          next: () => {
+            service.confirmOrder().subscribe({
+              next: (createdOrder: OrderDTO) => {
+                loginService.login('German', 'password123').subscribe({
+                  next: () => {
+                    service.getOrderById(createdOrder.id).subscribe({
+                      next: (fetchedOrder: OrderDTO) => {
+                        expect(fetchedOrder).toBeTruthy();
+                        expect(fetchedOrder.id).toBe(createdOrder.id);
+                        expect(Array.isArray(fetchedOrder.items)).toBeTrue();
+                        done();
+                      },
+                      error: (err) => {
+                        fail('Failed to fetch order by id: ' + err.message);
+                        done();
+                      }
+                    });
+                  },
+                  error: (err) => {
+                    fail('Admin login failed before fetching by id: ' + err.message);
+                    done();
+                  }
+                });
+              },
+              error: (err) => {
+                fail('Failed to confirm order before getOrderById: ' + err.message);
+                done();
+              }
+            });
+          },
+          error: (err) => {
+            fail('Failed to add item before getOrderById test: ' + err.message);
+            done();
+          }
+        });
+      },
+      error: (err) => {
+        fail('User login failed before getOrderById test: ' + err.message);
+        done();
+      }
+    });
+  });
+
+  it('should reject order by id after creating order (admin access)', (done) => {
+    loginService.login('Victor', 'password123').subscribe({
+      next: () => {
+        cartService.addCheeseToOrder(1, 1, 1).subscribe({
+          next: () => {
+            service.confirmOrder().subscribe({
+              next: (createdOrder: OrderDTO) => {
+                loginService.login('German', 'password123').subscribe({
+                  next: () => {
+                    service.rejectOrder(createdOrder.id).subscribe({
+                      next: (rejectedOrder: OrderDTO) => {
+                        expect(rejectedOrder).toBeTruthy();
+                        expect(rejectedOrder.id).toBe(createdOrder.id);
+                        expect(Array.isArray(rejectedOrder.items)).toBeTrue();
+                        done();
+                      },
+                      error: (err) => {
+                        fail('Failed to reject order by id: ' + err.message);
+                        done();
+                      }
+                    });
+                  },
+                  error: (err) => {
+                    fail('Admin login failed before rejectOrder: ' + err.message);
+                    done();
+                  }
+                });
+              },
+              error: (err) => {
+                fail('Failed to confirm order before rejectOrder: ' + err.message);
+                done();
+              }
+            });
+          },
+          error: (err) => {
+            fail('Failed to add item before rejectOrder test: ' + err.message);
+            done();
+          }
+        });
+      },
+      error: (err) => {
+        fail('User login failed before rejectOrder test: ' + err.message);
+        done();
+      }
+    });
+  });
+
 });

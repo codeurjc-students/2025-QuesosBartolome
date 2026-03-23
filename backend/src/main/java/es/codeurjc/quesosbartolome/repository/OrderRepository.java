@@ -9,6 +9,7 @@ import es.codeurjc.quesosbartolome.model.Order;
 
 @Repository
 public interface OrderRepository extends JpaRepository<Order, Long> {
-    Page<Order> findByOrderDateNotNull(Pageable pageable);
+    Page<Order> findByProcessedFalse(Pageable pageable);
+    java.util.Optional<Order> findByIdAndProcessedFalse(Long id);
 
 }

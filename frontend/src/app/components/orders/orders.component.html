@@ -31,10 +31,10 @@
   </div>
 
   <!-- PAGINACIÓN -->
-  <div class="pagination">
-    <button class="arrow" (click)="prevPage()">‹</button>
+  <div class="pagination" *ngIf="totalPages > 0">
+    <button class="arrow" [disabled]="currentPage === 0" (click)="prevPage()">‹</button>
     <span class="page-number">{{ currentPage + 1 }}</span>
-    <button class="arrow" (click)="nextPage()">›</button>
+    <button class="arrow" [disabled]="currentPage >= totalPages - 1" (click)="nextPage()">›</button>
   </div>
 
 </div>

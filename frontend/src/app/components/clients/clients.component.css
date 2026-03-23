@@ -134,9 +134,14 @@
   transition: all 0.3s;
 }
 
-.arrow:hover {
+.arrow:hover:not(:disabled) {
   background: #000;
   color: #fff;
+}
+
+.arrow:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
 }
 
 .page-number {
