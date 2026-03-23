@@ -66,7 +66,15 @@ public class OrderRestController {
 
             return ResponseEntity.created(location).body(dto);
         } catch (IllegalStateException e) {
+            // Cart is empty or not initialized
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        } catch (IllegalArgumentException e) {
+            // User not found (should not happen after principal check, but defensive)
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        } catch (Exception e) {
+            // Unexpected error - log and return 500
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 

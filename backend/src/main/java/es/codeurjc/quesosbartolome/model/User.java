@@ -42,6 +42,7 @@ public class User {
     private List<Order> orders = new ArrayList<>();
 
     public User() {
+        this.cart = new Cart(this);
     }
 
     public User(String name, String password, String gmail, String direction, String nif, String... rols) {

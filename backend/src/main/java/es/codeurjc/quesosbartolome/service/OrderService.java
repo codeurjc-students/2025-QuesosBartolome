@@ -66,9 +66,15 @@ public class OrderService {
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
+        
         Cart cart = user.getCart();
 
-        if (cart == null || cart.getItems().isEmpty()) {
+        // Validación robusta contra null o carrito vacío
+        if (cart == null) {
+            throw new IllegalStateException("Cart is not initialized for user");
+        }
+
+        if (cart.getItems() == null || cart.getItems().isEmpty()) {
             throw new IllegalStateException("Cart is empty");
         }
 
