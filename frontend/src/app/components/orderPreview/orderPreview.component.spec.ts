@@ -12,7 +12,7 @@ describe('OrderPreviewComponent', () => {
   let mockOrderService: jasmine.SpyObj<OrderService>;
   let mockInvoiceService: jasmine.SpyObj<InvoiceService>;
   let mockRouter: jasmine.SpyObj<Router>;
-  let routeId = '12';
+  let mockActivatedRoute: any;
 
   const mockOrder = {
     id: 12,
@@ -42,20 +42,19 @@ describe('OrderPreviewComponent', () => {
     mockOrderService.rejectOrder.and.returnValue(of(mockOrder));
     mockInvoiceService.createInvoiceFromOrder.and.returnValue(of({ invNo: 'FACT-Q26/12' } as any));
 
+    mockActivatedRoute = {
+      snapshot: {
+        paramMap: convertToParamMap({ id: '12' })
+      }
+    };
+
     await TestBed.configureTestingModule({
       imports: [OrderPreviewComponent],
       providers: [
         { provide: OrderService, useValue: mockOrderService },
         { provide: InvoiceService, useValue: mockInvoiceService },
         { provide: Router, useValue: mockRouter },
-        {
-          provide: ActivatedRoute,
-          useValue: {
-            get snapshot() {
-              return { paramMap: convertToParamMap({ id: routeId }) };
-            }
-          }
-        }
+        { provide: ActivatedRoute, useValue: mockActivatedRoute }
       ]
     }).compileComponents();
 
@@ -74,38 +73,83 @@ describe('OrderPreviewComponent', () => {
   });
 
   it('should navigate to /orders when route id is invalid', () => {
-    routeId = 'abc';
+    TestBed.resetTestingModule();
+    
+    const invalidMockActivatedRoute = {
+      snapshot: {
+        paramMap: convertToParamMap({ id: 'abc' })
+      }
+    };
+
+    TestBed.configureTestingModule({
+      imports: [OrderPreviewComponent],
+      providers: [
+        { provide: OrderService, useValue: mockOrderService },
+        { provide: InvoiceService, useValue: mockInvoiceService },
+        { provide: Router, useValue: mockRouter },
+        { provide: ActivatedRoute, useValue: invalidMockActivatedRoute }
+      ]
+    }).compileComponents();
+
     mockRouter.navigate.calls.reset();
     mockOrderService.getOrderById.calls.reset();
 
-    component.loading = true;
-    component.ngOnInit();
+    const newFixture = TestBed.createComponent(OrderPreviewComponent);
+    newFixture.detectChanges();
 
     expect(mockRouter.navigate).toHaveBeenCalledWith(['/orders']);
     expect(mockOrderService.getOrderById).not.toHaveBeenCalled();
   });
 
   it('should navigate to /orders when order load returns 404', () => {
-    routeId = '12';
-    mockOrderService.getOrderById.and.returnValue(throwError(() => ({ status: 404 })));
+    TestBed.resetTestingModule();
+
+    const mock404OrderService = jasmine.createSpyObj('OrderService', ['getOrderById', 'rejectOrder']);
+    mock404OrderService.getOrderById.and.returnValue(throwError(() => ({ status: 404 })));
+    mock404OrderService.rejectOrder.and.returnValue(of(mockOrder));
+
+    TestBed.configureTestingModule({
+      imports: [OrderPreviewComponent],
+      providers: [
+        { provide: OrderService, useValue: mock404OrderService },
+        { provide: InvoiceService, useValue: mockInvoiceService },
+        { provide: Router, useValue: mockRouter },
+        { provide: ActivatedRoute, useValue: mockActivatedRoute }
+      ]
+    }).compileComponents();
+
     mockRouter.navigate.calls.reset();
 
-    component.loading = true;
-    component.ngOnInit();
+    const newFixture = TestBed.createComponent(OrderPreviewComponent);
+    newFixture.detectChanges();
 
-    expect(component.loading).toBeFalse();
+    expect(mock404OrderService.getOrderById).toHaveBeenCalledWith(12);
     expect(mockRouter.navigate).toHaveBeenCalledWith(['/orders']);
   });
 
   it('should navigate to /error when order load returns 500', () => {
-    routeId = '12';
-    mockOrderService.getOrderById.and.returnValue(throwError(() => ({ status: 500 })));
+    TestBed.resetTestingModule();
+
+    const mock500OrderService = jasmine.createSpyObj('OrderService', ['getOrderById', 'rejectOrder']);
+    mock500OrderService.getOrderById.and.returnValue(throwError(() => ({ status: 500 })));
+    mock500OrderService.rejectOrder.and.returnValue(of(mockOrder));
+
+    TestBed.configureTestingModule({
+      imports: [OrderPreviewComponent],
+      providers: [
+        { provide: OrderService, useValue: mock500OrderService },
+        { provide: InvoiceService, useValue: mockInvoiceService },
+        { provide: Router, useValue: mockRouter },
+        { provide: ActivatedRoute, useValue: mockActivatedRoute }
+      ]
+    }).compileComponents();
+
     mockRouter.navigate.calls.reset();
 
-    component.loading = true;
-    component.ngOnInit();
+    const newFixture = TestBed.createComponent(OrderPreviewComponent);
+    newFixture.detectChanges();
 
-    expect(component.loading).toBeFalse();
+    expect(mock500OrderService.getOrderById).toHaveBeenCalledWith(12);
     expect(mockRouter.navigate).toHaveBeenCalledWith(['/error']);
   });
 
