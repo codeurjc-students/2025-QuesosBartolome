@@ -104,7 +104,7 @@ class OrderServiceUnitTest {
 
         assertThatThrownBy(() -> orderService.confirmOrder(1L))
                 .isInstanceOf(IllegalStateException.class)
-                .hasMessageContaining("Cart is empty");
+                .hasMessageContaining("Cart is not initialized for user");
 
         Cart emptyCart = new Cart();
         emptyCart.setItems(new ArrayList<>());
