@@ -69,7 +69,6 @@ public class OrderService {
         
         Cart cart = user.getCart();
 
-        // Validación robusta contra null o carrito vacío
         if (cart == null) {
             throw new IllegalStateException("Cart is not initialized for user");
         }
