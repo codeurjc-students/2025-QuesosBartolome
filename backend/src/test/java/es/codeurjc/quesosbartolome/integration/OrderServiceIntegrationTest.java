@@ -72,7 +72,7 @@ public class OrderServiceIntegrationTest {
         user.setOrders(new ArrayList<>());
         userRepository.save(user);
 
-        // Cheese with boxes to avoid conflicts with other tests    
+        // Cheese with boxes to avoid conflicts with other tests
         cheese = new Cheese(null, "Curado", 10.0, "desc", "tipo", "2024-01-01", "2025-01-01");
         cheese.setBoxes(new ArrayList<>(List.of(1.0, 2.0, 3.0)));
         cheeseRepository.save(cheese);
@@ -165,4 +165,73 @@ public class OrderServiceIntegrationTest {
         assertThat(user.getCart().getTotalPrice()).isEqualTo(0.0);
         assertThat(user.getCart().getTotalWeight()).isEqualTo(0.0);
     }
+
+    @Test
+    void getOrderByIdReturnsDTOWhenFoundAndNotProcessed() {
+        Order order = new Order(user);
+        order.setTotalPrice(15.0);
+        order.setTotalWeight(3.0);
+        order.setProcessed(false);
+        orderRepository.save(order);
+
+        Optional<OrderDTO> result = orderService.getOrderById(order.getId());
+
+        assertThat(result).isPresent();
+        assertThat(result.get().id()).isEqualTo(order.getId());
+        assertThat(result.get().totalPrice()).isEqualTo(15.0);
+    }
+
+    @Test
+    void getOrderByIdReturnsEmptyWhenNotFound() {
+        Optional<OrderDTO> result = orderService.getOrderById(999L);
+
+        assertThat(result).isEmpty();
+    }
+
+    @Test
+    void getOrderByIdReturnsEmptyWhenOrderIsProcessed() {
+        Order order = new Order(user);
+        order.setProcessed(true);
+        orderRepository.save(order);
+
+        Optional<OrderDTO> result = orderService.getOrderById(order.getId());
+
+        assertThat(result).isEmpty();
+    }
+
+    @Test
+    void rejectOrderThrowsWhenOrderNotFound() {
+        assertThatThrownBy(() -> orderService.rejectOrder(12345L))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("Order not found");
+    }
+
+    @Test
+    void rejectOrderMarksOrderAsProcessedAndReturnsDTO() {
+        Order order = new Order(user);
+        order.setProcessed(false);
+        order.setTotalPrice(30.0);
+        order.setTotalWeight(5.0);
+        orderRepository.save(order);
+
+        OrderDTO dto = orderService.rejectOrder(order.getId());
+
+        Order updated = orderRepository.findById(order.getId()).orElseThrow();
+
+        assertThat(dto).isNotNull();
+        assertThat(dto.id()).isEqualTo(order.getId());
+        assertThat(updated.isProcessed()).isTrue();
+    }
+
+    @Test
+    void rejectOrderThrowsWhenAlreadyProcessed() {
+        Order order = new Order(user);
+        order.setProcessed(true);
+        orderRepository.save(order);
+
+        assertThatThrownBy(() -> orderService.rejectOrder(order.getId()))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("Order already processed");
+    }
+
 }

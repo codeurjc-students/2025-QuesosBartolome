@@ -4,7 +4,7 @@ import { OrdersComponent } from './orders.component';
 import { OrderService } from '../../service/order.service';
 import { OrderDTO } from '../../dto/order.dto';
 import { By } from '@angular/platform-browser';
-import { DebugElement } from '@angular/core';
+import { Router } from '@angular/router';
 
 describe('OrdersComponent (unit)', () => {
 
@@ -12,12 +12,15 @@ describe('OrdersComponent (unit)', () => {
   let fixture: ComponentFixture<OrdersComponent>;
 
   let mockOrderService: jasmine.SpyObj<OrderService>;
+  let mockRouter: jasmine.SpyObj<Router>;
 
   beforeEach(async () => {
 
     mockOrderService = jasmine.createSpyObj('OrderService', [
       'getAllOrders'
     ]);
+
+    mockRouter = jasmine.createSpyObj('Router', ['navigate']);
 
     const mockOrders: OrderDTO[] = [
       {
@@ -53,7 +56,8 @@ describe('OrdersComponent (unit)', () => {
     await TestBed.configureTestingModule({
       imports: [OrdersComponent],
       providers: [
-        { provide: OrderService, useValue: mockOrderService }
+        { provide: OrderService, useValue: mockOrderService },
+        { provide: Router, useValue: mockRouter }
       ]
     }).compileComponents();
 
@@ -63,9 +67,7 @@ describe('OrdersComponent (unit)', () => {
   });
 
   it('should load and render orders', () => {
-    const debug: DebugElement = fixture.debugElement;
-
-    const rows = debug.queryAll(By.css('.orders-row'));
+    const rows = fixture.debugElement.queryAll(By.css('.orders-row'));
     expect(rows.length).toBe(1);
 
     const userName = rows[0].query(By.css('span:nth-child(2)'))
@@ -74,11 +76,27 @@ describe('OrdersComponent (unit)', () => {
     expect(userName).toBe('Victor');
   });
 
-  it('should call service with correct page when nextPage is called', () => {
+  it('should call service with correct page when nextPage is called and there are more pages', () => {
+    component.currentPage = 0;
+    component.totalPages = 3;
+    mockOrderService.getAllOrders.calls.reset();
+
     component.nextPage();
 
+    expect(component.currentPage).toBe(1);
     expect(mockOrderService.getAllOrders)
       .toHaveBeenCalledWith(1, component.pageSize);
+  });
+
+  it('should not go past last page', () => {
+    component.currentPage = 0;
+    component.totalPages = 1;
+    mockOrderService.getAllOrders.calls.reset();
+
+    component.nextPage();
+
+    expect(component.currentPage).toBe(0);
+    expect(mockOrderService.getAllOrders).not.toHaveBeenCalled();
   });
 
   it('should decrease page when prevPage is called', () => {
@@ -93,10 +111,12 @@ describe('OrdersComponent (unit)', () => {
 
   it('should not go to negative page', () => {
     component.currentPage = 0;
+    mockOrderService.getAllOrders.calls.reset();
 
     component.prevPage();
 
     expect(component.currentPage).toBe(0);
+    expect(mockOrderService.getAllOrders).not.toHaveBeenCalled();
   });
 
   it('should handle error when service fails', () => {
@@ -107,6 +127,23 @@ describe('OrdersComponent (unit)', () => {
     component.loadOrders();
 
     expect(component.loading).toBeFalse();
+  });
+
+  it('should navigate to /error when service fails with 500', () => {
+    mockOrderService.getAllOrders.and.returnValue(
+      throwError(() => ({ status: 500 }))
+    );
+
+    component.loadOrders();
+
+    expect(component.loading).toBeFalse();
+    expect(mockRouter.navigate).toHaveBeenCalledWith(['/error']);
+  });
+
+  it('should navigate to preview route when processing an order', () => {
+    component.processOrder(1);
+
+    expect(mockRouter.navigate).toHaveBeenCalledWith(['/orders', 1, 'preview']);
   });
 
 });

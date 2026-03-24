@@ -1,0 +1,37 @@
+<div class="invoices-container">
+
+  <h1>Facturas</h1>
+
+  <div class="invoices-card">
+
+    <div class="invoices-header header-highlight">
+      <span>Nº Factura</span>
+      <span>Usuario</span>
+      <span>Base imponible</span>
+      <span>Total</span>
+      <span></span>
+    </div>
+
+    <div class="invoices-row" *ngFor="let invoice of invoices">
+      <span class="invno">{{ invoice.invNo }}</span>
+      <span>{{ invoice.user.name }}</span>
+      <span class="badge">€{{ invoice.taxableBase | number:'1.2-2' }}</span>
+      <span class="badge">€{{ invoice.totalPrice | number:'1.2-2' }}</span>
+      <button class="btn-download" (click)="downloadInvoice(invoice)">
+        Descargar
+      </button>
+    </div>
+
+    <div class="empty-state" *ngIf="!loading && invoices.length === 0">
+      No hay facturas para mostrar.
+    </div>
+
+  </div>
+
+  <div class="pagination" *ngIf="totalPages > 0">
+    <button class="arrow" [disabled]="currentPage === 0" (click)="prevPage()">‹</button>
+    <span class="page-number">{{ currentPage + 1 }}</span>
+    <button class="arrow" [disabled]="currentPage >= totalPages - 1" (click)="nextPage()">›</button>
+  </div>
+
+</div>

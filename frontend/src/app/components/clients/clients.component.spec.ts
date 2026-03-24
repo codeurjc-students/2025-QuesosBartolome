@@ -4,7 +4,6 @@ import { ClientsComponent } from './clients.component';
 import { UserService } from '../../service/user.service';
 import { UserDTO } from '../../dto/user.dto';
 import { By } from '@angular/platform-browser';
-import { DebugElement } from '@angular/core';
 import { Router } from '@angular/router';
 
 describe('ClientsComponent (unit)', () => {
@@ -83,9 +82,26 @@ describe('ClientsComponent (unit)', () => {
     expect(component.users.length).toBe(0);
   });
 
-  it('should call service with correct page when nextPage is called', () => {
+  it('should go to next page and load users when there are more pages', () => {
+    component.currentPage = 0;
+    component.totalPages = 3;
+    mockUserService.getAllUsers.calls.reset();
+
     component.nextPage();
+
+    expect(component.currentPage).toBe(1);
     expect(mockUserService.getAllUsers).toHaveBeenCalledWith(1, component.pageSize);
+  });
+
+  it('should not go past last page', () => {
+    component.currentPage = 0;
+    component.totalPages = 1;
+    mockUserService.getAllUsers.calls.reset();
+
+    component.nextPage();
+
+    expect(component.currentPage).toBe(0);
+    expect(mockUserService.getAllUsers).not.toHaveBeenCalled();
   });
 
   it('should decrease page when prevPage is called', () => {

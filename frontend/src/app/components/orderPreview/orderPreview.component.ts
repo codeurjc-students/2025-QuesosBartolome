@@ -1,0 +1,133 @@
+import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { ActivatedRoute, Router } from '@angular/router';
+import { OrderDTO } from '../../dto/order.dto';
+import { OrderService } from '../../service/order.service';
+import { InvoiceService } from '../../service/invoice.service';
+
+@Component({
+  selector: 'app-order-preview',
+  standalone: true,
+  imports: [CommonModule],
+  templateUrl: './orderPreview.component.html',
+  styleUrls: ['./orderPreview.component.css']
+})
+export class OrderPreviewComponent implements OnInit {
+
+  order: OrderDTO | null = null;
+  loading = true;
+  creatingInvoice = false;
+  rejectingOrder = false;
+
+  constructor(
+    private route: ActivatedRoute,
+    private router: Router,
+    private orderService: OrderService,
+    private invoiceService: InvoiceService
+  ) { }
+
+  ngOnInit(): void {
+    const id = Number(this.route.snapshot.paramMap.get('id'));
+
+    if (!id || Number.isNaN(id)) {
+      this.router.navigate(['/orders']);
+      return;
+    }
+
+    this.orderService.getOrderById(id).subscribe({
+      next: (data) => {
+        this.order = data;
+        this.loading = false;
+      },
+      error: (err) => {
+        this.loading = false;
+
+        if (err.status === 404) {
+          this.router.navigate(['/orders']);
+          return;
+        }
+
+        if (err.status >= 500) {
+          this.router.navigate(['/error']);
+          return;
+        }
+
+        this.router.navigate(['/orders']);
+      }
+    });
+  }
+
+  goBack(): void {
+    this.router.navigate(['/orders']);
+  }
+
+  onConfirm(): void {
+    if (!this.order || this.creatingInvoice) {
+      return;
+    }
+
+    this.creatingInvoice = true;
+
+    this.invoiceService.createInvoiceFromOrder(this.order).subscribe({
+      next: (invoice) => {
+        this.creatingInvoice = false;
+        alert(`Factura creada correctamente: ${invoice.invNo}`);
+        this.router.navigate(['/orders']);
+      },
+      error: (err) => {
+        this.creatingInvoice = false;
+
+        if (err.status === 409) {
+          alert('Este pedido ya estaba procesado y ya tiene factura.');
+          this.router.navigate(['/orders']);
+          return;
+        }
+
+        if (err.status >= 500) {
+          this.router.navigate(['/error']);
+          return;
+        }
+
+        alert('No se ha podido crear la factura para este pedido.');
+      }
+    });
+  }
+
+  onCancel(): void {
+    if (!this.order || this.rejectingOrder || this.creatingInvoice) {
+      return;
+    }
+
+    this.rejectingOrder = true;
+
+    this.orderService.rejectOrder(this.order.id).subscribe({
+      next: () => {
+        this.rejectingOrder = false;
+        alert('Pedido rechazado.');
+        this.router.navigate(['/orders']);
+      },
+      error: (err) => {
+        this.rejectingOrder = false;
+
+        if (err.status === 409) {
+          alert('Este pedido ya estaba procesado.');
+          this.router.navigate(['/orders']);
+          return;
+        }
+
+        if (err.status === 404) {
+          alert('Pedido no encontrado.');
+          this.router.navigate(['/orders']);
+          return;
+        }
+
+        if (err.status >= 500) {
+          this.router.navigate(['/error']);
+          return;
+        }
+
+        alert('No se ha podido rechazar el pedido.');
+      }
+    });
+  }
+}

@@ -22,8 +22,8 @@ public class Order {
     private Double totalWeight;  
     private Double totalPrice;
     private LocalDateTime orderDate;   
+    private boolean processed;
 
-    // MAP: cheese → kg
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OrderItem> items = new ArrayList<>();
 
@@ -35,7 +35,8 @@ public class Order {
         this.user = user;
         this.totalWeight = 0.0;
         this.totalPrice = 0.0;
-         this.orderDate = LocalDateTime.now();
+        this.orderDate = LocalDateTime.now();
+        this.processed = false;
         this.items = new ArrayList<>();
     }
 
@@ -80,6 +81,14 @@ public class Order {
 
     public void setOrderDate(LocalDateTime orderDate) {
         this.orderDate = orderDate;
+    }
+
+    public boolean isProcessed() {
+        return processed;
+    }
+
+    public void setProcessed(boolean processed) {
+        this.processed = processed;
     }
 
     public List<OrderItem> getItems() {

@@ -30,8 +30,27 @@ public class OrderService {
     private OrderMapper orderMapper;
 
     public Page<OrderDTO> getAllOrders(Pageable pageable) {
-        Page<Order> orders = orderRepository.findByOrderDateNotNull(pageable);
+        Page<Order> orders = orderRepository.findByProcessedFalse(pageable);
         return orders.map(orderMapper::toDTO);
+    }
+
+    public Optional<OrderDTO> getOrderById(Long id) {
+        return orderRepository.findByIdAndProcessedFalse(id)
+                .map(orderMapper::toDTO);
+    }
+
+    public OrderDTO rejectOrder(Long orderId) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new IllegalArgumentException("Order not found"));
+
+        if (order.isProcessed()) {
+            throw new IllegalStateException("Order already processed");
+        }
+
+        order.setProcessed(true);
+        Order savedOrder = orderRepository.save(order);
+
+        return orderMapper.toDTO(savedOrder);
     }
 
     public Optional<User> findOwnerByName(String name) {
@@ -47,9 +66,14 @@ public class OrderService {
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
+        
         Cart cart = user.getCart();
 
-        if (cart == null || cart.getItems().isEmpty()) {
+        if (cart == null) {
+            throw new IllegalStateException("Cart is not initialized for user");
+        }
+
+        if (cart.getItems() == null || cart.getItems().isEmpty()) {
             throw new IllegalStateException("Cart is empty");
         }
 

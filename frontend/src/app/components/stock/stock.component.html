@@ -24,12 +24,12 @@
             No hay cajas
           </div>
 
-          <div class="pagination" *ngIf="item.cheese.boxes && item.cheese.boxes.length > boxPageSize">
-            <button class="arrow" [disabled]="isPrevBoxPageDisabled(item)" (click)="prevBoxPage(item)">
+          <div class="box-pagination" *ngIf="item.cheese.boxes && item.cheese.boxes.length > boxPageSize">
+            <button class="box-arrow" [disabled]="isPrevBoxPageDisabled(item)" (click)="prevBoxPage(item)">
               ‹
             </button>
-            <span class="page-number">{{ getCurrentBoxPageNumber(item) }}</span>
-            <button class="arrow" [disabled]="isNextBoxPageDisabled(item)" (click)="nextBoxPage(item)">
+            <span class="box-page-number">{{ getCurrentBoxPageNumber(item) }}</span>
+            <button class="box-arrow" [disabled]="isNextBoxPageDisabled(item)" (click)="nextBoxPage(item)">
               ›
             </button>
           </div>
@@ -46,7 +46,7 @@
       </div>
     </div>
 
-    <div class="pagination cheese-pagination" *ngIf="!loading && totalCheeses > cheesePageSize">
+    <div class="pagination cheese-pagination" *ngIf="!loading && totalCheesePages > 0">
       <button class="arrow" [disabled]="isPrevCheesePageDisabled()" (click)="prevCheesePage()">
         ‹
       </button>

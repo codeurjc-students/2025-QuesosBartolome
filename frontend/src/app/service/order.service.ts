@@ -28,4 +28,19 @@ export class OrderService {
       { withCredentials: true }
     );
   }
+
+  getOrderById(id: number): Observable<OrderDTO> {
+    return this.http.get<OrderDTO>(
+      `${this.apiUrl}/${id}`,
+      { withCredentials: true }
+    );
+  }
+
+  rejectOrder(id: number): Observable<OrderDTO> {
+    return this.http.put<OrderDTO>(
+      `${this.apiUrl}/${id}/reject`,
+      null,
+      { withCredentials: true }
+    );
+  }
 }

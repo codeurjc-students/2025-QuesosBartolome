@@ -11,6 +11,8 @@ import { ClientsComponent } from './components/clients/clients.component';
 import { ErrorPageComponent } from './components/errorPage/errorPage.component';
 import { CheeseFormComponent } from './components/cheeseForm/cheeseForm.component';
 import { StockComponent } from './components/stock/stock.component';
+import { OrderPreviewComponent } from './components/orderPreview/orderPreview.component';
+import { InvoicesComponent } from './components/invoices/invoices.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: '/cheeses', pathMatch: 'full' },
@@ -26,6 +28,8 @@ export const routes: Routes = [
   { path: 'stock', component: StockComponent },
   { path: 'myorder', component: MyOrderComponent },
   { path: 'orders', component: OrdersComponent },
+  { path: 'orders/:id/preview', component: OrderPreviewComponent },
+  { path: 'invoices', component: InvoicesComponent },
   { path: 'users', component: ClientsComponent },
   { path: 'error', component: ErrorPageComponent },
   { path: '**', component: ErrorPageComponent }

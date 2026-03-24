@@ -99,35 +99,144 @@ public class OrdersUITests {
         orderAlert.accept();
     }
 
+        private void openOrdersPageAsAdmin() {
+                driver.get("http://localhost:4200/");
+                WebElement ordersMenu = wait.until(ExpectedConditions.elementToBeClickable(
+                                By.xpath("//li[contains(text(),'Pedidos')]")));
+                ordersMenu.click();
+                wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".orders-card")));
+        }
+
+        private WebElement findOrderRowByUser(String username) {
+                wait.until(ExpectedConditions.or(
+                                ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".orders-row")),
+                                ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".orders-card"))));
+
+                List<WebElement> rows = driver.findElements(By.cssSelector(".orders-row"));
+                return rows.stream()
+                                .filter(row -> row.getText().contains(username))
+                                .findFirst()
+                                .orElseThrow(() -> new AssertionError("No pending order row found for user " + username));
+        }
+
+        private String getOrderIdFromRow(WebElement row) {
+                List<WebElement> cells = row.findElements(By.cssSelector("span"));
+                assertFalse(cells.isEmpty(), "Order row should contain columns");
+                return cells.get(0).getText().trim();
+        }
+
+        private boolean orderIdExistsInCurrentList(String orderId) {
+                List<WebElement> rows = driver.findElements(By.cssSelector(".orders-row"));
+                return rows.stream().anyMatch(row -> {
+                        List<WebElement> cells = row.findElements(By.cssSelector("span"));
+                        return !cells.isEmpty() && cells.get(0).getText().trim().equals(orderId);
+                });
+        }
+
+        private void assertOrderDisappearsFromList(String orderId) {
+                wait.until(ExpectedConditions.urlContains("/orders"));
+                wait.until(driver -> !orderIdExistsInCurrentList(orderId));
+                assertFalse(orderIdExistsInCurrentList(orderId), "Processed order should not appear in pending orders list");
+        }
+
 
     @Test
     @Order(1)
     public void testAdminCanSeeCreatedOrder() {
 
-        // 1. Login as normal USER and create an order
         login("Victor", "password123");
         createOrderAsUser();
         logout();
 
-        // 2. Login as ADMIN
+
         login("German", "password123");
 
-        // 3. Go to Orders page
+
         WebElement ordersMenu = wait.until(ExpectedConditions.elementToBeClickable(
                 By.xpath("//li[contains(text(),'Pedidos')]")));
         ordersMenu.click();
 
-        // 4. Check that the order appears in the list
+
         List<WebElement> orderRows = wait.until(
                 ExpectedConditions.visibilityOfAllElementsLocatedBy(
                         By.cssSelector(".orders-row")));
 
         assertFalse(orderRows.isEmpty(), "Admin should see at least one order");
 
-        // 5. Check that one of the orders belongs to Victor
+
         boolean foundVictor = orderRows.stream()
                 .anyMatch(row -> row.getText().contains("Victor"));
 
         assertTrue(foundVictor, "The order created by Victor should appear in admin orders list");
     }
+
+        @Test
+        public void testProcessOrderPreviewAndConfirmRemovesOrderFromList() {
+                String username = "Victor";
+
+                login(username, "password123");
+                createOrderAsUser();
+                logout();
+
+                login("German", "password123");
+                openOrdersPageAsAdmin();
+
+                WebElement orderRow = findOrderRowByUser(username);
+                String orderId = getOrderIdFromRow(orderRow);
+
+                WebElement processBtn = orderRow.findElement(By.cssSelector(".btn-process"));
+                wait.until(ExpectedConditions.elementToBeClickable(processBtn)).click();
+
+                wait.until(ExpectedConditions.urlContains("/orders/" + orderId + "/preview"));
+                WebElement title = wait.until(ExpectedConditions.visibilityOfElementLocated(
+                                By.cssSelector(".preview-card h1")));
+                assertEquals("Vista previa del pedido", title.getText().trim());
+
+                String previewText = driver.findElement(By.cssSelector(".preview-card")).getText();
+                assertTrue(previewText.contains("Cliente:"));
+                assertTrue(previewText.contains("Fecha:"));
+                assertTrue(previewText.contains("Producto"));
+                assertTrue(previewText.contains("Cajas"));
+                assertTrue(previewText.contains("Peso"));
+                assertTrue(previewText.contains("Total"));
+
+                WebElement confirmBtn = wait.until(ExpectedConditions.elementToBeClickable(
+                                By.cssSelector(".btn.btn-confirm")));
+                confirmBtn.click();
+
+                Alert confirmAlert = wait.until(ExpectedConditions.alertIsPresent());
+                assertTrue(confirmAlert.getText().contains("Factura creada correctamente"));
+                confirmAlert.accept();
+
+                assertOrderDisappearsFromList(orderId);
+        }
+
+        @Test
+        public void testRejectOrderRemovesOrderFromList() {
+                String username = "Victor";
+
+                login(username, "password123");
+                createOrderAsUser();
+                logout();
+
+                login("German", "password123");
+                openOrdersPageAsAdmin();
+
+                WebElement orderRow = findOrderRowByUser(username);
+                String orderId = getOrderIdFromRow(orderRow);
+
+                WebElement processBtn = orderRow.findElement(By.cssSelector(".btn-process"));
+                wait.until(ExpectedConditions.elementToBeClickable(processBtn)).click();
+                wait.until(ExpectedConditions.urlContains("/orders/" + orderId + "/preview"));
+
+                WebElement rejectBtn = wait.until(ExpectedConditions.elementToBeClickable(
+                                By.cssSelector(".btn.btn-cancel")));
+                rejectBtn.click();
+
+                Alert rejectAlert = wait.until(ExpectedConditions.alertIsPresent());
+                assertTrue(rejectAlert.getText().contains("Pedido rechazado"));
+                rejectAlert.accept();
+
+                assertOrderDisappearsFromList(orderId);
+        }
 }

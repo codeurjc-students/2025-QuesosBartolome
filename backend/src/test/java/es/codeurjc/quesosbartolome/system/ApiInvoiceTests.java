@@ -4,7 +4,6 @@ import io.restassured.RestAssured;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
@@ -12,8 +11,9 @@ import org.springframework.boot.test.web.server.LocalServerPort;
 import static io.restassured.RestAssured.*;
 import static org.hamcrest.Matchers.*;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, properties = "spring.profiles.active=test")
-public class ApiOrderTests {
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
+        properties = "spring.profiles.active=test")
+public class ApiInvoiceTests {
 
     @LocalServerPort
     int port;
@@ -25,12 +25,7 @@ public class ApiOrderTests {
         RestAssured.useRelaxedHTTPSValidation();
     }
 
-    /**
-     * Helper to register and log in a test user,
-     * returning the session cookies.
-     */
     private io.restassured.http.Cookies registerAndLoginTestUser(String name, String password) throws JSONException {
-        // Register user
         JSONObject registerBody = new JSONObject();
         registerBody.put("name", name);
         registerBody.put("password", password);
@@ -46,7 +41,6 @@ public class ApiOrderTests {
                 .then()
                 .statusCode(anyOf(is(200), is(201)));
 
-        // login()
         return login(name, password);
     }
 
@@ -65,94 +59,117 @@ public class ApiOrderTests {
                 .detailedCookies();
     }
 
-        private io.restassured.http.Cookies loginAsAdmin() throws JSONException {
-                return login("German", "password123");
-        }
+    private io.restassured.http.Cookies loginAsAdmin() throws JSONException {
+        return login("German", "password123");
+    }
 
     @Test
-    void testGetAllOrders_Ok() throws JSONException {
-                var cookies = loginAsAdmin();
+    void testGetAllInvoices_Ok() throws JSONException {
+        var adminCookies = loginAsAdmin();
 
         given()
-                .cookies(cookies)
+                .cookies(adminCookies)
                 .when()
-                .get("/api/v1/orders?page=0&size=10")
+                .get("/api/v1/invoices?page=0&size=10")
                 .then()
                 .statusCode(200)
                 .body("content", notNullValue());
     }
 
     @Test
-    void testConfirmOrder_Unauthorized() {
-        when()
-                .post("/api/v1/orders/confirm")
+    void testGetInvoiceById_NotFound() throws JSONException {
+        var adminCookies = loginAsAdmin();
+
+        given()
+                .cookies(adminCookies)
+                .when()
+                .get("/api/v1/invoices/999999")
                 .then()
-                .statusCode(401);
+                .statusCode(404);
     }
 
     @Test
-    void testConfirmOrder_UserNotFound() throws JSONException {
-        var cookies = registerAndLoginTestUser("GhostUser", "password123");
+    void testGetInvoiceById_Ok() throws Exception {
+        var userCookies = registerAndLoginTestUser("InvoiceUser1", "password123");
+        var adminCookies = loginAsAdmin();
 
         given()
-                .cookies(cookies)
+                .cookies(userCookies)
+                .queryParam("cheeseId", 5)
+                .queryParam("boxes", 1)
+                .when()
+                .put("/api/v1/cart/addItem")
+                .then()
+                .statusCode(200);
+
+        int orderId = given()
+                .cookies(userCookies)
                 .when()
                 .post("/api/v1/orders/confirm")
                 .then()
-                .statusCode(anyOf(is(404), is(400)));
+                .statusCode(201)
+                .extract()
+                .jsonPath()
+                .getInt("id");
+
+        JSONObject body = new JSONObject();
+        body.put("id", orderId);
+
+        int invoiceId = given()
+                .cookies(adminCookies)
+                .contentType("application/json")
+                .body(body.toString())
+                .when()
+                .post("/api/v1/invoices")
+                .then()
+                .statusCode(201)
+                .extract()
+                .jsonPath()
+                .getInt("id");
+
+        given()
+                .cookies(adminCookies)
+                .when()
+                .get("/api/v1/invoices/" + invoiceId)
+                .then()
+                .statusCode(200)
+                .body("id", equalTo(invoiceId));
     }
 
     @Test
-    void testConfirmOrder_BadRequestWhenCartEmpty() throws JSONException {
-        var cookies = registerAndLoginTestUser("EmptyCartUser", "password123");
+    void testCreateInvoice_BadRequest_NoBody() throws JSONException {
+        var adminCookies = loginAsAdmin();
 
         given()
-                .cookies(cookies)
+                .cookies(adminCookies)
+                .contentType("application/json")
+                .body("{}")
                 .when()
-                .post("/api/v1/orders/confirm")
+                .post("/api/v1/invoices")
                 .then()
                 .statusCode(400);
     }
 
     @Test
-    @Disabled("Fails sporadically in CI environment - passes locally")
-    void testConfirmOrder_Ok() throws JSONException {
-        var cookies = registerAndLoginTestUser("OrderUser2", "password123");
+    void testCreateInvoice_NotFound_OrderDoesNotExist() throws JSONException {
+        var adminCookies = loginAsAdmin();
+
+        JSONObject body = new JSONObject();
+        body.put("id", 999999);
 
         given()
-                .cookies(cookies)
-                .queryParam("cheeseId", 5)
-                .queryParam("boxes", 1)
+                .cookies(adminCookies)
+                .contentType("application/json")
+                .body(body.toString())
                 .when()
-                .put("/api/v1/cart/addItem")
+                .post("/api/v1/invoices")
                 .then()
-                .statusCode(200);
-
-        given()
-                .cookies(cookies)
-                .when()
-                .post("/api/v1/orders/confirm")
-                .then()
-                .statusCode(201) // created
-                .header("Location", containsString("/api/v1/orders/confirm/"))
-                .body("id", notNullValue())
-                .body("totalPrice", greaterThan(0.0f))
-                .body("totalWeight", greaterThan(0.0f));
+                .statusCode(404);
     }
 
-    @Test
-    void testGetOrderById_NotFound() {
-        given()
-                .when()
-                .get("/api/v1/orders/999999")
-                .then()
-                                .statusCode(401);
-    }
-
-    @Test
-        @Disabled("Fails sporadically in CI environment - passes locally")
-    void testGetOrderById_Ok() throws Exception {
-        var userCookies = registerAndLoginTestUser("OrderUserGet", "password123");
+        @Test
+        void testCreateInvoice_ReturnsExistingInvoice_WhenOrderAlreadyProcessed() throws Exception {
+        var userCookies = registerAndLoginTestUser("InvoiceUser2", "password123");
         var adminCookies = loginAsAdmin();
 
         given()
@@ -174,96 +191,69 @@ public class ApiOrderTests {
                 .jsonPath()
                 .getInt("id");
 
+        JSONObject body = new JSONObject();
+        body.put("id", orderId);
+
+        int firstInvoiceId = given()
+                .cookies(adminCookies)
+                .contentType("application/json")
+                .body(body.toString())
+                .when()
+                .post("/api/v1/invoices")
+                .then()
+                .statusCode(201)
+                .extract()
+                .jsonPath()
+                .getInt("id");
+
         given()
                 .cookies(adminCookies)
+                .contentType("application/json")
+                .body(body.toString())
                 .when()
-                .get("/api/v1/orders/" + orderId)
+                .post("/api/v1/invoices")
                 .then()
                 .statusCode(200)
-                .body("id", equalTo(orderId))
+                .body("id", equalTo(firstInvoiceId));
+    }
+
+    @Test
+    void testCreateInvoice_Ok() throws Exception {
+        var userCookies = registerAndLoginTestUser("InvoiceUser3", "password123");
+        var adminCookies = loginAsAdmin();
+
+        given()
+                .cookies(userCookies)
+                .queryParam("cheeseId", 5)
+                .queryParam("boxes", 1)
+                .when()
+                .put("/api/v1/cart/addItem")
+                .then()
+                .statusCode(200);
+
+        int orderId = given()
+                .cookies(userCookies)
+                .when()
+                .post("/api/v1/orders/confirm")
+                .then()
+                .statusCode(201)
+                .extract()
+                .jsonPath()
+                .getInt("id");
+
+        JSONObject body = new JSONObject();
+        body.put("id", orderId);
+
+        given()
+                .cookies(adminCookies)
+                .contentType("application/json")
+                .body(body.toString())
+                .when()
+                .post("/api/v1/invoices")
+                .then()
+                .statusCode(201)
+                .body("id", notNullValue())
+                .body("taxableBase", greaterThan(0.0f))
                 .body("totalPrice", greaterThan(0.0f));
     }
-
-    @Test
-    void testRejectOrder_NotFound() {
-        given()
-                .when()
-                .put("/api/v1/orders/999999/reject")
-                .then()
-                                .statusCode(401);
-    }
-
-    @Test
-    void testRejectOrder_ConflictWhenAlreadyProcessed() throws Exception {
-        var userCookies = registerAndLoginTestUser("RejectUser1", "password123");
-        var adminCookies = loginAsAdmin();
-
-        given()
-                .cookies(userCookies)
-                .queryParam("cheeseId", 5)
-                .queryParam("boxes", 1)
-                .when()
-                .put("/api/v1/cart/addItem")
-                .then()
-                .statusCode(200);
-
-        int orderId = given()
-                .cookies(userCookies)
-                .when()
-                .post("/api/v1/orders/confirm")
-                .then()
-                .statusCode(201)
-                .extract()
-                .jsonPath()
-                .getInt("id");
-
-        given()
-                .cookies(adminCookies)
-                .when()
-                .put("/api/v1/orders/" + orderId + "/reject")
-                .then()
-                .statusCode(200);
-
-        given()
-                .cookies(adminCookies)
-                .when()
-                .put("/api/v1/orders/" + orderId + "/reject")
-                .then()
-                .statusCode(409);
-    }
-
-    @Test
-    @Disabled("Fails sporadically in CI environment - passes locally")
-    void testRejectOrder_Ok() throws Exception {
-        var userCookies = registerAndLoginTestUser("RejectUser2", "password123");
-        var adminCookies = loginAsAdmin();
-
-        given()
-                .cookies(userCookies)
-                .queryParam("cheeseId", 5)
-                .queryParam("boxes", 1)
-                .when()
-                .put("/api/v1/cart/addItem")
-                .then()
-                .statusCode(200);
-
-        int orderId = given()
-                .cookies(userCookies)
-                .when()
-                .post("/api/v1/orders/confirm")
-                .then()
-                .statusCode(201)
-                .extract()
-                .jsonPath()
-                .getInt("id");
-
-        given()
-                .cookies(adminCookies)
-                .when()
-                .put("/api/v1/orders/" + orderId + "/reject")
-                .then()
-                .statusCode(200)
-                .body("id", equalTo(orderId));
-    }
-
 }

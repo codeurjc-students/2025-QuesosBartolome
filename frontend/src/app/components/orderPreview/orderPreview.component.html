@@ -1,0 +1,47 @@
+<div class="preview-page" *ngIf="loading">
+  <p>Cargando pedido...</p>
+</div>
+
+<div class="preview-container" *ngIf="!loading && order">
+  <button class="btn-back" type="button" (click)="goBack()" aria-label="Volver">←</button>
+
+  <div class="preview-card">
+    <h1>Vista previa del pedido</h1>
+
+    <div class="order-meta">
+      <div class="meta-row">
+        <span class="meta-label">Cliente:</span>
+        <span class="meta-value">{{ order.user.name }}</span>
+      </div>
+      <div class="meta-row">
+        <span class="meta-label">Fecha:</span>
+        <span class="meta-value">{{ order.orderDate | date:'dd/MM/yyyy HH:mm' }}</span>
+      </div>
+    </div>
+
+    <div class="items-box">
+      <div class="items-header">
+        <span>Producto</span>
+        <span>Cajas</span>
+        <span>Peso</span>
+        <span>Total</span>
+      </div>
+
+      <div class="item-row" *ngFor="let item of order.items">
+        <span>{{ item.cheeseName }}</span>
+        <span class="badge">{{ item.boxes.length }}</span>
+        <span class="badge">{{ item.weight | number:'1.2-2' }} Kg</span>
+        <span class="badge">€{{ item.totalPrice | number:'1.2-2' }}</span>
+      </div>
+    </div>
+
+    <div class="actions-row">
+      <button class="btn btn-confirm" type="button" (click)="onConfirm()" [disabled]="creatingInvoice">
+        {{ creatingInvoice ? 'Creando factura...' : 'Confirmar pedido' }}
+      </button>
+      <button class="btn btn-cancel" type="button" (click)="onCancel()" [disabled]="rejectingOrder">
+        {{ rejectingOrder ? 'Rechazando pedido...' : 'Rechazar pedido' }}
+      </button>
+    </div>
+  </div>
+</div>
