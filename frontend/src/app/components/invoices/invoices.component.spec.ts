@@ -151,11 +151,4 @@ describe('InvoicesComponent', () => {
     expect(invoiceServiceSpy.getAllInvoices).not.toHaveBeenCalled();
   });
 
-  it('should alert when downloadInvoice is called', () => {
-    const alertSpy = spyOn(window, 'alert');
-
-    component.downloadInvoice(mockInvoices[0]);
-
-    expect(alertSpy).toHaveBeenCalledWith('Descarga de factura FACT-Q26/1 no implementada todavía.');
-  });
 });

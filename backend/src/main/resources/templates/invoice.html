@@ -184,18 +184,18 @@
 
         <div class="invoice-info">
             <div class="invoice-title">FACTURA</div>
-            <div><strong>Nº:</strong> <span th:text="${invoice.invNo}">FACT-Q26/001</span></div>
-            <div><strong>Fecha:</strong> <span th:text="${#temporals.format(invoice.invoiceDate, 'dd/MM/yyyy')}">24/03/2026</span></div>
+            <div><strong>Nº:</strong> <span th:text="${invoice.invNo != null ? invoice.invNo : '-'}">FACT-Q26/001</span></div>
+            <div><strong>Fecha:</strong> <span th:text="${invoice.invoiceDate != null ? #temporals.format(invoice.invoiceDate, 'dd/MM/yyyy') : '-'}">24/03/2026</span></div>
         </div>
     </div>
 
     <!-- CLIENT -->
     <div class="client-box">
         <div class="client-label">CLIENTE</div>
-        <div><strong th:text="${invoice.user.name}">Cliente</strong></div>
-        <div th:text="${invoice.user.gmail}">email@example.com</div>
-        <div th:text="${invoice.user.direction}">Dirección</div>
-        <div th:text="${'NIF: ' + invoice.user.nif}">NIF: 12345678A</div>
+        <div><strong th:text="${invoice.user != null && invoice.user.name != null ? invoice.user.name : 'Cliente'}">Cliente</strong></div>
+        <div th:text="${invoice.user != null && invoice.user.gmail != null ? invoice.user.gmail : '-'}">email@example.com</div>
+        <div th:text="${invoice.user != null && invoice.user.direction != null ? invoice.user.direction : '-'}">Dirección</div>
+        <div th:text="${invoice.user != null && invoice.user.nif != null ? 'NIF: ' + invoice.user.nif : 'NIF: -'}">NIF: 12345678A</div>
     </div>
 
     <!-- ITEMS TABLE -->
@@ -230,17 +230,17 @@
         <div class="totals">
             <div class="totals-row">
                 <span>Base Imponible:</span>
-                <span>€<span th:text="${#numbers.formatDecimal(invoice.taxableBase, 1, 2)}">296.25</span></span>
+                <span>€<span th:text="${#numbers.formatDecimal(invoice.taxableBase != null ? invoice.taxableBase : 0.0, 1, 2)}">296.25</span></span>
             </div>
 
             <div class="totals-row">
                 <span>IVA 4%:</span>
-                <span>€<span th:text="${#numbers.formatDecimal(invoice.totalPrice - invoice.taxableBase, 1, 2)}">11.85</span></span>
+                <span>€<span th:text="${#numbers.formatDecimal((invoice.totalPrice != null ? invoice.totalPrice : 0.0) - (invoice.taxableBase != null ? invoice.taxableBase : 0.0), 1, 2)}">11.85</span></span>
             </div>
 
             <div class="totals-row final">
                 <span>TOTAL:</span>
-                <span>€<span th:text="${#numbers.formatDecimal(invoice.totalPrice, 1, 2)}">308.10</span></span>
+                <span>€<span th:text="${#numbers.formatDecimal(invoice.totalPrice != null ? invoice.totalPrice : 0.0, 1, 2)}">308.10</span></span>
             </div>
         </div>
 
@@ -248,7 +248,7 @@
             <div class="transfer-title">Pago por transferencia a:</div>
             <div><strong>Cuenta:</strong></div>
             <div>IBAN: ES12 3456 7890 1234 5678 9012</div>
-            <div>Concepto: <span th:text="${invoice.invNo}">FACT-Q26/001</span></div>
+            <div>Concepto: <span th:text="${invoice.invNo != null ? invoice.invNo : '-'}">FACT-Q26/001</span></div>
         </div>
     </div>
 

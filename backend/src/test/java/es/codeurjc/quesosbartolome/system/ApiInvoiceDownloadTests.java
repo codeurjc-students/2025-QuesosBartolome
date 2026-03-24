@@ -50,7 +50,7 @@ public class ApiInvoiceDownloadTests {
 
     private io.restassured.http.Cookies login(String name, String password) throws JSONException {
         JSONObject loginBody = new JSONObject();
-        loginBody.put("name", name);
+        loginBody.put("username", name);
         loginBody.put("password", password);
 
         return given()
@@ -68,8 +68,11 @@ public class ApiInvoiceDownloadTests {
     }
 
     @Test
-    void testDownloadInvoicePdfNotFound() {
+    void testDownloadInvoicePdfNotFound() throws Exception {
+        var adminCookies = loginAsAdmin();
+
         given()
+                .cookies(adminCookies)
                 .when()
                 .get("/api/v1/invoices/999999/download-pdf")
                 .then()
@@ -79,10 +82,10 @@ public class ApiInvoiceDownloadTests {
     @Test
     void testDownloadInvoicePdfSuccess() throws Exception {
         // GIVEN: Create an invoice
-        var userCookies = registerAndLoginTestUser("PdfTestUser", "password123");
+        String uniqueUser = "PdfTestUser" + System.nanoTime();
+        var userCookies = registerAndLoginTestUser(uniqueUser, "password123");
         var adminCookies = loginAsAdmin();
 
-        // Add cheese to cart
         given()
                 .cookies(userCookies)
                 .queryParam("cheeseId", 5)
@@ -92,7 +95,6 @@ public class ApiInvoiceDownloadTests {
                 .then()
                 .statusCode(200);
 
-        // Create order
         int orderId = given()
                 .cookies(userCookies)
                 .when()
@@ -103,7 +105,6 @@ public class ApiInvoiceDownloadTests {
                 .jsonPath()
                 .getInt("id");
 
-        // Create invoice from order
         var invoiceResponse = given()
                 .cookies(adminCookies)
                 .contentType("application/json")
@@ -117,8 +118,8 @@ public class ApiInvoiceDownloadTests {
 
         int invoiceId = invoiceResponse.getInt("id");
 
-        // WHEN: Download PDF
         byte[] pdfResponse = given()
+            .cookies(adminCookies)
                 .when()
                 .get("/api/v1/invoices/" + invoiceId + "/download-pdf")
                 .then()
@@ -129,7 +130,6 @@ public class ApiInvoiceDownloadTests {
                 .body()
                 .asByteArray();
 
-        // THEN: Verify PDF is valid
         assert pdfResponse.length > 0 : "PDF should not be empty";
         assert pdfResponse[0] == '%' : "PDF should start with %";
         assert pdfResponse[1] == 'P' : "PDF header should be valid";

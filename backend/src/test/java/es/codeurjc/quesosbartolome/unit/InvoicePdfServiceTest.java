@@ -125,10 +125,8 @@ class InvoicePdfServiceTest {
         // GIVEN
         Invoice invoice = new Invoice();
         invoice.setInvNo("INVALID");
-        // Missing user and order - should cause issues
 
-        // WHEN & THEN - Should not throw, PDF generation handles null gracefully
-        // This tests that the service doesn't crash even with incomplete data
+        // WHEN & THEN
         assertDoesNotThrow(() -> invoicePdfService.generateInvoicePdf(invoice));
     }
 }
