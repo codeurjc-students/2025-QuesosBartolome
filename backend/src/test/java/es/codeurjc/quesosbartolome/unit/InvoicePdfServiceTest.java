@@ -5,9 +5,14 @@ import es.codeurjc.quesosbartolome.model.Order;
 import es.codeurjc.quesosbartolome.model.OrderItem;
 import es.codeurjc.quesosbartolome.model.User;
 import es.codeurjc.quesosbartolome.service.InvoicePdfService;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.context.Context;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -15,12 +20,24 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.when;
 
-@SpringBootTest
+@ExtendWith(MockitoExtension.class)
 class InvoicePdfServiceTest {
 
-    @Autowired
+    @Mock
+    private TemplateEngine templateEngine;
+
+    @InjectMocks
     private InvoicePdfService invoicePdfService;
+
+    @BeforeEach
+    void setUp() {
+        String minimalHtml = "<html><body><h1>Factura</h1><p>Contenido</p></body></html>";
+        when(templateEngine.process(eq("invoice"), any(Context.class))).thenReturn(minimalHtml);
+    }
 
     @Test
     void testGenerateInvoicePdfReturnsValidPdf() throws IOException {
