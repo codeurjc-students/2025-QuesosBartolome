@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Factura [[${invoice.invNo}]]</title>
+
+    <style>
+        @page {
+            size: A4;
+            margin: 0;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 12px;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+
+        .page {
+            width: 100%;
+            max-width: 210mm;
+            min-height: 297mm;
+            padding: 10mm;
+            margin: 0 auto;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .content {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+        }
+
+        /* HEADER */
+        .header {
+            border-bottom: 2px solid #c23333;
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+            justify-content: space-between;
+        }
+
+        .company {
+            flex: 1 1 auto;
+            max-width: 62%;
+        }
+
+        .company-name {
+            font-size: 18px;
+            font-weight: bold;
+            color: #c23333;
+        }
+
+        .invoice-info {
+            flex: 0 0 34%;
+            text-align: right;
+        }
+
+        .invoice-title {
+            font-size: 22px;
+            font-weight: bold;
+            color: #c23333;
+        }
+
+        /* CLIENT */
+        .client-box {
+            background: #f7f7f7;
+            border-left: 4px solid #c23333;
+            padding: 10px;
+            margin-bottom: 25px;
+        }
+
+        .client-label {
+            font-weight: bold;
+            color: #c23333;
+            margin-bottom: 5px;
+        }
+
+        /* TABLE */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: fixed;
+            margin-bottom: 25px;
+        }
+
+        thead, thead tr {
+            background: #c23333;
+        }
+
+        thead {
+            color: white;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 6px;
+            word-wrap: break-word;
+        }
+
+        th {
+            background: #c23333;
+            color: #fff;
+            font-weight: bold;
+            text-align: left;
+        }
+
+        .text-right { text-align: right; }
+        .text-center { text-align: center; }
+
+        /* TOTALS */
+        .totals {
+            width: 100%;
+            border: 2px solid #c23333;
+        }
+
+        .payment-section {
+            width: 320px;
+            margin-top: auto;
+            margin-left: auto;
+        }
+
+        .totals-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 10px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .totals-row.final {
+            background: #c23333;
+            color: white;
+            font-weight: bold;
+            border: none;
+        }
+
+        .transfer-box {
+            margin-top: 8px;
+            border: 1px solid #c23333;
+            background: #faf7f7;
+            padding: 7px 9px;
+            font-size: 10px;
+            line-height: 1.35;
+        }
+
+        .transfer-title {
+            font-weight: bold;
+            color: #c23333;
+            margin-bottom: 2px;
+        }
+
+        /* FOOTER */
+        .footer {
+            margin-top: 10px;
+            text-align: center;
+            font-size: 10px;
+            color: #777;
+            border-top: 1px solid #c23333;
+            padding-top: 10px;
+            padding-bottom: 6mm;
+        }
+    </style>
+</head>
+
+<body>
+<div class="page">
+    <div class="content">
+
+    <!-- HEADER -->
+    <div class="header">
+        <div class="company">
+            <div class="company-name">Quesos Bartolomé</div>
+            <div>NIF: 93432577H</div>
+            <div>Calle Prado Martín Nº 2</div>
+            <div>CP 40531 · Tlf: 634 435 726</div>
+            <div>quesosbartolome@gmail.com</div>
+        </div>
+
+        <div class="invoice-info">
+            <div class="invoice-title">FACTURA</div>
+            <div><strong>Nº:</strong> <span th:text="${invoice.invNo}">FACT-Q26/001</span></div>
+            <div><strong>Fecha:</strong> <span th:text="${#temporals.format(invoice.invoiceDate, 'dd/MM/yyyy')}">24/03/2026</span></div>
+        </div>
+    </div>
+
+    <!-- CLIENT -->
+    <div class="client-box">
+        <div class="client-label">CLIENTE</div>
+        <div><strong th:text="${invoice.user.name}">Cliente</strong></div>
+        <div th:text="${invoice.user.gmail}">email@example.com</div>
+        <div th:text="${invoice.user.direction}">Dirección</div>
+        <div th:text="${'NIF: ' + invoice.user.nif}">NIF: 12345678A</div>
+    </div>
+
+    <!-- ITEMS TABLE -->
+    <table>
+        <thead>
+        <tr>
+            <th>Código</th>
+            <th>Producto</th>
+            <th class="text-center">Cajas</th>
+            <th class="text-center">Peso (kg)</th>
+            <th class="text-right">Precio</th>
+            <th class="text-right">Importe</th>
+            <th class="text-right">IVA 4%</th>
+        </tr>
+        </thead>
+
+        <tbody>
+        <tr th:each="item : ${invoice.order.items}">
+            <td th:text="${item.cheeseId}">001</td>
+            <td th:text="${item.cheeseName}">Queso Curado</td>
+            <td class="text-center" th:text="${item.boxes.size()}">2</td>
+            <td class="text-center" th:text="${item.weight}">6.87</td>
+            <td class="text-right">€<span th:text="${#numbers.formatDecimal(item.cheesePrice, 1, 2)}">17.50</span></td>
+            <td class="text-right">€<span th:text="${#numbers.formatDecimal(item.totalPrice, 1, 2)}">120.23</span></td>
+            <td class="text-right">€<span th:text="${#numbers.formatDecimal(item.totalPrice * 0.04, 1, 2)}">4.81</span></td>
+        </tr>
+        </tbody>
+    </table>
+
+    <!-- TOTALS -->
+    <div class="payment-section">
+        <div class="totals">
+            <div class="totals-row">
+                <span>Base Imponible:</span>
+                <span>€<span th:text="${#numbers.formatDecimal(invoice.taxableBase, 1, 2)}">296.25</span></span>
+            </div>
+
+            <div class="totals-row">
+                <span>IVA 4%:</span>
+                <span>€<span th:text="${#numbers.formatDecimal(invoice.totalPrice - invoice.taxableBase, 1, 2)}">11.85</span></span>
+            </div>
+
+            <div class="totals-row final">
+                <span>TOTAL:</span>
+                <span>€<span th:text="${#numbers.formatDecimal(invoice.totalPrice, 1, 2)}">308.10</span></span>
+            </div>
+        </div>
+
+        <div class="transfer-box">
+            <div class="transfer-title">Pago por transferencia a:</div>
+            <div><strong>Cuenta:</strong></div>
+            <div>IBAN: ES12 3456 7890 1234 5678 9012</div>
+            <div>Concepto: <span th:text="${invoice.invNo}">FACT-Q26/001</span></div>
+        </div>
+    </div>
+
+    </div>
+
+    <!-- FOOTER -->
+    <div class="footer">
+        Factura generada electrónicamente. Válida sin firma.
+    </div>
+
+</div>
+</body>
+</html>

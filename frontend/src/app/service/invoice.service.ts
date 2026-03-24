@@ -35,4 +35,14 @@ export class InvoiceService {
       { withCredentials: true }
     );
   }
+
+  downloadInvoicePdf(invoiceId: number): Observable<Blob> {
+    return this.http.get(
+      `${this.apiUrl}/${invoiceId}/download-pdf`,
+      {
+        responseType: 'blob',
+        withCredentials: true
+      }
+    );
+  }
 }

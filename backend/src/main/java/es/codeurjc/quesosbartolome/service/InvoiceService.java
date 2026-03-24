@@ -35,6 +35,10 @@ public class InvoiceService {
                 .map(invoiceMapper::toDTO);
     }
 
+    public Optional<Invoice> getInvoiceEntity(Long invoiceId) {
+        return invoiceRepository.findById(invoiceId);
+    }
+
     public boolean existsByOrderId(Long orderId) {
         return invoiceRepository.findByOrderId(orderId).isPresent();
     }

@@ -58,6 +58,29 @@ export class InvoicesComponent implements OnInit {
   }
 
   downloadInvoice(invoice: InvoiceDTO): void {
-    alert(`Descarga de factura ${invoice.invNo} no implementada todavía.`);
+    this.invoiceService.downloadInvoicePdf(invoice.id).subscribe({
+      next: (pdfBlob: Blob) => {
+        // Create a URL for the blob
+        const blobUrl = window.URL.createObjectURL(pdfBlob);
+        
+        // Create a temporary link and trigger download
+        const link = document.createElement('a');
+        link.href = blobUrl;
+        link.download = `${invoice.invNo}.pdf`;
+        document.body.appendChild(link);
+        link.click();
+        
+        // Clean up
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(blobUrl);
+      },
+      error: (err) => {
+        if (err.status === 404) {
+          alert('Factura no encontrada.');
+        } else {
+          alert('Error al descargar la factura. Intenta de nuevo.');
+        }
+      }
+    });
   }
 }
