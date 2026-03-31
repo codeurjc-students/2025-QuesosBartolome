@@ -1,36 +1,37 @@
 # 2025-QUESOS BARTOLOMÉ
 
-## Version 0.1
-For this version, we have started with the basic functionalities of our cheese sales and production control website. In this first release, the essential features have been implemented to provide context for what the platform will become in the future, beginning with the simplest yet most general options.
+## Version 0.2
+For this version, we have focused on developing more specific features tailored to the real workflow of our cheese factory. Our goal is to move beyond a simple cheese buying-and-selling website and instead create a platform that reflects how the business actually operates, making it a useful management tool for the company.
 
-For unregistered users: register, log in, view the cheeses available on the website along with their details, and access the “About Us” section.
+New Features:
 
-For registered users: everything above, plus the ability to view their own profile and place orders.
+In addition to the previous functionalities, Unregistered Users can view the reviews associated with each cheese, access the profiles of the users who wrote those reviews, filter cheeses by type.
 
-And for administrators: view both the orders placed and the customers of the cheese factory.
+Registered Users can rate a cheese by writing a review that will appear on the website, delete their own reviews, edit their profile, including credentials and attributes such as name, profile picture, address...
 
-With these basic features, we take the first step toward what will become our final website. Thanks to them, users can begin familiarizing themselves with the platform, and administrators can start getting to know the future production management tools that the site will include.
+Administrators receive the largest set of new features. They can edit their own profile manage cheese stock by adding or removing boxes, delete reviews from any user, ban users, process orders, accepting or rejecting them and when an order is accepted, generate a PDF invoice.
 
-[![Screenshots of Version 0.1](https://img.shields.io/badge/CAPTURES-VERSION%200.1-ffc107?style=for-the-badge&logo=markdown)](docs/readme/Capt0.1.md)
+With these features, we move closer to the final version of our application. We have implemented functionalities that reflect the daily operations of the cheese factory, helping streamline its management while also improving the overall user experience.
+
+[![Screenshots of Version 0.2](https://img.shields.io/badge/CAPTURES-VERSION%200.1-ffc107?style=for-the-badge&logo=markdown)](docs/readme/Capt0.2.md)
 
 ### Website Status
-This is version 0.1 of the website. It is currently under development to improve and introduce new functionalities.
+This is version 0.2 of the website. It is currently under development to improve and introduce new functionalities.
 
 ### Video
 
-[![Video Demo](https://img.shields.io/badge/🎬%20VIDEO-DEMO-red?style=for-the-badge)](https://youtu.be/iXKCkcoqsYs)
+[![Video Demo](https://img.shields.io/badge/🎬%20VIDEO-DEMO-red?style=for-the-badge)](https://youtu.be/44xbFBr17LQ)
 
 ### Upcoming Features
-For the next version (0.2) of the application, the following functionalities are expected to be included:
+For the next version (1.0) of the application, the following functionalities are expected to be included:
 
-- Unregistered users: View reviews for each cheese and access the profile of each review’s author.
-- Registered users: Edit their profile and credentials, as well as view, create, delete, and edit reviews.
-- Administrators: Add, edit, and delete cheeses from the website, ban users, process orders and generate invoices.
+- Registered users: view their orders and their status, have access to a list of the invoices for their accepted orders, download their invoices.
+- Administrators: view charts, send emails to users with invoices, filter charts by cheeses and customers.
 
-With this, we take another step toward a more complete and dynamic website, moving closer to the final experience we aim to offer.
+With this, we take the final step toward a more complete and dynamic website, moving closer to the final experience we aim to offer.
 
 ### Index
-- [Version 0.1 Features](docs/readme/Features0.1.md)
+- [Version 0.2 Features](docs/readme/Features0.2.md)
 - [Detailed Features](docs/readme/DetailedFeatures.md)
 - [Execution](docs/readme/ProgramExecution.md)
 - [Development Guide](docs/readme/DevelopmentGuide.md)

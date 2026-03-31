@@ -24,10 +24,10 @@ For each feature, a feature/ branch is created where the implementation is devel
 
 | Metric | Value |
 |---------|-------|
-| Commits | - 175 | 
+| Commits | - 207 | 
 | Branches | - 1 | 
-| Issues | - Open: 1 <br> - Closed: 12 | 
-| Pull Requests | - Open: 0 <br> - Closed: 34  | 
+| Issues | - Open: 0 <br> - Closed: 17 | 
+| Pull Requests | - Open: 0 <br> - Closed: 42  | 
 
 #### Continuous Integration
 
@@ -57,3 +57,24 @@ Below are the features included in this version:
 - Registered users can place orders to the cheesery and modify them dynamically using a shopping cart.
 - Administrators can view a paginated list of customers.
 - Administrators can view a paginated list of orders placed to the cheesery.
+
+##### Version 0.2
+Date: March 2026
+
+**Features**
+
+Below are the features included in this version:
+
+- Filter cheeses on the main page by type.
+- View the reviews of the different cheeses.
+- View the profiles of review authors.
+- Registered users can edit their attributes and credentials.
+- Registered users can create reviews and delete their own reviews.
+- Administrators can control cheese stock by adding or removing boxes.
+- Administrators can create new cheeses.
+- Administrators can delete and edit the cheeses of the cheesery.
+- Administrators can ban users.
+- Administrators can delete user reviews.
+- Administrators can finalize orders and generate invoices for those orders.
+- Administrators can reject orders.
+- Administrators can download the PDF invoices generated for the orders.
