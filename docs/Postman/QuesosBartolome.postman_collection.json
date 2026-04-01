@@ -1,272 +1,798 @@
 {
-	"info": {
-		"_postman_id": "f1499dd6-9a37-4d84-b1b0-d0bc4cfd30c7",
-		"name": "QuesosBartolome",
-		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "43223390"
-	},
-	"item": [
-		{
-			"name": "GET Cheeses",
-			"request": {
-				"method": "GET",
-				"header": []
-			},
-			"response": []
-		},
-		{
-			"name": "GET Cheese {id}",
-			"request": {
-				"method": "GET",
-				"header": []
-			},
-			"response": []
-		},
-		{
-			"name": "POST Log in",
-			"request": {
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n  \"username\": \"Victor\",\r\n  \"password\": \"password123\"\r\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "https://localhost:443/api/v1/auth/login",
-					"protocol": "https",
-					"host": [
-						"localhost"
-					],
-					"port": "443",
-					"path": [
-						"api",
-						"v1",
-						"auth",
-						"login"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "POST refresh",
-			"request": {
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n  \"username\": \"Victor\",\r\n  \"password\": \"password123\"\r\n}"
-				},
-				"url": {
-					"raw": "https://localhost:443/api/v1/auth/refresh",
-					"protocol": "https",
-					"host": [
-						"localhost"
-					],
-					"port": "443",
-					"path": [
-						"api",
-						"v1",
-						"auth",
-						"refresh"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "POST LogOut",
-			"request": {
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n  \"username\": \"Victor\",\r\n  \"password\": \"password123\"\r\n}"
-				},
-				"url": {
-					"raw": "https://localhost:443/api/v1/auth/logout",
-					"protocol": "https",
-					"host": [
-						"localhost"
-					],
-					"port": "443",
-					"path": [
-						"api",
-						"v1",
-						"auth",
-						"logout"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "POST Register",
-			"request": {
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n    \"name\": \"Juan\",\r\n    \"password\": \"password123\",\r\n    \"gmail\": \"juan@example.com\",\r\n    \"direction\": \"Calle Falsa 123\",\r\n    \"nif\": \"12345678A\",\r\n    \"image\": null\r\n}\r\n",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "https://localhost:443/api/v1/auth/user",
-					"protocol": "https",
-					"host": [
-						"localhost"
-					],
-					"port": "443",
-					"path": [
-						"api",
-						"v1",
-						"auth",
-						"user"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "GET UserAuth",
-			"request": {
-				"method": "GET",
-				"header": []
-			},
-			"response": []
-		},
-		{
-			"name": "GET user id",
-			"request": {
-				"method": "GET",
-				"header": []
-			},
-			"response": []
-		},
-		{
-			"name": "GET UserImage id",
-			"request": {
-				"method": "GET",
-				"header": []
-			},
-			"response": []
-		},
-		{
-			"name": "GET Mycart",
-			"request": {
-				"method": "GET",
-				"header": []
-			},
-			"response": []
-		},
-		{
-			"name": "AddItem",
-			"request": {
-				"method": "PUT",
-				"header": [],
-				"url": {
-					"raw": "https://localhost:443/api/v1/orders/user/1/myorder?cheeseId=1&boxes=2",
-					"protocol": "https",
-					"host": [
-						"localhost"
-					],
-					"port": "443",
-					"path": [
-						"api",
-						"v1",
-						"orders",
-						"user",
-						"1",
-						"myorder"
-					],
-					"query": [
-						{
-							"key": "cheeseId",
-							"value": "1"
-						},
-						{
-							"key": "boxes",
-							"value": "2"
-						}
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "removeItem",
-			"request": {
-				"method": "PUT",
-				"header": [],
-				"url": {
-					"raw": "https://localhost:443/api/v1/cart/removeItem?ItemId=1",
-					"protocol": "https",
-					"host": [
-						"localhost"
-					],
-					"port": "443",
-					"path": [
-						"api",
-						"v1",
-						"cart",
-						"removeItem"
-					],
-					"query": [
-						{
-							"key": "ItemId",
-							"value": "1"
-						}
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "GET Orders",
-			"request": {
-				"method": "GET",
-				"header": []
-			},
-			"response": []
-		},
-		{
-			"name": "POST Order",
-			"request": {
-				"method": "POST",
-				"header": [],
-				"url": {
-					"raw": "https://localhost:443/api/v1/orders/confirm",
-					"protocol": "https",
-					"host": [
-						"localhost"
-					],
-					"port": "443",
-					"path": [
-						"api",
-						"v1",
-						"orders",
-						"confirm"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "GET Users",
-			"request": {
-				"method": "GET",
-				"header": []
-			},
-			"response": []
-		}
-	]
+  "info": {
+    "_postman_id": "f1499dd6-9a37-4d84-b1b0-d0bc4cfd30c7",
+    "name": "QuesosBartolome",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "43223390"
+  },
+  "item": [
+    {
+      "name": "GET Cheeses",
+      "request": {
+        "method": "GET",
+        "header": []
+      },
+      "response": []
+    },
+    {
+      "name": "GET Cheese {id}",
+      "request": {
+        "method": "GET",
+        "header": []
+      },
+      "response": []
+    },
+    {
+      "name": "POST Log in",
+      "request": {
+        "auth": {
+          "type": "noauth"
+        },
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"username\": \"Victor\",\r\n  \"password\": \"password123\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://localhost:443/api/v1/auth/login",
+          "protocol": "https",
+          "host": [
+            "localhost"
+          ],
+          "port": "443",
+          "path": [
+            "api",
+            "v1",
+            "auth",
+            "login"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "POST refresh",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"username\": \"Victor\",\r\n  \"password\": \"password123\"\r\n}"
+        },
+        "url": {
+          "raw": "https://localhost:443/api/v1/auth/refresh",
+          "protocol": "https",
+          "host": [
+            "localhost"
+          ],
+          "port": "443",
+          "path": [
+            "api",
+            "v1",
+            "auth",
+            "refresh"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "POST LogOut",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"username\": \"Victor\",\r\n  \"password\": \"password123\"\r\n}"
+        },
+        "url": {
+          "raw": "https://localhost:443/api/v1/auth/logout",
+          "protocol": "https",
+          "host": [
+            "localhost"
+          ],
+          "port": "443",
+          "path": [
+            "api",
+            "v1",
+            "auth",
+            "logout"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "POST Register",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"name\": \"Juan\",\r\n    \"password\": \"password123\",\r\n    \"gmail\": \"juan@example.com\",\r\n    \"direction\": \"Calle Falsa 123\",\r\n    \"nif\": \"12345678A\",\r\n    \"image\": null\r\n}\r\n",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://localhost:443/api/v1/auth/user",
+          "protocol": "https",
+          "host": [
+            "localhost"
+          ],
+          "port": "443",
+          "path": [
+            "api",
+            "v1",
+            "auth",
+            "user"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "GET UserAuth",
+      "request": {
+        "method": "GET",
+        "header": []
+      },
+      "response": []
+    },
+    {
+      "name": "GET user id",
+      "request": {
+        "method": "GET",
+        "header": []
+      },
+      "response": []
+    },
+    {
+      "name": "GET UserImage id",
+      "request": {
+        "method": "GET",
+        "header": []
+      },
+      "response": []
+    },
+    {
+      "name": "GET Mycart",
+      "request": {
+        "method": "GET",
+        "header": []
+      },
+      "response": []
+    },
+    {
+      "name": "AddItem",
+      "request": {
+        "method": "PUT",
+        "header": [],
+        "url": {
+          "raw": "https://localhost:443/api/v1/orders/user/1/myorder?cheeseId=1&boxes=2",
+          "protocol": "https",
+          "host": [
+            "localhost"
+          ],
+          "port": "443",
+          "path": [
+            "api",
+            "v1",
+            "orders",
+            "user",
+            "1",
+            "myorder"
+          ],
+          "query": [
+            {
+              "key": "cheeseId",
+              "value": "1"
+            },
+            {
+              "key": "boxes",
+              "value": "2"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "removeItem",
+      "request": {
+        "method": "PUT",
+        "header": [],
+        "url": {
+          "raw": "https://localhost:443/api/v1/cart/removeItem?ItemId=1",
+          "protocol": "https",
+          "host": [
+            "localhost"
+          ],
+          "port": "443",
+          "path": [
+            "api",
+            "v1",
+            "cart",
+            "removeItem"
+          ],
+          "query": [
+            {
+              "key": "ItemId",
+              "value": "1"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "GET Orders",
+      "request": {
+        "method": "GET",
+        "header": []
+      },
+      "response": []
+    },
+    {
+      "name": "POST Order",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "url": {
+          "raw": "https://localhost:443/api/v1/orders/confirm",
+          "protocol": "https",
+          "host": [
+            "localhost"
+          ],
+          "port": "443",
+          "path": [
+            "api",
+            "v1",
+            "orders",
+            "confirm"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "PUT Reject Order",
+      "request": {
+        "method": "PUT",
+        "header": [],
+        "url": {
+          "raw": "https://localhost:443/api/v1/orders/1/reject",
+          "protocol": "https",
+          "host": [
+            "localhost"
+          ],
+          "port": "443",
+          "path": [
+            "api",
+            "v1",
+            "orders",
+            "1",
+            "reject"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "GET Users",
+      "request": {
+        "method": "GET",
+        "header": []
+      },
+      "response": []
+    },
+    {
+      "name": "POST Cheese",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"id\": null,\r\n  \"name\": \"Queso Nuevo\",\r\n  \"price\": 12.5,\r\n  \"description\": \"Curado artesanal\",\r\n  \"manufactureDate\": \"2024-01-10\",\r\n  \"expirationDate\": \"2024-10-10\",\r\n  \"Type\": \"Curado\",\r\n  \"boxes\": []\r\n}"
+        },
+        "url": {
+          "raw": "https://localhost:443/api/v1/cheeses/new",
+          "protocol": "https",
+          "host": [
+            "localhost"
+          ],
+          "port": "443",
+          "path": [
+            "api",
+            "v1",
+            "cheeses",
+            "new"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "PUT Cheese",
+      "request": {
+        "method": "PUT",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "\"name\": \"Queso Actualizado\", \"price\": 15.75, \"description\": \"Queso curado premium\", \"manufactureDate\": \"2024-01-10\", \"expirationDate\": \"2025-01-10\", \"type\": \"Curado\", \"boxes\": [] }",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "PUT https://localhost:443/api/v1/cheeses/1\n",
+          "protocol": "PUT https",
+          "host": [
+            "localhost"
+          ],
+          "port": "443",
+          "path": [
+            "api",
+            "v1",
+            "cheeses",
+            "1\n"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "PUT Cheese img",
+      "request": {
+        "method": "PUT",
+        "header": [],
+        "body": {
+          "mode": "file",
+          "file": {
+            "src": "/C:/Users/Propietario/Pictures/Camera Roll/WIN_20231211_18_12_06_Pro.jpg"
+          }
+        },
+        "url": {
+          "raw": "https://localhost:443/api/v1/cheeses/1/image",
+          "protocol": "https",
+          "host": [
+            "localhost"
+          ],
+          "port": "443",
+          "path": [
+            "api",
+            "v1",
+            "cheeses",
+            "1",
+            "image"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "POST Cheese img",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            {
+              "key": "",
+              "type": "file",
+              "uuid": "b9fd6a98-e042-4034-8985-61e98ecbbf43",
+              "src": "/C:/Users/Propietario/Pictures/Screenshots/Captura de pantalla 2023-10-06 021110.png"
+            }
+          ]
+        },
+        "url": {
+          "raw": "https://localhost:443/api/v1/cheeses/1/image",
+          "protocol": "https",
+          "host": [
+            "localhost"
+          ],
+          "port": "443",
+          "path": [
+            "api",
+            "v1",
+            "cheeses",
+            "1",
+            "image"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "GET Cheese img",
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "method": "GET",
+        "header": [],
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            {
+              "key": "",
+              "type": "file",
+              "uuid": "b9fd6a98-e042-4034-8985-61e98ecbbf43",
+              "src": "/C:/Users/Propietario/Pictures/Screenshots/Captura de pantalla 2023-10-06 021110.png"
+            }
+          ]
+        },
+        "url": {
+          "raw": "https://localhost:443/api/v1/cheeses/1/image",
+          "protocol": "https",
+          "host": [
+            "localhost"
+          ],
+          "port": "443",
+          "path": [
+            "api",
+            "v1",
+            "cheeses",
+            "1",
+            "image"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "DELETE Cheese",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "https://localhost:443/api/v1/cheeses/1",
+          "protocol": "https",
+          "host": [
+            "localhost"
+          ],
+          "port": "443",
+          "path": [
+            "api",
+            "v1",
+            "cheeses",
+            "1"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "GET Invoices",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "https://localhost:443/api/v1/invoices",
+          "protocol": "https",
+          "host": [
+            "localhost"
+          ],
+          "port": "443",
+          "path": [
+            "api",
+            "v1",
+            "invoices"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "GET Invoice id",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "https://localhost:443/api/v1/invoices/1",
+          "protocol": "https",
+          "host": [
+            "localhost"
+          ],
+          "port": "443",
+          "path": [
+            "api",
+            "v1",
+            "invoices",
+            "1"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "POST Invoice",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"id\": 1\r\n}\r\n",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://localhost:443/api/v1/invoices",
+          "protocol": "https",
+          "host": [
+            "localhost"
+          ],
+          "port": "443",
+          "path": [
+            "api",
+            "v1",
+            "invoices"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "GET Invoice PDF",
+      "request": {
+        "method": "GET",
+        "header": []
+      },
+      "response": []
+    },
+    {
+      "name": "GET Cheese id Review",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "https://localhost:443/api/v1/reviews/cheese/1?page=0&size=3",
+          "protocol": "https",
+          "host": [
+            "localhost"
+          ],
+          "port": "443",
+          "path": [
+            "api",
+            "v1",
+            "reviews",
+            "cheese",
+            "1"
+          ],
+          "query": [
+            {
+              "key": "page",
+              "value": "0"
+            },
+            {
+              "key": "size",
+              "value": "3"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "GET user id reviews",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "https://localhost:443/api/v1/reviews/user/1?page=0&size=3",
+          "protocol": "https",
+          "host": [
+            "localhost"
+          ],
+          "port": "443",
+          "path": [
+            "api",
+            "v1",
+            "reviews",
+            "user",
+            "1"
+          ],
+          "query": [
+            {
+              "key": "page",
+              "value": "0"
+            },
+            {
+              "key": "size",
+              "value": "3"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "GET Review id",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "https://localhost:443/api/v1/reviews/1",
+          "protocol": "https",
+          "host": [
+            "localhost"
+          ],
+          "port": "443",
+          "path": [
+            "api",
+            "v1",
+            "reviews",
+            "1"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "POST Review",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "url": {
+          "raw": "https://localhost:443/api/v1/reviews",
+          "protocol": "https",
+          "host": [
+            "localhost"
+          ],
+          "port": "443",
+          "path": [
+            "api",
+            "v1",
+            "reviews"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "DELETE Review",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "https://localhost:443/api/v1/reviews/4",
+          "protocol": "https",
+          "host": [
+            "localhost"
+          ],
+          "port": "443",
+          "path": [
+            "api",
+            "v1",
+            "reviews",
+            "4"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "PUT User id",
+      "request": {
+        "method": "PUT",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"name\": \"nuevoNombre\",\r\n  \"gmail\": \"nuevo@gmail.com\",\r\n  \"direction\": \"Nueva dirección 123\",\r\n  \"nif\": \"12345678A\"\r\n}\r\n",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://localhost:443/api/v1/users/1",
+          "protocol": "https",
+          "host": [
+            "localhost"
+          ],
+          "port": "443",
+          "path": [
+            "api",
+            "v1",
+            "users",
+            "1"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "PUT User image",
+      "request": {
+        "method": "PUT",
+        "header": [],
+        "url": {
+          "raw": "https://localhost:443/api/v1/users/12/image",
+          "protocol": "https",
+          "host": [
+            "localhost"
+          ],
+          "port": "443",
+          "path": [
+            "api",
+            "v1",
+            "users",
+            "12",
+            "image"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "PUT User password",
+      "request": {
+        "method": "PUT",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"currentPassword\": \"vieja123\",\r\n  \"newPassword\": \"nueva123\",\r\n  \"confirmPassword\": \"nueva123\"\r\n}\r\n",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://localhost:443/api/v1/users/1/password",
+          "protocol": "https",
+          "host": [
+            "localhost"
+          ],
+          "port": "443",
+          "path": [
+            "api",
+            "v1",
+            "users",
+            "1",
+            "password"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "PUT Ban User",
+      "request": {
+        "method": "PUT",
+        "header": [],
+        "url": {
+          "raw": "https://localhost:443/api/v1/users/12/ban",
+          "protocol": "https",
+          "host": [
+            "localhost"
+          ],
+          "port": "443",
+          "path": [
+            "api",
+            "v1",
+            "users",
+            "12",
+            "ban"
+          ]
+        }
+      },
+      "response": []
+    }
+  ]
 }

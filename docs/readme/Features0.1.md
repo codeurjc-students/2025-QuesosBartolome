@@ -6,7 +6,7 @@ Below we present a detailed overview of the features included in version 0.1 of 
 
 - On this screen you can see all the cheeses available on the website, along with basic details such as name and price per box. By selecting a cheese, you can access its detailed page. You can also see the buttons to register or log in, as well as the "About Us" section button on the left side.
 
-![Cheese Page](/Images/CheesePage.png)
+![Cheese Page](/Images/CheesePageUR.png)
 
 - This screen shows the detailed information of each cheese. If you are a registered user, you can place orders by boxes. If you are an administrator, an “Edit” button will appear, although it is not functional yet.
 

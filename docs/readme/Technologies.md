@@ -11,3 +11,5 @@
 | Karma + Jasmine | - Frontend testing tools. Jasmine defines the syntax for unit and integration tests, while Karma acts as a test runner in real browser environments (such as Chrome Headless). | - https://karma-runner.github.io <br> - https://jasmine.github.io |
 | Rest Assured | - Java library for automated REST API testing. | - https://rest-assured.io |
 | Selenium | - End-to-end (E2E) testing framework for web applications. | - https://www.selenium.dev |
+| Thymeleaf | - Server-side templating engine used to generate the HTML structure of the invoices before converting them to PDF. | - https://www.thymeleaf.org |
+| iText7 (html2pdf) | - Library used to convert HTML templates into PDF files, enabling the generation of invoice PDFs. | - https://itextpdf.com |
