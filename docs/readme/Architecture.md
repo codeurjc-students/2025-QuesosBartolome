@@ -14,7 +14,7 @@ This diagram shows the persistent entities of the application.
 #### API REST
 The REST API is properly documented using OpenAPI.
 
-Documentation: [DOC APIREST](https://raw.githack.com/codeurjc-students/2025-QuesosBartolome/refs/heads/main/docs/OpenApi/openapi.html)
+Documentation: [DOC APIREST](https://raw.githack.com/codeurjc-students/2025-QuesosBartolome/main/docs/OpenApi/openapi0.2.html)
 
 #### Server Architecture
 “Server class diagram showing its layer separation and the responsibility of each layer.
