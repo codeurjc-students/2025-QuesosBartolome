@@ -176,6 +176,7 @@ public class UserRestController {
 
         return ResponseEntity.ok().build();
     }
+    
 
     @PutMapping("/{id}/password")
     public ResponseEntity<Void> changePassword(
