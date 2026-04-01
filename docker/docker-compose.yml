@@ -24,7 +24,7 @@ services:
       start_period: 30s
 
   app:
-    image: victorbartolome/quesosbartolome:0.1
+    image: victorbartolome/quesosbartolome:latest
     container_name: webapp
     restart: unless-stopped
     env_file:

@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>es.codeurjc</groupId>
 	<artifactId>backend</artifactId>
-	<version>0.1.0</version>
+	<version>0.2.0</version>
 	<name>quesosbartolome</name>
 	<description>Demo project for Spring Boot</description>
 	<url/>
@@ -105,13 +105,11 @@
 			<scope>runtime</scope>
 		</dependency>
 
-		<!-- Thymeleaf for templating -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-thymeleaf</artifactId>
 		</dependency>
 
-		<!-- iText7 for PDF generation -->
 		<dependency>
 			<groupId>com.itextpdf</groupId>
 			<artifactId>html2pdf</artifactId>
