@@ -59,7 +59,7 @@ public class OrdersUITests {
         WebElement submitButton = driver.findElement(By.cssSelector("button[type='submit']"));
         submitButton.click();
 
-        Alert alert = wait.until(ExpectedConditions.alertIsPresent());
+        Alert alert = SeleniumDialogHelper.waitForDialog(wait);
         alert.accept();
     }
 
@@ -83,7 +83,7 @@ public class OrdersUITests {
                 ExpectedConditions.elementToBeClickable(By.cssSelector(".add-btn")));
         new Actions(driver).moveToElement(addButton).pause(200).click().perform();
 
-        Alert successAlert = wait.until(ExpectedConditions.alertIsPresent());
+        Alert successAlert = SeleniumDialogHelper.waitForDialog(wait);
         successAlert.accept();
 
         // Go to My Order page
@@ -94,7 +94,7 @@ public class OrdersUITests {
                 ExpectedConditions.elementToBeClickable(By.cssSelector(".btn.confirm")));
         confirmBtn.click();
 
-        Alert orderAlert = wait.until(ExpectedConditions.alertIsPresent());
+        Alert orderAlert = SeleniumDialogHelper.waitForDialog(wait);
         assertTrue(orderAlert.getText().contains("Pedido realizado correctamente"));
         orderAlert.accept();
     }
@@ -204,7 +204,7 @@ public class OrdersUITests {
                                 By.cssSelector(".btn.btn-confirm")));
                 confirmBtn.click();
 
-                Alert confirmAlert = wait.until(ExpectedConditions.alertIsPresent());
+                Alert confirmAlert = SeleniumDialogHelper.waitForDialog(wait);
                 assertTrue(confirmAlert.getText().contains("Factura creada correctamente"));
                 confirmAlert.accept();
 
@@ -233,7 +233,7 @@ public class OrdersUITests {
                                 By.cssSelector(".btn.btn-cancel")));
                 rejectBtn.click();
 
-                Alert rejectAlert = wait.until(ExpectedConditions.alertIsPresent());
+                Alert rejectAlert = SeleniumDialogHelper.waitForDialog(wait);
                 assertTrue(rejectAlert.getText().contains("Pedido rechazado"));
                 rejectAlert.accept();
 

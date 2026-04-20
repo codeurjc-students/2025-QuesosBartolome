@@ -4,6 +4,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { OrderDTO } from '../../dto/order.dto';
 import { OrderService } from '../../service/order.service';
 import { InvoiceService } from '../../service/invoice.service';
+import { DialogService } from '../../service/dialog.service';
 
 @Component({
   selector: 'app-order-preview',
@@ -23,7 +24,8 @@ export class OrderPreviewComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private orderService: OrderService,
-    private invoiceService: InvoiceService
+    private invoiceService: InvoiceService,
+    private dialogService: DialogService
   ) { }
 
   ngOnInit(): void {
@@ -71,14 +73,14 @@ export class OrderPreviewComponent implements OnInit {
     this.invoiceService.createInvoiceFromOrder(this.order).subscribe({
       next: (invoice) => {
         this.creatingInvoice = false;
-        alert(`Factura creada correctamente: ${invoice.invNo}`);
+        this.dialogService.alert(`Factura creada correctamente: ${invoice.invNo}`);
         this.router.navigate(['/orders']);
       },
       error: (err) => {
         this.creatingInvoice = false;
 
         if (err.status === 409) {
-          alert('Este pedido ya estaba procesado y ya tiene factura.');
+          this.dialogService.alert('Este pedido ya estaba procesado y ya tiene factura.');
           this.router.navigate(['/orders']);
           return;
         }
@@ -88,7 +90,7 @@ export class OrderPreviewComponent implements OnInit {
           return;
         }
 
-        alert('No se ha podido crear la factura para este pedido.');
+        this.dialogService.alert('No se ha podido crear la factura para este pedido.');
       }
     });
   }
@@ -103,20 +105,20 @@ export class OrderPreviewComponent implements OnInit {
     this.orderService.rejectOrder(this.order.id).subscribe({
       next: () => {
         this.rejectingOrder = false;
-        alert('Pedido rechazado.');
+        this.dialogService.alert('Pedido rechazado.');
         this.router.navigate(['/orders']);
       },
       error: (err) => {
         this.rejectingOrder = false;
 
         if (err.status === 409) {
-          alert('Este pedido ya estaba procesado.');
+          this.dialogService.alert('Este pedido ya estaba procesado.');
           this.router.navigate(['/orders']);
           return;
         }
 
         if (err.status === 404) {
-          alert('Pedido no encontrado.');
+          this.dialogService.alert('Pedido no encontrado.');
           this.router.navigate(['/orders']);
           return;
         }
@@ -126,7 +128,7 @@ export class OrderPreviewComponent implements OnInit {
           return;
         }
 
-        alert('No se ha podido rechazar el pedido.');
+        this.dialogService.alert('No se ha podido rechazar el pedido.');
       }
     });
   }

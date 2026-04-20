@@ -10,6 +10,7 @@ import { CartService } from '../../service/cart.service';
 import { ReviewService } from '../../service/review.service';
 import { ReviewDTO } from '../../dto/review.dto';
 import { Page } from '../../dto/page.dto';
+import { DialogService } from '../../service/dialog.service';
 
 @Component({
   selector: 'app-cheese-details',
@@ -42,7 +43,8 @@ export class CheeseDetailsComponent implements OnInit {
     private userService: UserService,
     private router: Router,
     private cartService: CartService,
-    private reviewService: ReviewService
+    private reviewService: ReviewService,
+    private dialogService: DialogService
   ) { }
 
   ngOnInit(): void {
@@ -97,19 +99,19 @@ export class CheeseDetailsComponent implements OnInit {
 
     // Validate input
     if (!boxesValue) {
-      alert('Debes introducir una cantidad');
+      this.dialogService.alert('Debes introducir una cantidad');
       return;
     }
 
     const boxes = Number(boxesValue);
 
     if (isNaN(boxes) || boxes <= 0 || boxes > this.cajasDisponibles) {
-      alert('Ingrese una cantidad correcta');
+      this.dialogService.alert('Ingrese una cantidad correcta');
       return;
     }
 
     if (!this.currentUser) {
-      alert('Debes estar logueado');
+      this.dialogService.alert('Debes estar logueado');
       return;
     }
 
@@ -119,12 +121,12 @@ export class CheeseDetailsComponent implements OnInit {
     this.cartService.addCheeseToOrder(userId, cheeseId!, boxes)
       .subscribe({
         next: () => {
-          alert('Producto añadido al pedido');
+          this.dialogService.alert('Producto añadido al pedido');
           this.loadCheese(cheeseId!);
         },
         error: (err) => {
           console.error('FULL ERROR:', err);
-          alert('Error al añadir el producto');
+          this.dialogService.alert('Error al añadir el producto');
           if (err.status >= 500) {
             this.router.navigate(['/error']);
           }
@@ -155,21 +157,24 @@ export class CheeseDetailsComponent implements OnInit {
       return;
     }
 
-    if (confirm(`¿Estás seguro de que quieres eliminar el queso "${this.cheese.name}"?`)) {
-      this.cheeseService.deleteCheese(this.cheese.id).subscribe({
+    const cheeseId = this.cheese.id;
+    const cheeseName = this.cheese.name;
+
+    this.dialogService.confirm(`¿Estás seguro de que quieres eliminar el queso "${cheeseName}"?`, () => {
+      this.cheeseService.deleteCheese(cheeseId).subscribe({
         next: () => {
-          alert('Queso eliminado correctamente');
+          this.dialogService.alert('Queso eliminado correctamente');
           this.router.navigate(['/cheeses']);
         },
         error: (err) => {
           console.error('Error al eliminar el queso:', err);
-          alert('Error al eliminar el queso');
+          this.dialogService.alert('Error al eliminar el queso');
           if (err.status >= 500) {
             this.router.navigate(['/error']);
           }
         }
       });
-    }
+    });
   }
   loadReviews(cheeseId: number, page: number): void {
     this.reviewService.getReviewsByCheeseId(cheeseId, page, this.reviewsPerPage).subscribe({
@@ -223,20 +228,20 @@ export class CheeseDetailsComponent implements OnInit {
   submitReview(): void {
     // Validate rating
     if (this.newRating < 0 || this.newRating > 5) {
-      alert('La puntuación debe estar entre 0 y 5');
+      this.dialogService.alert('La puntuación debe estar entre 0 y 5');
       return;
     }
 
     // Validate comment
     if (!this.newComment || this.newComment.trim() === '') {
-      alert('El comentario es obligatorio');
+      this.dialogService.alert('El comentario es obligatorio');
       return;
     }
 
     // Create review
     this.reviewService.createReview(this.newRating, this.newComment.trim(), this.cheese.id!).subscribe({
       next: () => {
-        alert('Reseña creada correctamente');
+        this.dialogService.alert('Reseña creada correctamente');
         this.showReviewForm = false;
         this.newRating = 5;
         this.newComment = '';
@@ -245,7 +250,7 @@ export class CheeseDetailsComponent implements OnInit {
       },
       error: (err) => {
         console.error('Error creating review:', err);
-        alert('Error al crear la reseña');
+        this.dialogService.alert('Error al crear la reseña');
       }
     });
   }
@@ -257,20 +262,18 @@ export class CheeseDetailsComponent implements OnInit {
   }
 
   deleteReviewFromCheese(reviewId: number): void {
-    if (!confirm('¿Estás seguro de que quieres eliminar esta reseña?')) {
-      return;
-    }
-
-    this.reviewService.deleteReview(reviewId).subscribe({
-      next: () => {
-        alert('Reseña eliminada correctamente');
-        // Reload reviews after deletion
-        this.loadReviews(this.cheese.id!, this.currentPage);
-      },
-      error: (err) => {
-        console.error('Error deleting review', err);
-        alert('No se pudo eliminar la reseña');
-      }
+    this.dialogService.confirm('¿Estás seguro de que quieres eliminar esta reseña?', () => {
+      this.reviewService.deleteReview(reviewId).subscribe({
+        next: () => {
+          this.dialogService.alert('Reseña eliminada correctamente');
+          // Reload reviews after deletion
+          this.loadReviews(this.cheese.id!, this.currentPage);
+        },
+        error: (err) => {
+          console.error('Error deleting review', err);
+          this.dialogService.alert('No se pudo eliminar la reseña');
+        }
+      });
     });
   }
 

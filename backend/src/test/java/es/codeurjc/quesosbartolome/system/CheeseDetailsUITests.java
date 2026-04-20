@@ -78,7 +78,7 @@ public class CheeseDetailsUITests {
                 WebElement submitButton = driver.findElement(By.cssSelector("button[type='submit']"));
                 submitButton.click();
 
-                Alert alert = wait.until(ExpectedConditions.alertIsPresent());
+                Alert alert = SeleniumDialogHelper.waitForDialog(wait);
                 assertEquals("¡Login correcto! Los tokens están en las cookies.", alert.getText());
                 alert.accept();
 
@@ -127,7 +127,7 @@ public class CheeseDetailsUITests {
                 WebElement submitButton = driver.findElement(By.cssSelector("button[type='submit']"));
                 submitButton.click();
 
-                Alert alert = wait.until(ExpectedConditions.alertIsPresent());
+                Alert alert = SeleniumDialogHelper.waitForDialog(wait);
                 assertEquals("¡Login correcto! Los tokens están en las cookies.", alert.getText());
                 alert.accept();
 
@@ -176,7 +176,7 @@ public class CheeseDetailsUITests {
                 submitButton.click();
 
                 // Accept login success alert
-                Alert alert = wait.until(ExpectedConditions.alertIsPresent());
+                Alert alert = SeleniumDialogHelper.waitForDialog(wait);
                 alert.accept();
 
                 // Wait until cheese grid is visible
@@ -201,7 +201,7 @@ public class CheeseDetailsUITests {
                 actions.moveToElement(addButton).pause(200).click().perform();
 
                 // Expect success alert
-                Alert successAlert = wait.until(ExpectedConditions.alertIsPresent());
+                Alert successAlert = SeleniumDialogHelper.waitForDialog(wait);
                 assertTrue(successAlert.getText().contains("Producto añadido al pedido"));
                 successAlert.accept();
         }
@@ -229,7 +229,7 @@ public class CheeseDetailsUITests {
                 submitButton.click();
 
                 // Accept login success alert
-                Alert alert = wait.until(ExpectedConditions.alertIsPresent());
+                Alert alert = SeleniumDialogHelper.waitForDialog(wait);
                 alert.accept();
 
                 // Wait until cheese grid is visible
@@ -254,7 +254,7 @@ public class CheeseDetailsUITests {
                 actions.moveToElement(addButton).pause(200).click().perform();
 
                 // Expect error alert
-                Alert errorAlert = wait.until(ExpectedConditions.alertIsPresent());
+                Alert errorAlert = SeleniumDialogHelper.waitForDialog(wait);
                 assertTrue(errorAlert.getText().contains("Error al añadir el producto")
                                 || errorAlert.getText().contains("Ingrese una cantidad correcta"));
                 errorAlert.accept();

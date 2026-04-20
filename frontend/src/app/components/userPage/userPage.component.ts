@@ -7,6 +7,7 @@ import { ReviewService } from '../../service/review.service';
 import { UserDTO } from '../../dto/user.dto';
 import { ReviewDTO } from '../../dto/review.dto';
 import { Page } from '../../dto/page.dto';
+import { DialogService } from '../../service/dialog.service';
 
 @Component({
   selector: 'app-userPage',
@@ -58,7 +59,8 @@ export class UserPageComponent implements OnInit {
     private userService: UserService,
     private reviewService: ReviewService,
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private dialogService: DialogService
   ) {}
 
   ngOnInit(): void {
@@ -171,19 +173,17 @@ export class UserPageComponent implements OnInit {
   }
 
   deleteReview(reviewId: number): void {
-    if (!confirm('¿Estás seguro de que quieres eliminar esta reseña?')) {
-      return;
-    }
-
-    this.reviewService.deleteReview(reviewId).subscribe({
-      next: () => {
-        // Reload reviews after deletion
-        this.loadReviews(this.user.id, this.currentPage);
-      },
-      error: (err) => {
-        console.error('Error deleting review', err);
-        alert('No se pudo eliminar la reseña');
-      }
+    this.dialogService.confirm('¿Estás seguro de que quieres eliminar esta reseña?', () => {
+      this.reviewService.deleteReview(reviewId).subscribe({
+        next: () => {
+          // Reload reviews after deletion
+          this.loadReviews(this.user.id, this.currentPage);
+        },
+        error: (err) => {
+          console.error('Error deleting review', err);
+          this.dialogService.alert('No se pudo eliminar la reseña');
+        }
+      });
     });
   }
 
@@ -267,7 +267,7 @@ export class UserPageComponent implements OnInit {
       },
       error: (err) => {
         console.error('Error updating profile', err);
-        alert('No se pudo guardar el perfil. Inténtalo de nuevo.');
+        this.dialogService.alert('No se pudo guardar el perfil. Inténtalo de nuevo.');
       }
     });
   }
@@ -295,7 +295,7 @@ export class UserPageComponent implements OnInit {
       next: () => {
         this.resetPasswordForm();
         this.isPasswordMode = false;
-        alert('Contraseña actualizada correctamente.');
+        this.dialogService.alert('Contraseña actualizada correctamente.');
       },
       error: (err) => {
         console.error('Error updating password', err);

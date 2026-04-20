@@ -3,6 +3,7 @@ import { of, throwError } from 'rxjs';
 import { RegisterComponent } from './register.component';
 import { LoginService } from '../../service/login.service';
 import { Router } from '@angular/router';
+import { DialogService } from '../../service/dialog.service';
 
 
 describe('RegisterComponent (unit)', () => {
@@ -11,17 +12,20 @@ describe('RegisterComponent (unit)', () => {
   let fixture: ComponentFixture<RegisterComponent>;
   let mockLoginService: jasmine.SpyObj<LoginService>;
   let mockRouter: jasmine.SpyObj<Router>;
+  let mockDialogService: jasmine.SpyObj<DialogService>;
 
   beforeEach(async () => {
 
     mockLoginService = jasmine.createSpyObj('LoginService', ['register']);
     mockRouter = jasmine.createSpyObj('Router', ['navigate']);
+    mockDialogService = jasmine.createSpyObj('DialogService', ['alert']);
 
     await TestBed.configureTestingModule({
       imports: [RegisterComponent],
       providers: [
         { provide: LoginService, useValue: mockLoginService },
-        { provide: Router, useValue: mockRouter }
+        { provide: Router, useValue: mockRouter },
+        { provide: DialogService, useValue: mockDialogService }
       ]
     }).compileComponents();
 
@@ -71,8 +75,6 @@ describe('RegisterComponent (unit)', () => {
 
 
   it('should alert if any required field is empty', () => {
-    spyOn(window, 'alert');
-
     component.nombre = '';
     component.password = '123';
     component.confirmPassword = '123';
@@ -82,13 +84,11 @@ describe('RegisterComponent (unit)', () => {
 
     component.register();
 
-    expect(window.alert).toHaveBeenCalledWith('Todos los campos son obligatorios');
+    expect(mockDialogService.alert).toHaveBeenCalledWith('Todos los campos son obligatorios');
     expect(mockLoginService.register).not.toHaveBeenCalled();
   });
 
   it('should alert if passwords do not match', () => {
-    spyOn(window, 'alert');
-
     component.nombre = 'Juan';
     component.password = '123';
     component.confirmPassword = '456';
@@ -98,7 +98,7 @@ describe('RegisterComponent (unit)', () => {
 
     component.register();
 
-    expect(window.alert).toHaveBeenCalledWith('Las contraseñas no coinciden');
+    expect(mockDialogService.alert).toHaveBeenCalledWith('Las contraseñas no coinciden');
     expect(mockLoginService.register).not.toHaveBeenCalled();
   });
 

@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { UserService } from '../../service/user.service';
 import { UserDTO } from '../../dto/user.dto';
 import { Router } from '@angular/router';
+import { DialogService } from '../../service/dialog.service';
 
 @Component({
     selector: 'app-clients',
@@ -21,7 +22,7 @@ export class ClientsComponent implements OnInit {
     pageSize = 10;
     totalPages = 0;
 
-    constructor(private userService: UserService, private router: Router) { }
+    constructor(private userService: UserService, private router: Router, private dialogService: DialogService) { }
 
     ngOnInit(): void {
         this.loadUsers();
@@ -85,20 +86,18 @@ export class ClientsComponent implements OnInit {
         const shouldBan = !user.banned;
         const action = shouldBan ? 'banear' : 'desbanear';
 
-        if (!confirm(`¿Seguro que quieres ${action} a ${user.name}?`)) {
-            return;
-        }
-
-        this.userService.toggleUserBan(user.id).subscribe({
-            next: (updatedUser) => {
-                user.banned = updatedUser.banned;
-            },
-            error: (err) => {
-                alert('No se pudo actualizar el estado de baneo del usuario.');
-                if (err.status >= 500) {
-                    this.router.navigate(['/error']);
+        this.dialogService.confirm(`¿Seguro que quieres ${action} a ${user.name}?`, () => {
+            this.userService.toggleUserBan(user.id).subscribe({
+                next: (updatedUser) => {
+                    user.banned = updatedUser.banned;
+                },
+                error: (err) => {
+                    this.dialogService.alert('No se pudo actualizar el estado de baneo del usuario.');
+                    if (err.status >= 500) {
+                        this.router.navigate(['/error']);
+                    }
                 }
-            }
+            });
         });
 
     }

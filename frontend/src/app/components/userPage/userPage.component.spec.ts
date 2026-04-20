@@ -12,6 +12,7 @@ import { UserBasicDTO } from '../../dto/userBasic.dto';
 import { CheeseBasicDTO } from '../../dto/cheeseBasic.dto';
 import { Page } from '../../dto/page.dto';
 import { ActivatedRoute, Router } from '@angular/router';
+import { DialogService } from '../../service/dialog.service';
 
 describe('UserPageComponent (unit)', () => {
 
@@ -22,6 +23,7 @@ describe('UserPageComponent (unit)', () => {
   let mockReviewService: jasmine.SpyObj<ReviewService>;
   let mockRouter: jasmine.SpyObj<Router>;
   let mockRoute: any;
+  let mockDialogService: jasmine.SpyObj<DialogService>;
 
   const mockUserBasic: UserBasicDTO = { id: 1, name: 'Juan' };
   const mockCheeseBasic: CheeseBasicDTO = { id: 10, name: 'Semicurado', price: 17.5 };
@@ -60,6 +62,8 @@ describe('UserPageComponent (unit)', () => {
     ]);
 
     mockRouter = jasmine.createSpyObj('Router', ['navigate']);
+    mockDialogService = jasmine.createSpyObj('DialogService', ['alert', 'confirm']);
+    mockDialogService.confirm.and.callFake((_message, onConfirm) => onConfirm());
 
     mockRoute = { snapshot: { paramMap: new Map() } };
     mockUserService.getCurrentUser.and.returnValue(throwError(() => ({ status: 401 })));
@@ -71,7 +75,8 @@ describe('UserPageComponent (unit)', () => {
         { provide: UserService, useValue: mockUserService },
         { provide: ReviewService, useValue: mockReviewService },
         { provide: Router, useValue: mockRouter },
-        { provide: ActivatedRoute, useValue: mockRoute }
+        { provide: ActivatedRoute, useValue: mockRoute },
+        { provide: DialogService, useValue: mockDialogService }
       ]
     }).compileComponents();
 
@@ -204,8 +209,6 @@ describe('UserPageComponent (unit)', () => {
   });
 
   it('should delete review successfully', () => {
-    spyOn(window, 'confirm').and.returnValue(true);
-
     component.user = { ...component.user, id: 1 };
     component.currentUser = { ...component.user };
     component.reviews = [mockReview];
@@ -221,9 +224,6 @@ describe('UserPageComponent (unit)', () => {
   });
 
   it('should alert when deleteReview fails', () => {
-    spyOn(window, 'confirm').and.returnValue(true);
-    spyOn(window, 'alert');
-
     component.user = { ...component.user, id: 1 };
     component.currentUser = { ...component.user };
 
@@ -233,7 +233,7 @@ describe('UserPageComponent (unit)', () => {
 
     component.deleteReview(1);
 
-    expect(window.alert).toHaveBeenCalledWith('No se pudo eliminar la reseña');
+    expect(mockDialogService.alert).toHaveBeenCalledWith('No se pudo eliminar la reseña');
   });
 
   it('should navigate to cheese when clicking a review cheese', () => {
@@ -315,8 +315,6 @@ describe('UserPageComponent (unit)', () => {
   });
 
   it('should alert when updateUser fails', () => {
-    spyOn(window, 'alert');
-
     mockUserService.updateUser = jasmine.createSpy().and.returnValue(
       throwError(() => ({ status: 500 }))
     );
@@ -328,7 +326,7 @@ describe('UserPageComponent (unit)', () => {
 
     component.confirmEdit();
 
-    expect(window.alert).toHaveBeenCalledWith('No se pudo guardar el perfil. Inténtalo de nuevo.');
+    expect(mockDialogService.alert).toHaveBeenCalledWith('No se pudo guardar el perfil. Inténtalo de nuevo.');
   });
 
   it('should enter password mode when changePassword() is called', () => {
@@ -376,7 +374,6 @@ describe('UserPageComponent (unit)', () => {
 
   it('should call changePassword when confirmPasswordChange() is valid', () => {
     mockUserService.changePassword = jasmine.createSpy().and.returnValue(of(void 0));
-    spyOn(window, 'alert');
 
     component.user.id = 1;
     const expectedPayload = {
@@ -389,7 +386,7 @@ describe('UserPageComponent (unit)', () => {
     component.confirmPasswordChange();
 
     expect(mockUserService.changePassword).toHaveBeenCalledWith(1, expectedPayload);
-    expect(window.alert).toHaveBeenCalledWith('Contraseña actualizada correctamente.');
+    expect(mockDialogService.alert).toHaveBeenCalledWith('Contraseña actualizada correctamente.');
   });
 
   it('should show error if changePassword fails', () => {

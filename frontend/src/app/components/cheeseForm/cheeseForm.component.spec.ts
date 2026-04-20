@@ -4,6 +4,7 @@ import { CheeseService } from '../../service/cheese.service';
 import { UserService } from '../../service/user.service';
 import { Router, ActivatedRoute } from '@angular/router';
 import { of, throwError } from 'rxjs';
+import { DialogService } from '../../service/dialog.service';
 
 describe('CheeseFormComponent (unit)', () => {
 
@@ -14,6 +15,7 @@ describe('CheeseFormComponent (unit)', () => {
     let mockUserService: jasmine.SpyObj<UserService>;
     let mockRouter: jasmine.SpyObj<Router>;
     let mockActivatedRoute: any;
+    let mockDialogService: jasmine.SpyObj<DialogService>;
 
     beforeEach(async () => {
 
@@ -28,6 +30,7 @@ describe('CheeseFormComponent (unit)', () => {
         mockUserService = jasmine.createSpyObj('UserService', ['getCurrentUser']);
 
         mockRouter = jasmine.createSpyObj('Router', ['navigate']);
+    mockDialogService = jasmine.createSpyObj('DialogService', ['alert']);
 
         mockActivatedRoute = {
             snapshot: { paramMap: new Map() }
@@ -50,7 +53,8 @@ describe('CheeseFormComponent (unit)', () => {
                 { provide: CheeseService, useValue: mockCheeseService },
                 { provide: UserService, useValue: mockUserService },
                 { provide: Router, useValue: mockRouter },
-                { provide: ActivatedRoute, useValue: mockActivatedRoute }
+                { provide: ActivatedRoute, useValue: mockActivatedRoute },
+                { provide: DialogService, useValue: mockDialogService }
             ]
         }).compileComponents();
 
@@ -105,18 +109,15 @@ it('should redirect to /error if user is not admin', () => {
     });
 
     it('should alert and redirect when loadCheeseData fails', () => {
-        spyOn(window, 'alert');
         mockCheeseService.getCheeseById.and.returnValue(throwError(() => new Error('fail')));
 
         component.loadCheeseData(10);
 
-        expect(window.alert).toHaveBeenCalledWith('Error al cargar los datos del queso');
+        expect(mockDialogService.alert).toHaveBeenCalledWith('Error al cargar los datos del queso');
         expect(mockRouter.navigate).toHaveBeenCalledWith(['/']);
     });
 
     it('should alert when manufactureDate format is invalid', () => {
-        spyOn(window, 'alert');
-
         component.name = 'Queso';
         component.description = 'desc';
         component.type = 'Cremoso';
@@ -126,14 +127,12 @@ it('should redirect to /error if user is not admin', () => {
 
         component.createCheese();
 
-        expect(window.alert).toHaveBeenCalledWith(
+        expect(mockDialogService.alert).toHaveBeenCalledWith(
             "La fecha de fabricación debe estar en formato YYYY-MM-DD"
         );
     });
 
     it('should alert when expirationDate format is invalid', () => {
-        spyOn(window, 'alert');
-
         component.name = 'Queso';
         component.description = 'desc';
         component.type = 'Cremoso';
@@ -143,7 +142,7 @@ it('should redirect to /error if user is not admin', () => {
 
         component.createCheese();
 
-        expect(window.alert).toHaveBeenCalledWith(
+        expect(mockDialogService.alert).toHaveBeenCalledWith(
             "La fecha de caducidad debe estar en formato YYYY-MM-DD"
         );
     });
@@ -177,8 +176,6 @@ it('should redirect to /error if user is not admin', () => {
     });
 
     it('should call createCheese() and upload image', () => {
-    spyOn(window, 'alert');
-
     component.name = 'Queso';
     component.description = 'desc';
     component.type = 'Cremoso';
@@ -210,8 +207,6 @@ it('should redirect to /error if user is not admin', () => {
 });
 
     it('should update cheese successfully without image', () => {
-    spyOn(window, 'alert');
-
     component.isEditMode = true;
     component.cheeseId = 10;
 
@@ -241,8 +236,6 @@ it('should redirect to /error if user is not admin', () => {
 
 
     it('should update cheese and upload image', () => {
-    spyOn(window, 'alert');
-
     component.isEditMode = true;
     component.cheeseId = 10;
 
@@ -277,8 +270,6 @@ it('should redirect to /error if user is not admin', () => {
 
 
     it('should alert error when updateCheese fails', () => {
-        spyOn(window, 'alert');
-
         component.isEditMode = true;
         component.cheeseId = 10;
 
@@ -295,7 +286,7 @@ it('should redirect to /error if user is not admin', () => {
 
         component.editCheese();
 
-        expect(window.alert).toHaveBeenCalledWith("Error al actualizar queso");
+        expect(mockDialogService.alert).toHaveBeenCalledWith("Error al actualizar queso");
     });
 
 });

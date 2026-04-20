@@ -85,7 +85,7 @@ public class MyOrderUITests {
             ((JavascriptExecutor) driver).executeScript("arguments[0].click();", submitButton);
         }
 
-        Alert alert = wait.until(ExpectedConditions.alertIsPresent());
+        Alert alert = SeleniumDialogHelper.waitForDialog(wait);
         alert.accept();
         
         try {
@@ -160,7 +160,7 @@ public class MyOrderUITests {
         Thread.sleep(1000);
 
         // Accept success alert
-        Alert successAlert = wait.until(ExpectedConditions.alertIsPresent());
+        Alert successAlert = SeleniumDialogHelper.waitForDialog(wait);
         successAlert.accept();
 
         // Go to "Mi pedido"
@@ -225,7 +225,7 @@ public class MyOrderUITests {
         Thread.sleep(1000);
 
         // Accept success alert
-        Alert successAlert = wait.until(ExpectedConditions.alertIsPresent());
+        Alert successAlert = SeleniumDialogHelper.waitForDialog(wait);
         successAlert.accept();
 
         // Go to "My order"
@@ -250,7 +250,7 @@ public class MyOrderUITests {
         Thread.sleep(1000);
 
         // Expect success alert
-        Alert orderAlert = wait.until(ExpectedConditions.alertIsPresent());
+        Alert orderAlert = SeleniumDialogHelper.waitForDialog(wait);
         assertTrue(orderAlert.getText().contains("Pedido realizado correctamente"),
                 "Order success alert should appear");
         orderAlert.accept();
@@ -305,7 +305,7 @@ public class MyOrderUITests {
         Thread.sleep(1000);
 
         // Check the alert text
-        Alert orderAlert = wait.until(ExpectedConditions.alertIsPresent());
+        Alert orderAlert = SeleniumDialogHelper.waitForDialog(wait);
         String alertText = orderAlert.getText();
         orderAlert.accept();
 

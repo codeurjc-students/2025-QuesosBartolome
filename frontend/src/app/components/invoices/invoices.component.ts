@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { InvoiceService } from '../../service/invoice.service';
 import { InvoiceDTO } from '../../dto/invoice.dto';
+import { DialogService } from '../../service/dialog.service';
 
 @Component({
   selector: 'app-invoices',
@@ -20,7 +21,7 @@ export class InvoicesComponent implements OnInit {
   pageSize = 10;
   totalPages = 0;
 
-  constructor(private invoiceService: InvoiceService, private router: Router) {}
+  constructor(private invoiceService: InvoiceService, private router: Router, private dialogService: DialogService) {}
 
   ngOnInit(): void {
     this.loadInvoices();
@@ -76,9 +77,9 @@ export class InvoicesComponent implements OnInit {
       },
       error: (err) => {
         if (err.status === 404) {
-          alert('Factura no encontrada.');
+          this.dialogService.alert('Factura no encontrada.');
         } else {
-          alert('Error al descargar la factura. Intenta de nuevo.');
+          this.dialogService.alert('Error al descargar la factura. Intenta de nuevo.');
         }
       }
     });

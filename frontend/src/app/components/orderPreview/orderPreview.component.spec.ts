@@ -4,6 +4,7 @@ import { OrderPreviewComponent } from './orderPreview.component';
 import { ActivatedRoute, convertToParamMap, Router } from '@angular/router';
 import { OrderService } from '../../service/order.service';
 import { InvoiceService } from '../../service/invoice.service';
+import { DialogService } from '../../service/dialog.service';
 
 describe('OrderPreviewComponent', () => {
   let component: OrderPreviewComponent;
@@ -13,6 +14,7 @@ describe('OrderPreviewComponent', () => {
   let mockInvoiceService: jasmine.SpyObj<InvoiceService>;
   let mockRouter: jasmine.SpyObj<Router>;
   let mockActivatedRoute: any;
+  let mockDialogService: jasmine.SpyObj<DialogService>;
 
   const mockOrder = {
     id: 12,
@@ -37,6 +39,7 @@ describe('OrderPreviewComponent', () => {
     mockOrderService = jasmine.createSpyObj('OrderService', ['getOrderById', 'rejectOrder']);
     mockInvoiceService = jasmine.createSpyObj('InvoiceService', ['createInvoiceFromOrder']);
     mockRouter = jasmine.createSpyObj('Router', ['navigate']);
+    mockDialogService = jasmine.createSpyObj('DialogService', ['alert']);
 
     mockOrderService.getOrderById.and.returnValue(of(mockOrder));
     mockOrderService.rejectOrder.and.returnValue(of(mockOrder));
@@ -54,7 +57,8 @@ describe('OrderPreviewComponent', () => {
         { provide: OrderService, useValue: mockOrderService },
         { provide: InvoiceService, useValue: mockInvoiceService },
         { provide: Router, useValue: mockRouter },
-        { provide: ActivatedRoute, useValue: mockActivatedRoute }
+        { provide: ActivatedRoute, useValue: mockActivatedRoute },
+        { provide: DialogService, useValue: mockDialogService }
       ]
     }).compileComponents();
 
@@ -159,14 +163,12 @@ describe('OrderPreviewComponent', () => {
   });
 
   it('should confirm order and navigate on invoice success', () => {
-    spyOn(window, 'alert');
-
     component.order = mockOrder;
     component.onConfirm();
 
     expect(mockInvoiceService.createInvoiceFromOrder).toHaveBeenCalledWith(mockOrder);
     expect(component.creatingInvoice).toBeFalse();
-    expect(window.alert).toHaveBeenCalledWith('Factura creada correctamente: FACT-Q26/12');
+    expect(mockDialogService.alert).toHaveBeenCalledWith('Factura creada correctamente: FACT-Q26/12');
     expect(mockRouter.navigate).toHaveBeenCalledWith(['/orders']);
   });
 
@@ -177,13 +179,12 @@ describe('OrderPreviewComponent', () => {
   });
 
   it('should handle 409 when confirming invoice', () => {
-    spyOn(window, 'alert');
     mockInvoiceService.createInvoiceFromOrder.and.returnValue(throwError(() => ({ status: 409 })));
     component.order = mockOrder;
 
     component.onConfirm();
 
-    expect(window.alert).toHaveBeenCalledWith('Este pedido ya estaba procesado y ya tiene factura.');
+    expect(mockDialogService.alert).toHaveBeenCalledWith('Este pedido ya estaba procesado y ya tiene factura.');
     expect(mockRouter.navigate).toHaveBeenCalledWith(['/orders']);
     expect(component.creatingInvoice).toBeFalse();
   });
@@ -199,25 +200,23 @@ describe('OrderPreviewComponent', () => {
   });
 
   it('should show generic alert when confirming invoice fails with non-409/non-500', () => {
-    spyOn(window, 'alert');
     mockInvoiceService.createInvoiceFromOrder.and.returnValue(throwError(() => ({ status: 400 })));
     component.order = mockOrder;
 
     component.onConfirm();
 
-    expect(window.alert).toHaveBeenCalledWith('No se ha podido crear la factura para este pedido.');
+    expect(mockDialogService.alert).toHaveBeenCalledWith('No se ha podido crear la factura para este pedido.');
     expect(component.creatingInvoice).toBeFalse();
   });
 
   it('should reject order and navigate on success', () => {
-    spyOn(window, 'alert');
     component.order = mockOrder;
 
     component.onCancel();
 
     expect(mockOrderService.rejectOrder).toHaveBeenCalledWith(12);
     expect(component.rejectingOrder).toBeFalse();
-    expect(window.alert).toHaveBeenCalledWith('Pedido rechazado.');
+    expect(mockDialogService.alert).toHaveBeenCalledWith('Pedido rechazado.');
     expect(mockRouter.navigate).toHaveBeenCalledWith(['/orders']);
   });
 
@@ -237,24 +236,22 @@ describe('OrderPreviewComponent', () => {
   });
 
   it('should handle 409 when rejecting order', () => {
-    spyOn(window, 'alert');
     mockOrderService.rejectOrder.and.returnValue(throwError(() => ({ status: 409 })));
     component.order = mockOrder;
 
     component.onCancel();
 
-    expect(window.alert).toHaveBeenCalledWith('Este pedido ya estaba procesado.');
+    expect(mockDialogService.alert).toHaveBeenCalledWith('Este pedido ya estaba procesado.');
     expect(mockRouter.navigate).toHaveBeenCalledWith(['/orders']);
   });
 
   it('should handle 404 when rejecting order', () => {
-    spyOn(window, 'alert');
     mockOrderService.rejectOrder.and.returnValue(throwError(() => ({ status: 404 })));
     component.order = mockOrder;
 
     component.onCancel();
 
-    expect(window.alert).toHaveBeenCalledWith('Pedido no encontrado.');
+    expect(mockDialogService.alert).toHaveBeenCalledWith('Pedido no encontrado.');
     expect(mockRouter.navigate).toHaveBeenCalledWith(['/orders']);
   });
 
@@ -268,12 +265,11 @@ describe('OrderPreviewComponent', () => {
   });
 
   it('should show generic alert when rejecting order fails with non-404/non-409/non-500', () => {
-    spyOn(window, 'alert');
     mockOrderService.rejectOrder.and.returnValue(throwError(() => ({ status: 400 })));
     component.order = mockOrder;
 
     component.onCancel();
 
-    expect(window.alert).toHaveBeenCalledWith('No se ha podido rechazar el pedido.');
+    expect(mockDialogService.alert).toHaveBeenCalledWith('No se ha podido rechazar el pedido.');
   });
 });

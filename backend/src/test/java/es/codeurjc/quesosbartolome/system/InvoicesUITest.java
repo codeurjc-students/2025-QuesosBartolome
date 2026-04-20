@@ -66,7 +66,7 @@ public class InvoicesUITest {
 	WebElement submitButton = driver.findElement(By.cssSelector("button[type='submit']"));
 	submitButton.click();
 
-	Alert alert = wait.until(ExpectedConditions.alertIsPresent());
+	Alert alert = SeleniumDialogHelper.waitForDialog(wait);
 	alert.accept();
     }
 
@@ -88,7 +88,7 @@ public class InvoicesUITest {
 		ExpectedConditions.elementToBeClickable(By.cssSelector(".add-btn")));
 	new Actions(driver).moveToElement(addButton).pause(200).click().perform();
 
-	Alert addAlert = wait.until(ExpectedConditions.alertIsPresent());
+	Alert addAlert = SeleniumDialogHelper.waitForDialog(wait);
 	addAlert.accept();
 
 	driver.get("http://localhost:4200/myorder");
@@ -97,7 +97,7 @@ public class InvoicesUITest {
 		ExpectedConditions.elementToBeClickable(By.cssSelector(".btn.confirm")));
 	confirmBtn.click();
 
-	Alert orderAlert = wait.until(ExpectedConditions.alertIsPresent());
+	Alert orderAlert = SeleniumDialogHelper.waitForDialog(wait);
 	assertTrue(orderAlert.getText().contains("Pedido realizado correctamente"));
 	orderAlert.accept();
     }
@@ -131,7 +131,7 @@ public class InvoicesUITest {
 		ExpectedConditions.elementToBeClickable(By.cssSelector(".btn.btn-confirm")));
 	confirmBtn.click();
 
-	Alert invoiceAlert = wait.until(ExpectedConditions.alertIsPresent());
+	Alert invoiceAlert = SeleniumDialogHelper.waitForDialog(wait);
 	assertTrue(invoiceAlert.getText().contains("Factura creada correctamente"));
 	invoiceAlert.accept();
 
