@@ -17,7 +17,7 @@
           Mi pedido
         </li>
 
-        <ng-container *ngIf="isLoggedIn && isAdmin()">
+        <ng-container *ngIf="isLoggedIn && (isAdmin() || isUser())">
 
           <li (click)="goToOrders()">
             Pedidos
@@ -26,6 +26,10 @@
           <li (click)="goToInvoices()">
             Facturas
           </li>
+
+        </ng-container>
+
+        <ng-container *ngIf="isLoggedIn && isAdmin()">
 
           <li>
             Gráficos

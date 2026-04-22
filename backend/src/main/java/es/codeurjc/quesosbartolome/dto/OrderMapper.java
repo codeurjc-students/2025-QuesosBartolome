@@ -17,6 +17,7 @@ public interface OrderMapper {
         @Mapping(source = "totalWeight", target = "totalWeight"),
         @Mapping(source = "totalPrice", target = "totalPrice"),
         @Mapping(source = "orderDate", target = "orderDate"),
+        @Mapping(source = "processed", target = "processed"),
         @Mapping(source = "items", target = "items")
     })
     OrderDTO toDTO(Order order);
@@ -28,6 +29,7 @@ public interface OrderMapper {
         @Mapping(source = "totalWeight", target = "totalWeight"),
         @Mapping(source = "totalPrice", target = "totalPrice"),
         @Mapping(source = "orderDate", target = "orderDate"),
+        @Mapping(source = "processed", target = "processed"),
         @Mapping(source = "items", target = "items")
     })
     Order toDomain(OrderDTO dto);

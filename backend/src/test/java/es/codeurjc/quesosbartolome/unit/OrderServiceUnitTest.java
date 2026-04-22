@@ -64,6 +64,42 @@ class OrderServiceUnitTest {
     }
 
     @Test
+    void getOrdersForUserReturnsMappedPageWhenUserExists() {
+        User user = new User();
+        user.setId(11L);
+        user.setName("maria");
+
+        Order o1 = new Order();
+        o1.setId(100L);
+        Order o2 = new Order();
+        o2.setId(101L);
+
+        Page<Order> page = new PageImpl<>(List.of(o1, o2));
+
+        when(userRepository.findByName("maria")).thenReturn(Optional.of(user));
+        when(orderRepository.findByUserIdOrderByOrderDateDesc(11L, Pageable.unpaged())).thenReturn(page);
+
+        Page<OrderDTO> result = orderService.getOrdersForUser("maria", Pageable.unpaged());
+
+        assertThat(result).hasSize(2);
+        assertThat(result.map(OrderDTO::id).toList()).containsExactly(100L, 101L);
+        verify(userRepository).findByName("maria");
+        verify(orderRepository).findByUserIdOrderByOrderDateDesc(11L, Pageable.unpaged());
+    }
+
+    @Test
+    void getOrdersForUserThrowsWhenUserNotFound() {
+        when(userRepository.findByName("ghost")).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> orderService.getOrdersForUser("ghost", Pageable.unpaged()))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("User not found");
+
+        verify(userRepository).findByName("ghost");
+        verify(orderRepository, never()).findByUserIdOrderByOrderDateDesc(anyLong(), any(Pageable.class));
+    }
+
+    @Test
     void findOwnerByNameReturnsEmptyWhenNotFound() {
         when(userRepository.findByName("ghost")).thenReturn(Optional.empty());
 
@@ -188,6 +224,53 @@ class OrderServiceUnitTest {
 
         assertThat(result).isEmpty();
         verify(orderRepository).findByIdAndProcessedFalse(20L);
+    }
+
+    @Test
+    void getOrderByIdForUserReturnsEmptyWhenUserNotFound() {
+        when(userRepository.findByName("unknown")).thenReturn(Optional.empty());
+
+        Optional<OrderDTO> result = orderService.getOrderByIdForUser(9L, "unknown");
+
+        assertThat(result).isEmpty();
+        verify(userRepository).findByName("unknown");
+        verify(orderRepository, never()).findByIdAndUserId(anyLong(), anyLong());
+    }
+
+    @Test
+    void getOrderByIdForUserReturnsDTOWhenFound() {
+        User user = new User();
+        user.setId(21L);
+        user.setName("lucia");
+
+        Order order = new Order();
+        order.setId(33L);
+
+        when(userRepository.findByName("lucia")).thenReturn(Optional.of(user));
+        when(orderRepository.findByIdAndUserId(33L, 21L)).thenReturn(Optional.of(order));
+
+        Optional<OrderDTO> result = orderService.getOrderByIdForUser(33L, "lucia");
+
+        assertThat(result).isPresent();
+        assertThat(result.get().id()).isEqualTo(33L);
+        verify(userRepository).findByName("lucia");
+        verify(orderRepository).findByIdAndUserId(33L, 21L);
+    }
+
+    @Test
+    void getOrderByIdForUserReturnsEmptyWhenOrderNotFoundForUser() {
+        User user = new User();
+        user.setId(7L);
+        user.setName("carlos");
+
+        when(userRepository.findByName("carlos")).thenReturn(Optional.of(user));
+        when(orderRepository.findByIdAndUserId(99L, 7L)).thenReturn(Optional.empty());
+
+        Optional<OrderDTO> result = orderService.getOrderByIdForUser(99L, "carlos");
+
+        assertThat(result).isEmpty();
+        verify(userRepository).findByName("carlos");
+        verify(orderRepository).findByIdAndUserId(99L, 7L);
     }
 
     @Test

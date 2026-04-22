@@ -6,6 +6,7 @@ import es.codeurjc.quesosbartolome.model.Invoice;
 import es.codeurjc.quesosbartolome.model.Order;
 import es.codeurjc.quesosbartolome.repository.InvoiceRepository;
 import es.codeurjc.quesosbartolome.repository.OrderRepository;
+import es.codeurjc.quesosbartolome.repository.UserRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,10 +24,22 @@ public class InvoiceService {
     private OrderRepository orderRepository;
 
     @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
     private InvoiceMapper invoiceMapper;
 
     public Page<InvoiceDTO> getAllInvoices(Pageable pageable) {
         return invoiceRepository.findAll(pageable)
+                .map(invoiceMapper::toDTO);
+    }
+
+    public Page<InvoiceDTO> getInvoicesForUser(String username, Pageable pageable) {
+        Long userId = userRepository.findByName(username)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"))
+                .getId();
+
+        return invoiceRepository.findByUserIdOrderByInvoiceDateDesc(userId, pageable)
                 .map(invoiceMapper::toDTO);
     }
 
@@ -35,8 +48,27 @@ public class InvoiceService {
                 .map(invoiceMapper::toDTO);
     }
 
+    public Optional<InvoiceDTO> getInvoiceByIdForUser(Long invoiceId, String username) {
+        Optional<Long> userId = userRepository.findByName(username).map(user -> user.getId());
+        if (userId.isEmpty()) {
+            return Optional.empty();
+        }
+
+        return invoiceRepository.findByIdAndUserId(invoiceId, userId.get())
+                .map(invoiceMapper::toDTO);
+    }
+
     public Optional<Invoice> getInvoiceEntity(Long invoiceId) {
         return invoiceRepository.findById(invoiceId);
+    }
+
+    public Optional<Invoice> getInvoiceEntityForUser(Long invoiceId, String username) {
+        Optional<Long> userId = userRepository.findByName(username).map(user -> user.getId());
+        if (userId.isEmpty()) {
+            return Optional.empty();
+        }
+
+        return invoiceRepository.findByIdAndUserId(invoiceId, userId.get());
     }
 
     public boolean existsByOrderId(Long orderId) {

@@ -5,6 +5,7 @@ import { OrderDTO } from '../../dto/order.dto';
 import { OrderService } from '../../service/order.service';
 import { InvoiceService } from '../../service/invoice.service';
 import { DialogService } from '../../service/dialog.service';
+import { UserService } from '../../service/user.service';
 
 @Component({
   selector: 'app-order-preview',
@@ -19,13 +20,16 @@ export class OrderPreviewComponent implements OnInit {
   loading = true;
   creatingInvoice = false;
   rejectingOrder = false;
+  canManageOrder = false;
+  currentUserId: number | null = null;
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     private orderService: OrderService,
     private invoiceService: InvoiceService,
-    private dialogService: DialogService
+    private dialogService: DialogService,
+    private userService: UserService
   ) { }
 
   ngOnInit(): void {
@@ -36,7 +40,30 @@ export class OrderPreviewComponent implements OnInit {
       return;
     }
 
-    this.orderService.getOrderById(id).subscribe({
+    this.userService.getCurrentUser().subscribe({
+      next: (user) => {
+        this.canManageOrder = user.rols?.includes('ADMIN') ?? false;
+        this.currentUserId = user.id;
+        this.loadOrder(id);
+      },
+      error: () => {
+        this.router.navigate(['/auth/login']);
+      }
+    });
+
+  }
+
+  private loadOrder(id: number): void {
+    if (!this.canManageOrder && !this.currentUserId) {
+      this.router.navigate(['/auth/login']);
+      return;
+    }
+
+    const request = this.canManageOrder
+      ? this.orderService.getOrderById(id)
+      : this.userService.getMyOrderById(this.currentUserId!, id);
+
+    request.subscribe({
       next: (data) => {
         this.order = data;
         this.loading = false;
@@ -64,7 +91,7 @@ export class OrderPreviewComponent implements OnInit {
   }
 
   onConfirm(): void {
-    if (!this.order || this.creatingInvoice) {
+    if (!this.order || this.creatingInvoice || !this.canManageOrder) {
       return;
     }
 
@@ -96,7 +123,7 @@ export class OrderPreviewComponent implements OnInit {
   }
 
   onCancel(): void {
-    if (!this.order || this.rejectingOrder || this.creatingInvoice) {
+    if (!this.order || this.rejectingOrder || this.creatingInvoice || !this.canManageOrder) {
       return;
     }
 

@@ -7,5 +7,6 @@ export interface OrderDTO {
   totalWeight: number;
   totalPrice: number;
   orderDate: string | null; 
+  processed: boolean;
   items: OrderItemDTO[];
 }

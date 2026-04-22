@@ -30,6 +30,41 @@ public class ApiUserTests {
                 RestAssured.useRelaxedHTTPSValidation();
         }
 
+        private io.restassured.http.Cookies login(String username, String password) throws JSONException {
+                JSONObject loginBody = new JSONObject();
+                loginBody.put("username", username);
+                loginBody.put("password", password);
+
+                return given()
+                                .contentType("application/json")
+                                .body(loginBody.toString())
+                                .post("/api/v1/auth/login")
+                                .then()
+                                .statusCode(200)
+                                .extract()
+                                .detailedCookies();
+        }
+
+        private Long getCurrentUserId(io.restassured.http.Cookies cookies) {
+                Number id = given()
+                                .cookies(cookies)
+                                .when()
+                                .get("/api/v1/users")
+                                .then()
+                                .statusCode(200)
+                                .extract()
+                                .path("id");
+                return id.longValue();
+        }
+
+        private io.restassured.http.Cookies loginAsAdminGerman() throws JSONException {
+                return login("German", "password123");
+        }
+
+        private io.restassured.http.Cookies loginAsUserVictor() throws JSONException {
+                return login("Victor", "password123");
+        }
+
         @Test
         @Order(1)
         void testGetCurrentUserUnauthorized() {
@@ -919,6 +954,196 @@ public class ApiUserTests {
                                 .then()
                                 .statusCode(200)
                                 .body("banned", equalTo(false));
+        }
+
+        @Test
+        @Order(26)
+        void testGetMyOrdersUnauthorized() {
+                given()
+                                .when()
+                                .get("/api/v1/users/1/orders")
+                                .then()
+                                .statusCode(401);
+        }
+
+        @Test
+        @Order(27)
+        void testGetMyOrdersAsVictorSuccess() throws JSONException {
+                var victorCookies = loginAsUserVictor();
+                Long victorId = getCurrentUserId(victorCookies);
+
+                given()
+                                .cookies(victorCookies)
+                                .queryParam("page", 0)
+                                .queryParam("size", 10)
+                                .when()
+                                .get("/api/v1/users/" + victorId + "/orders")
+                                .then()
+                                .statusCode(200)
+                                .body("content", notNullValue());
+        }
+
+        @Test
+        @Order(28)
+        void testGetMyOrdersForbiddenWhenVictorUsesGermanId() throws JSONException {
+                var victorCookies = loginAsUserVictor();
+                var germanCookies = loginAsAdminGerman();
+
+                Long germanId = getCurrentUserId(germanCookies);
+
+                given()
+                                .cookies(victorCookies)
+                                .when()
+                                .get("/api/v1/users/" + germanId + "/orders")
+                                .then()
+                                .statusCode(403);
+        }
+
+        @Test
+        @Order(29)
+        void testGetMyOrdersForbiddenWhenGermanUsesVictorId() throws JSONException {
+                var victorCookies = loginAsUserVictor();
+                var germanCookies = loginAsAdminGerman();
+
+                Long victorId = getCurrentUserId(victorCookies);
+
+                given()
+                                .cookies(germanCookies)
+                                .when()
+                                .get("/api/v1/users/" + victorId + "/orders")
+                                .then()
+                                .statusCode(403);
+        }
+
+        @Test
+        @Order(30)
+        void testGetMyOrderByIdUnauthorized() {
+                given()
+                                .when()
+                                .get("/api/v1/users/1/orders/1")
+                                .then()
+                                .statusCode(401);
+        }
+
+        @Test
+        @Order(31)
+        void testGetMyOrderByIdNotFoundForVictor() throws JSONException {
+                var victorCookies = loginAsUserVictor();
+                Long victorId = getCurrentUserId(victorCookies);
+
+                given()
+                                .cookies(victorCookies)
+                                .when()
+                                .get("/api/v1/users/" + victorId + "/orders/999999")
+                                .then()
+                                .statusCode(404);
+        }
+
+        @Test
+        @Order(32)
+        void testGetMyInvoicesUnauthorized() {
+                given()
+                                .when()
+                                .get("/api/v1/users/1/invoices")
+                                .then()
+                                .statusCode(401);
+        }
+
+        @Test
+        @Order(33)
+        void testGetMyInvoicesAsVictorSuccess() throws JSONException {
+                var victorCookies = loginAsUserVictor();
+                Long victorId = getCurrentUserId(victorCookies);
+
+                given()
+                                .cookies(victorCookies)
+                                .queryParam("page", 0)
+                                .queryParam("size", 10)
+                                .when()
+                                .get("/api/v1/users/" + victorId + "/invoices")
+                                .then()
+                                .statusCode(200)
+                                .body("content", notNullValue());
+        }
+
+        @Test
+        @Order(34)
+        void testGetMyInvoicesForbiddenWhenVictorUsesGermanId() throws JSONException {
+                var victorCookies = loginAsUserVictor();
+                var germanCookies = loginAsAdminGerman();
+
+                Long germanId = getCurrentUserId(germanCookies);
+
+                given()
+                                .cookies(victorCookies)
+                                .when()
+                                .get("/api/v1/users/" + germanId + "/invoices")
+                                .then()
+                                .statusCode(403);
+        }
+
+        @Test
+        @Order(35)
+        void testGetMyInvoiceByIdUnauthorized() {
+                given()
+                                .when()
+                                .get("/api/v1/users/1/invoices/1")
+                                .then()
+                                .statusCode(401);
+        }
+
+        @Test
+        @Order(36)
+        void testGetMyInvoiceByIdNotFoundForVictor() throws JSONException {
+                var victorCookies = loginAsUserVictor();
+                Long victorId = getCurrentUserId(victorCookies);
+
+                given()
+                                .cookies(victorCookies)
+                                .when()
+                                .get("/api/v1/users/" + victorId + "/invoices/999999")
+                                .then()
+                                .statusCode(404);
+        }
+
+        @Test
+        @Order(37)
+        void testDownloadMyInvoicePdfUnauthorized() {
+                given()
+                                .when()
+                                .get("/api/v1/users/1/invoices/1/download-pdf")
+                                .then()
+                                .statusCode(401);
+        }
+
+        @Test
+        @Order(38)
+        void testDownloadMyInvoicePdfForbiddenWhenVictorUsesGermanId() throws JSONException {
+                var victorCookies = loginAsUserVictor();
+                var germanCookies = loginAsAdminGerman();
+
+                Long germanId = getCurrentUserId(germanCookies);
+
+                given()
+                                .cookies(victorCookies)
+                                .when()
+                                .get("/api/v1/users/" + germanId + "/invoices/1/download-pdf")
+                                .then()
+                                .statusCode(403);
+        }
+
+        @Test
+        @Order(39)
+        void testDownloadMyInvoicePdfNotFoundForVictor() throws JSONException {
+                var victorCookies = loginAsUserVictor();
+                Long victorId = getCurrentUserId(victorCookies);
+
+                given()
+                                .cookies(victorCookies)
+                                .when()
+                                .get("/api/v1/users/" + victorId + "/invoices/999999/download-pdf")
+                                .then()
+                                .statusCode(404);
         }
 
 }

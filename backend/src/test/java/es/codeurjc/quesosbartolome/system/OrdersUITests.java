@@ -99,6 +99,29 @@ public class OrdersUITests {
         orderAlert.accept();
     }
 
+        private void openOrdersPageAsUser() {
+                driver.get("http://localhost:4200/orders");
+                wait.until(ExpectedConditions.urlContains("/orders"));
+                wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".orders-card")));
+        }
+
+        private List<WebElement> waitForOrderRowsWithRetry() {
+                for (int attempt = 0; attempt < 3; attempt++) {
+                        try {
+                                wait.until(driver -> !driver.findElements(By.cssSelector(".orders-row")).isEmpty());
+                                List<WebElement> rows = driver.findElements(By.cssSelector(".orders-row"));
+                                if (!rows.isEmpty()) {
+                                        return rows;
+                                }
+                        } catch (TimeoutException ignored) {
+                                // Retry by refreshing because Angular data loading can be delayed in headless mode.
+                        }
+                        driver.navigate().refresh();
+                        wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".orders-card")));
+                }
+                return driver.findElements(By.cssSelector(".orders-row"));
+        }
+
         private void openOrdersPageAsAdmin() {
                 driver.get("http://localhost:4200/");
                 WebElement ordersMenu = wait.until(ExpectedConditions.elementToBeClickable(
@@ -238,5 +261,53 @@ public class OrdersUITests {
                 rejectAlert.accept();
 
                 assertOrderDisappearsFromList(orderId);
+        }
+
+        @Test
+        public void testUserCanSeeOnlyOwnOrdersInOrdersPage() {
+                String username = "Victor";
+
+                login(username, "password123");
+                createOrderAsUser();
+
+                openOrdersPageAsUser();
+
+                List<WebElement> orderRows = waitForOrderRowsWithRetry();
+
+                assertFalse(orderRows.isEmpty(), "User should see at least one own order");
+                assertTrue(orderRows.stream().allMatch(row -> row.getText().contains(username)),
+                                "User orders list should only contain own orders");
+
+                WebElement firstRow = orderRows.get(0);
+                assertFalse(firstRow.findElements(By.cssSelector(".status-tag")).isEmpty(),
+                                "User row should show status tag");
+                assertTrue(firstRow.findElements(By.cssSelector(".btn-process")).isEmpty(),
+                                "User row should not show admin process button");
+        }
+
+        @Test
+        public void testUserCanOpenOwnOrderPreviewInReadOnlyMode() {
+                String username = "Victor";
+
+                login(username, "password123");
+                createOrderAsUser();
+
+                openOrdersPageAsUser();
+
+                WebElement userOrderRow = waitForOrderRowsWithRetry().stream()
+                                .filter(row -> row.getText().contains(username))
+                                .findFirst()
+                                .orElseThrow(() -> new AssertionError("No order row found for user " + username));
+
+                userOrderRow.click();
+
+                wait.until(ExpectedConditions.urlContains("/orders/"));
+                wait.until(ExpectedConditions.urlContains("/preview"));
+                wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".preview-card")));
+
+                assertTrue(driver.findElements(By.cssSelector(".btn.btn-confirm")).isEmpty(),
+                                "User preview should not show confirm button");
+                assertTrue(driver.findElements(By.cssSelector(".btn.btn-cancel")).isEmpty(),
+                                "User preview should not show reject button");
         }
 }

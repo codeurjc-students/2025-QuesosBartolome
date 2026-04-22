@@ -4,6 +4,8 @@ import { Router } from '@angular/router';
 import { InvoiceService } from '../../service/invoice.service';
 import { InvoiceDTO } from '../../dto/invoice.dto';
 import { DialogService } from '../../service/dialog.service';
+import { UserService } from '../../service/user.service';
+import { UserDTO } from '../../dto/user.dto';
 
 @Component({
   selector: 'app-invoices',
@@ -16,20 +18,45 @@ export class InvoicesComponent implements OnInit {
 
   invoices: InvoiceDTO[] = [];
   loading = true;
+  currentUser: UserDTO | null = null;
 
   currentPage = 0;
   pageSize = 10;
   totalPages = 0;
 
-  constructor(private invoiceService: InvoiceService, private router: Router, private dialogService: DialogService) {}
+  constructor(
+    private invoiceService: InvoiceService,
+    private userService: UserService,
+    private router: Router,
+    private dialogService: DialogService
+  ) {}
 
   ngOnInit(): void {
-    this.loadInvoices();
+    this.userService.getCurrentUser().subscribe({
+      next: (user) => {
+        this.currentUser = user;
+        this.loadInvoices();
+      },
+      error: () => {
+        this.currentUser = null;
+        this.loadInvoices();
+      }
+    });
   }
 
   loadInvoices(): void {
     this.loading = true;
-    this.invoiceService.getAllInvoices(this.currentPage, this.pageSize).subscribe({
+
+    if (!this.isAdmin() && !this.currentUser?.id) {
+      this.router.navigate(['/auth/login']);
+      return;
+    }
+
+    const request = this.isAdmin()
+      ? this.invoiceService.getAllInvoices(this.currentPage, this.pageSize)
+      : this.userService.getMyInvoices(this.currentUser!.id, this.currentPage, this.pageSize);
+
+    request.subscribe({
       next: (data) => {
         this.invoices = data.content;
         this.totalPages = data.totalPages;
@@ -59,7 +86,16 @@ export class InvoicesComponent implements OnInit {
   }
 
   downloadInvoice(invoice: InvoiceDTO): void {
-    this.invoiceService.downloadInvoicePdf(invoice.id).subscribe({
+    if (!this.isAdmin() && !this.currentUser?.id) {
+      this.router.navigate(['/auth/login']);
+      return;
+    }
+
+    const request = this.isAdmin()
+      ? this.invoiceService.downloadInvoicePdf(invoice.id)
+      : this.userService.downloadMyInvoicePdf(this.currentUser!.id, invoice.id);
+
+    request.subscribe({
       next: (pdfBlob: Blob) => {
         // Create a URL for the blob
         const blobUrl = window.URL.createObjectURL(pdfBlob);
@@ -83,5 +119,9 @@ export class InvoicesComponent implements OnInit {
         }
       }
     });
+  }
+
+  isAdmin(): boolean {
+    return this.currentUser?.rols?.includes('ADMIN') ?? false;
   }
 }

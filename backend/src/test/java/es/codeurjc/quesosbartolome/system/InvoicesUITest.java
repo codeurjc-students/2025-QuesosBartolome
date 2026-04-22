@@ -11,6 +11,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
@@ -102,15 +103,7 @@ public class InvoicesUITest {
 	orderAlert.accept();
     }
 
-    @Test
-    public void testAdminSeesInvoiceAfterProcessingOrder() {
-	String username = "Victor";
-
-	login(username, "password123");
-	createOrderAsUser();
-	logout();
-
-	login("German", "password123");
+    private void processFirstPendingOrderForUserAsAdmin(String username) {
 	driver.get("http://localhost:4200/orders");
 
 	List<WebElement> orderRows = wait.until(
@@ -134,6 +127,41 @@ public class InvoicesUITest {
 	Alert invoiceAlert = SeleniumDialogHelper.waitForDialog(wait);
 	assertTrue(invoiceAlert.getText().contains("Factura creada correctamente"));
 	invoiceAlert.accept();
+    }
+
+    private void openInvoicesPageAsUser() {
+	driver.get("http://localhost:4200/invoices");
+	wait.until(ExpectedConditions.urlContains("/invoices"));
+	wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".invoices-card")));
+    }
+
+    private List<WebElement> waitForInvoiceRowsWithRetry() {
+	for (int attempt = 0; attempt < 3; attempt++) {
+	    try {
+		wait.until(driver -> !driver.findElements(By.cssSelector(".invoices-row")).isEmpty());
+		List<WebElement> rows = driver.findElements(By.cssSelector(".invoices-row"));
+		if (!rows.isEmpty()) {
+		    return rows;
+		}
+	    } catch (TimeoutException ignored) {
+		// Retry by refreshing because Angular data loading can be delayed in headless mode.
+	    }
+	    driver.navigate().refresh();
+	    wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".invoices-card")));
+	}
+	return driver.findElements(By.cssSelector(".invoices-row"));
+    }
+
+    @Test
+    public void testAdminSeesInvoiceAfterProcessingOrder() {
+	String username = "Victor";
+
+	login(username, "password123");
+	createOrderAsUser();
+	logout();
+
+	login("German", "password123");
+	processFirstPendingOrderForUserAsAdmin(username);
 
 	driver.get("http://localhost:4200/invoices");
 
@@ -147,5 +175,55 @@ public class InvoicesUITest {
 	});
 
 	assertTrue(foundUserInvoice, "Invoice for processed order should appear in invoices section");
+    }
+
+    @Test
+    public void testUserCanSeeOnlyOwnInvoices() {
+	String username = "Victor";
+
+	login(username, "password123");
+	createOrderAsUser();
+	logout();
+
+	login("German", "password123");
+	processFirstPendingOrderForUserAsAdmin(username);
+	logout();
+
+	login(username, "password123");
+	openInvoicesPageAsUser();
+
+	List<WebElement> invoiceRows = waitForInvoiceRowsWithRetry();
+	assertFalse(invoiceRows.isEmpty(), "User should see at least one own invoice");
+	assertTrue(invoiceRows.stream().allMatch(row -> row.getText().contains(username)),
+		"User invoices list should only contain own invoices");
+	assertTrue(invoiceRows.stream().allMatch(row -> !row.findElements(By.cssSelector(".btn-download")).isEmpty()),
+		"Each invoice row should include download button");
+    }
+
+    @Test
+    public void testUserCanDownloadOwnInvoiceFromInvoicesPage() {
+	String username = "Victor";
+
+	login(username, "password123");
+	createOrderAsUser();
+	logout();
+
+	login("German", "password123");
+	processFirstPendingOrderForUserAsAdmin(username);
+	logout();
+
+	login(username, "password123");
+	openInvoicesPageAsUser();
+
+	WebElement invoiceRow = waitForInvoiceRowsWithRetry().stream()
+		.filter(row -> row.getText().contains(username) && row.getText().contains("FACT-Q"))
+		.findFirst()
+		.orElseThrow(() -> new AssertionError("No invoice row found for user " + username));
+
+	WebElement downloadBtn = invoiceRow.findElement(By.cssSelector(".btn-download"));
+	wait.until(ExpectedConditions.elementToBeClickable(downloadBtn)).click();
+
+	assertTrue(driver.findElements(By.cssSelector(".invoices-card")).size() == 1,
+		"Invoices page should remain visible after download action");
     }
 }

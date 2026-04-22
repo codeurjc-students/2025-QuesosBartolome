@@ -1,26 +1,38 @@
 import { TestBed } from '@angular/core/testing';
 import { HttpClientModule } from '@angular/common/http';
+import { firstValueFrom } from 'rxjs';
 
 import { UserService } from './user.service';
 import { LoginService } from './login.service';
+import { CartService } from './cart.service';
+import { OrderService } from './order.service';
+import { InvoiceService } from './invoice.service';
 import { UserDTO } from '../dto/user.dto';
 import { Page } from '../dto/page.dto';
+import { OrderDTO } from '../dto/order.dto';
+import { InvoiceDTO } from '../dto/invoice.dto';
 
 describe('UserService (integration with real login)', () => {
 
   let service: UserService;
   let loginService: LoginService;
+  let cartService: CartService;
+  let orderService: OrderService;
+  let invoiceService: InvoiceService;
 
   beforeEach(() => {
     TestBed.resetTestingModule();
 
     TestBed.configureTestingModule({
       imports: [HttpClientModule],
-      providers: [UserService, LoginService]
+      providers: [UserService, LoginService, CartService, OrderService, InvoiceService]
     });
 
     service = TestBed.inject(UserService);
     loginService = TestBed.inject(LoginService);
+    cartService = TestBed.inject(CartService);
+    orderService = TestBed.inject(OrderService);
+    invoiceService = TestBed.inject(InvoiceService);
   });
 
   function loginAs(username: string, password: string): Promise<void> {
@@ -56,6 +68,35 @@ describe('UserService (integration with real login)', () => {
     await registerUser(userData);
     await loginAs(username, password);
     return { username, password };
+  }
+
+  function createOrderAsUser(username: string, password: string): Promise<OrderDTO> {
+    return loginAs(username, password).then(() =>
+      new Promise<OrderDTO>((resolve, reject) => {
+        cartService.addCheeseToOrder(5, 1, 1).subscribe({
+          next: () => {
+            orderService.confirmOrder().subscribe({
+              next: (order) => resolve(order),
+              error: (err) => reject('Failed to confirm order: ' + err.message)
+            });
+          },
+          error: (err) => reject('Failed to add cheese before confirming order: ' + err.message)
+        });
+      })
+    );
+  }
+
+  function createInvoiceForUser(username: string, password: string): Promise<InvoiceDTO> {
+    return createOrderAsUser(username, password)
+      .then((order) => loginAs('German', 'password123').then(() => order))
+      .then((order) =>
+        new Promise<InvoiceDTO>((resolve, reject) => {
+          invoiceService.createInvoiceFromOrder({ id: order.id } as any).subscribe({
+            next: (invoice) => resolve(invoice),
+            error: (err) => reject('Failed to create invoice from order: ' + err.message)
+          });
+        })
+      );
   }
 
   it('should return 401 when user is not authenticated', (done) => {
@@ -192,6 +233,156 @@ describe('UserService (integration with real login)', () => {
         }
       });
 
+    }).catch(err => {
+      fail(err);
+      done();
+    });
+  });
+
+  it('should return my paginated orders after user login', (done) => {
+    loginAs('Victor', 'password123').then(() => {
+
+      service.getCurrentUser().subscribe({
+        next: (user) => {
+          service.getMyOrders(user.id, 0, 10).subscribe({
+            next: (page: Page<OrderDTO>) => {
+              expect(page).toBeTruthy();
+              expect(Array.isArray(page.content)).toBeTrue();
+              expect(page.number).toBe(0);
+              expect(page.size).toBe(10);
+              done();
+            },
+            error: (err) => {
+              fail('Failed to get my orders: ' + err.message);
+              done();
+            }
+          });
+        },
+        error: (err) => {
+          fail('Failed to get current user before getMyOrders: ' + err.message);
+          done();
+        }
+      });
+
+    }).catch(err => {
+      fail(err);
+      done();
+    });
+  });
+
+  it('should return my order by id after creating an order', (done) => {
+    createOrderAsUser('Victor', 'password123').then((order) => {
+
+      return firstValueFrom(service.getCurrentUser()).then((user) => ({ order, user }));
+
+    }).then(({ order, user }) => {
+      service.getMyOrderById(user!.id, order.id).subscribe({
+        next: (fetched: OrderDTO) => {
+          expect(fetched).toBeTruthy();
+          expect(fetched.id).toBe(order.id);
+          expect(Array.isArray(fetched.items)).toBeTrue();
+          done();
+        },
+        error: (err) => {
+          fail('Failed to get my order by id: ' + err.message);
+          done();
+        }
+      });
+    }).catch(err => {
+      fail(err);
+      done();
+    });
+  });
+
+  it('should return my paginated invoices after user login', (done) => {
+    loginAs('Victor', 'password123').then(() => {
+
+      service.getCurrentUser().subscribe({
+        next: (user) => {
+          service.getMyInvoices(user.id, 0, 10).subscribe({
+            next: (page: Page<InvoiceDTO>) => {
+              expect(page).toBeTruthy();
+              expect(Array.isArray(page.content)).toBeTrue();
+              expect(page.number).toBe(0);
+              expect(page.size).toBe(10);
+              done();
+            },
+            error: (err) => {
+              fail('Failed to get my invoices: ' + err.message);
+              done();
+            }
+          });
+        },
+        error: (err) => {
+          fail('Failed to get current user before getMyInvoices: ' + err.message);
+          done();
+        }
+      });
+
+    }).catch(err => {
+      fail(err);
+      done();
+    });
+  });
+
+  it('should return my invoice by id after creating an invoice', (done) => {
+    createInvoiceForUser('Victor', 'password123').then((invoice) => {
+
+      return loginAs('Victor', 'password123').then(() => invoice);
+
+    }).then((invoice) => {
+      service.getCurrentUser().subscribe({
+        next: (user) => {
+          service.getMyInvoiceById(user.id, invoice.id).subscribe({
+            next: (fetched: InvoiceDTO) => {
+              expect(fetched).toBeTruthy();
+              expect(fetched.id).toBe(invoice.id);
+              expect(fetched.invNo).toContain('FACT-Q');
+              done();
+            },
+            error: (err) => {
+              fail('Failed to get my invoice by id: ' + err.message);
+              done();
+            }
+          });
+        },
+        error: (err) => {
+          fail('Failed to get current user before getMyInvoiceById: ' + err.message);
+          done();
+        }
+      });
+    }).catch(err => {
+      fail(err);
+      done();
+    });
+  });
+
+  it('should download my invoice pdf as Blob', (done) => {
+    createInvoiceForUser('Victor', 'password123').then((invoice) => {
+
+      return loginAs('Victor', 'password123').then(() => invoice);
+
+    }).then((invoice) => {
+      service.getCurrentUser().subscribe({
+        next: (user) => {
+          service.downloadMyInvoicePdf(user.id, invoice.id).subscribe({
+            next: (blob: Blob) => {
+              expect(blob).toBeTruthy();
+              expect(blob instanceof Blob).toBeTrue();
+              expect(blob.size).toBeGreaterThan(0);
+              done();
+            },
+            error: (err) => {
+              fail('Failed to download my invoice pdf: ' + err.message);
+              done();
+            }
+          });
+        },
+        error: (err) => {
+          fail('Failed to get current user before downloadMyInvoicePdf: ' + err.message);
+          done();
+        }
+      });
     }).catch(err => {
       fail(err);
       done();

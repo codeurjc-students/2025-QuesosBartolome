@@ -103,6 +103,8 @@ public class SecurityConfiguration {
                         .requestMatchers(HttpMethod.POST, "/api/v1/invoices").hasAnyRole("ADMIN")
                         .requestMatchers(HttpMethod.GET, "/api/v1/invoices").hasAnyRole("ADMIN")
                         .requestMatchers(HttpMethod.GET, "/api/v1/invoices/*").hasAnyRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/v1/users/*/orders/**").hasAnyRole("USER")
+                        .requestMatchers(HttpMethod.GET, "/api/v1/users/*/invoices/**").hasAnyRole("USER")
                         .requestMatchers(HttpMethod.GET, "/api/v1/users/all").hasAnyRole("ADMIN")
                         .requestMatchers(HttpMethod.POST, "/api/v1/cheeses/new").hasAnyRole("ADMIN")
                         .requestMatchers(HttpMethod.POST, "/api/v1/cheeses/*/image").hasAnyRole("ADMIN")

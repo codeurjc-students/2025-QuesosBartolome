@@ -34,8 +34,26 @@ public class OrderService {
         return orders.map(orderMapper::toDTO);
     }
 
+    public Page<OrderDTO> getOrdersForUser(String username, Pageable pageable) {
+        User user = userRepository.findByName(username)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+        return orderRepository.findByUserIdOrderByOrderDateDesc(user.getId(), pageable)
+                .map(orderMapper::toDTO);
+    }
+
     public Optional<OrderDTO> getOrderById(Long id) {
         return orderRepository.findByIdAndProcessedFalse(id)
+                .map(orderMapper::toDTO);
+    }
+
+    public Optional<OrderDTO> getOrderByIdForUser(Long id, String username) {
+        Optional<User> userOpt = userRepository.findByName(username);
+        if (userOpt.isEmpty()) {
+            return Optional.empty();
+        }
+
+        return orderRepository.findByIdAndUserId(id, userOpt.get().getId())
                 .map(orderMapper::toDTO);
     }
 

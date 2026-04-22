@@ -219,10 +219,10 @@ public class CheeseUITests {
 
                 // Regular USER should see:
                 assertTrue(sidebar.getText().contains("Mi pedido"), "USER should see 'Mi pedido'");
+                assertTrue(sidebar.getText().contains("Pedidos"), "USER should see 'Pedidos'");
+                assertTrue(sidebar.getText().contains("Facturas"), "USER should see 'Facturas'");
 
-                // And SHOULD NOT see admin entries
-                assertFalse(sidebar.getText().contains("Pedidos"), "USER must NOT see 'Pedidos'");
-                assertFalse(sidebar.getText().contains("Facturas"), "USER must NOT see 'Facturas'");
+                // And SHOULD NOT see admin-only entries
                 assertFalse(sidebar.getText().contains("Gráficos"), "USER must NOT see 'Gráficos'");
                 assertFalse(sidebar.getText().contains("Stock"), "USER must NOT see 'Stock'");
                 assertFalse(sidebar.getText().contains("Clientes"), "USER must NOT see 'Clientes'");

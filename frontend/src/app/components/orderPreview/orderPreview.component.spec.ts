@@ -5,6 +5,7 @@ import { ActivatedRoute, convertToParamMap, Router } from '@angular/router';
 import { OrderService } from '../../service/order.service';
 import { InvoiceService } from '../../service/invoice.service';
 import { DialogService } from '../../service/dialog.service';
+import { UserService } from '../../service/user.service';
 
 describe('OrderPreviewComponent', () => {
   let component: OrderPreviewComponent;
@@ -15,6 +16,7 @@ describe('OrderPreviewComponent', () => {
   let mockRouter: jasmine.SpyObj<Router>;
   let mockActivatedRoute: any;
   let mockDialogService: jasmine.SpyObj<DialogService>;
+  let mockUserService: jasmine.SpyObj<UserService>;
 
   const mockOrder = {
     id: 12,
@@ -22,6 +24,7 @@ describe('OrderPreviewComponent', () => {
     totalWeight: 4.5,
     totalPrice: 86,
     orderDate: '2026-03-18T10:30:00',
+    processed: false,
     items: [
       {
         id: 1,
@@ -40,10 +43,13 @@ describe('OrderPreviewComponent', () => {
     mockInvoiceService = jasmine.createSpyObj('InvoiceService', ['createInvoiceFromOrder']);
     mockRouter = jasmine.createSpyObj('Router', ['navigate']);
     mockDialogService = jasmine.createSpyObj('DialogService', ['alert']);
+    mockUserService = jasmine.createSpyObj('UserService', ['getCurrentUser', 'getMyOrderById']);
 
     mockOrderService.getOrderById.and.returnValue(of(mockOrder));
     mockOrderService.rejectOrder.and.returnValue(of(mockOrder));
     mockInvoiceService.createInvoiceFromOrder.and.returnValue(of({ invNo: 'FACT-Q26/12' } as any));
+    mockUserService.getCurrentUser.and.returnValue(of({ id: 1, rols: ['ADMIN'] } as any));
+    mockUserService.getMyOrderById.and.returnValue(of(mockOrder));
 
     mockActivatedRoute = {
       snapshot: {
@@ -58,7 +64,8 @@ describe('OrderPreviewComponent', () => {
         { provide: InvoiceService, useValue: mockInvoiceService },
         { provide: Router, useValue: mockRouter },
         { provide: ActivatedRoute, useValue: mockActivatedRoute },
-        { provide: DialogService, useValue: mockDialogService }
+        { provide: DialogService, useValue: mockDialogService },
+        { provide: UserService, useValue: mockUserService }
       ]
     }).compileComponents();
 
@@ -76,6 +83,40 @@ describe('OrderPreviewComponent', () => {
     expect(component.loading).toBeFalse();
   });
 
+  it('should load order with user endpoint when current user is USER', () => {
+    mockUserService.getCurrentUser.and.returnValue(of({ id: 7, rols: ['USER'] } as any));
+    mockOrderService.getOrderById.calls.reset();
+    mockUserService.getMyOrderById.calls.reset();
+
+    component.ngOnInit();
+
+    expect(mockUserService.getMyOrderById).toHaveBeenCalledWith(7, 12);
+    expect(mockOrderService.getOrderById).not.toHaveBeenCalled();
+    expect(component.canManageOrder).toBeFalse();
+  });
+
+  it('should navigate to /auth/login when getCurrentUser fails', () => {
+    mockUserService.getCurrentUser.and.returnValue(throwError(() => ({ status: 401 })));
+    mockRouter.navigate.calls.reset();
+
+    component.ngOnInit();
+
+    expect(mockRouter.navigate).toHaveBeenCalledWith(['/auth/login']);
+  });
+
+  it('should navigate to /auth/login when user is not admin and has no id', () => {
+    mockUserService.getCurrentUser.and.returnValue(of({ rols: ['USER'] } as any));
+    mockRouter.navigate.calls.reset();
+    mockUserService.getMyOrderById.calls.reset();
+    mockOrderService.getOrderById.calls.reset();
+
+    component.ngOnInit();
+
+    expect(mockRouter.navigate).toHaveBeenCalledWith(['/auth/login']);
+    expect(mockUserService.getMyOrderById).not.toHaveBeenCalled();
+    expect(mockOrderService.getOrderById).not.toHaveBeenCalled();
+  });
+
   it('should navigate to /orders when route id is invalid', () => {
     TestBed.resetTestingModule();
     
@@ -91,7 +132,8 @@ describe('OrderPreviewComponent', () => {
         { provide: OrderService, useValue: mockOrderService },
         { provide: InvoiceService, useValue: mockInvoiceService },
         { provide: Router, useValue: mockRouter },
-        { provide: ActivatedRoute, useValue: invalidMockActivatedRoute }
+        { provide: ActivatedRoute, useValue: invalidMockActivatedRoute },
+        { provide: UserService, useValue: mockUserService }
       ]
     }).compileComponents();
 
@@ -118,7 +160,8 @@ describe('OrderPreviewComponent', () => {
         { provide: OrderService, useValue: mock404OrderService },
         { provide: InvoiceService, useValue: mockInvoiceService },
         { provide: Router, useValue: mockRouter },
-        { provide: ActivatedRoute, useValue: mockActivatedRoute }
+        { provide: ActivatedRoute, useValue: mockActivatedRoute },
+        { provide: UserService, useValue: mockUserService }
       ]
     }).compileComponents();
 
@@ -144,7 +187,8 @@ describe('OrderPreviewComponent', () => {
         { provide: OrderService, useValue: mock500OrderService },
         { provide: InvoiceService, useValue: mockInvoiceService },
         { provide: Router, useValue: mockRouter },
-        { provide: ActivatedRoute, useValue: mockActivatedRoute }
+        { provide: ActivatedRoute, useValue: mockActivatedRoute },
+        { provide: UserService, useValue: mockUserService }
       ]
     }).compileComponents();
 
@@ -175,6 +219,25 @@ describe('OrderPreviewComponent', () => {
   it('should not confirm when order is null', () => {
     component.order = null;
     component.onConfirm();
+    expect(mockInvoiceService.createInvoiceFromOrder).not.toHaveBeenCalled();
+  });
+
+  it('should not confirm when user cannot manage order', () => {
+    component.order = mockOrder;
+    component.canManageOrder = false;
+
+    component.onConfirm();
+
+    expect(mockInvoiceService.createInvoiceFromOrder).not.toHaveBeenCalled();
+  });
+
+  it('should not confirm when invoice is already being created', () => {
+    component.order = mockOrder;
+    component.canManageOrder = true;
+    component.creatingInvoice = true;
+
+    component.onConfirm();
+
     expect(mockInvoiceService.createInvoiceFromOrder).not.toHaveBeenCalled();
   });
 
@@ -229,6 +292,25 @@ describe('OrderPreviewComponent', () => {
   it('should not reject when invoice is being created', () => {
     component.order = mockOrder;
     component.creatingInvoice = true;
+
+    component.onCancel();
+
+    expect(mockOrderService.rejectOrder).not.toHaveBeenCalled();
+  });
+
+  it('should not reject when user cannot manage order', () => {
+    component.order = mockOrder;
+    component.canManageOrder = false;
+
+    component.onCancel();
+
+    expect(mockOrderService.rejectOrder).not.toHaveBeenCalled();
+  });
+
+  it('should not reject when already rejecting order', () => {
+    component.order = mockOrder;
+    component.canManageOrder = true;
+    component.rejectingOrder = true;
 
     component.onCancel();
 

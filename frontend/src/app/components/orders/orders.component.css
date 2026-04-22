@@ -36,10 +36,17 @@
 
 .orders-row {
   border-bottom: 1px solid var(--gris-suave);
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.2s ease;
 }
 
 .orders-row:last-child {
   border-bottom: none;
+}
+
+.orders-row:hover {
+  background: rgba(0, 0, 0, 0.04);
+  transform: translateY(-1px);
 }
 
 .orders-header span,
@@ -55,6 +62,25 @@
   text-align: center;
   font-size: 0.9rem;
   width: fit-content;
+}
+
+.status-tag {
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 0.88rem;
+  width: fit-content;
+  color: #fff;
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.12);
+}
+
+.status-processed {
+  background: linear-gradient(135deg, #2f80ed, #56ccf2);
+}
+
+.status-pending {
+  background: linear-gradient(135deg, #f2c94c, #f2994a);
+  color: #3a2b00;
 }
 
 .btn-process {

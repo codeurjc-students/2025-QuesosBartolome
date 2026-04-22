@@ -36,10 +36,16 @@
 
 .invoices-row {
   border-bottom: 1px solid var(--gris-suave);
+  transition: background-color 0.2s ease, transform 0.2s ease;
 }
 
 .invoices-row:last-child {
   border-bottom: none;
+}
+
+.invoices-row:hover {
+  background: rgba(0, 0, 0, 0.04);
+  transform: translateY(-1px);
 }
 
 .invoices-header span,

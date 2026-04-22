@@ -121,6 +121,46 @@ public class OrderServiceIntegrationTest {
     }
 
     @Test
+    void shouldReturnOrdersForUser() {
+        Cart otherCart = new Cart();
+        otherCart.setItems(new ArrayList<>());
+        otherCart.setTotalPrice(0.0);
+        otherCart.setTotalWeight(0.0);
+        cartRepository.save(otherCart);
+
+        User otherUser = new User();
+        otherUser.setName("ana");
+        otherUser.setCart(otherCart);
+        otherUser.setOrders(new ArrayList<>());
+        userRepository.save(otherUser);
+
+        Order order1 = new Order(user);
+        order1.setTotalPrice(12.0);
+        orderRepository.save(order1);
+
+        Order order2 = new Order(user);
+        order2.setTotalPrice(22.0);
+        orderRepository.save(order2);
+
+        Order otherOrder = new Order(otherUser);
+        otherOrder.setTotalPrice(50.0);
+        orderRepository.save(otherOrder);
+
+        Page<OrderDTO> page = orderService.getOrdersForUser("pepe", Pageable.unpaged());
+
+        assertThat(page.getContent()).hasSize(2);
+        assertThat(page.getContent().stream().map(OrderDTO::totalPrice).toList())
+                .containsExactlyInAnyOrder(12.0, 22.0);
+    }
+
+    @Test
+    void getOrdersForUserThrowsWhenUserNotFound() {
+        assertThatThrownBy(() -> orderService.getOrdersForUser("ghost", Pageable.unpaged()))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("User not found");
+    }
+
+    @Test
     void shouldFindOwnerByName() {
         Optional<User> found = orderService.findOwnerByName("pepe");
         assertThat(found).isPresent();
@@ -195,6 +235,51 @@ public class OrderServiceIntegrationTest {
         orderRepository.save(order);
 
         Optional<OrderDTO> result = orderService.getOrderById(order.getId());
+
+        assertThat(result).isEmpty();
+    }
+
+    @Test
+    void getOrderByIdForUserReturnsOrderWhenOwnedByUser() {
+        Order order = new Order(user);
+        order.setTotalPrice(19.0);
+        orderRepository.save(order);
+
+        Optional<OrderDTO> result = orderService.getOrderByIdForUser(order.getId(), "pepe");
+
+        assertThat(result).isPresent();
+        assertThat(result.get().id()).isEqualTo(order.getId());
+        assertThat(result.get().totalPrice()).isEqualTo(19.0);
+    }
+
+    @Test
+    void getOrderByIdForUserReturnsEmptyWhenUserDoesNotExist() {
+        Order order = new Order(user);
+        orderRepository.save(order);
+
+        Optional<OrderDTO> result = orderService.getOrderByIdForUser(order.getId(), "ghost");
+
+        assertThat(result).isEmpty();
+    }
+
+    @Test
+    void getOrderByIdForUserReturnsEmptyWhenOrderBelongsToAnotherUser() {
+        Cart otherCart = new Cart();
+        otherCart.setItems(new ArrayList<>());
+        otherCart.setTotalPrice(0.0);
+        otherCart.setTotalWeight(0.0);
+        cartRepository.save(otherCart);
+
+        User otherUser = new User();
+        otherUser.setName("ana");
+        otherUser.setCart(otherCart);
+        otherUser.setOrders(new ArrayList<>());
+        userRepository.save(otherUser);
+
+        Order otherOrder = new Order(otherUser);
+        orderRepository.save(otherOrder);
+
+        Optional<OrderDTO> result = orderService.getOrderByIdForUser(otherOrder.getId(), "pepe");
 
         assertThat(result).isEmpty();
     }
