@@ -12,6 +12,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.test.annotation.DirtiesContext;
 
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import static io.restassured.RestAssured.*;
 import static org.hamcrest.Matchers.*;
 
@@ -141,26 +146,25 @@ public class ApiUserTests {
                                 .body(registerBody.toString())
                                 .post("/api/v1/auth/register")
                                 .then()
-                                .statusCode(201); // Verify registration was successful
+                                .statusCode(201);
 
-                // Login
                 JSONObject loginBody = new JSONObject();
                 loginBody.put("username", "JorgeTestUser");
                 loginBody.put("password", "password123");
 
-                // Store the cookies from the login response
-                var responseCookies = given()
+                var loginResponse = given()
                                 .contentType("application/json")
                                 .body(loginBody.toString())
                                 .post("/api/v1/auth/login")
                                 .then()
                                 .statusCode(200)
                                 .extract()
-                                .detailedCookies();
+                                .response();
 
-                // Get current user with the stored cookies
+                var cookies = loginResponse.detailedCookies();
+
                 given()
-                                .cookies(responseCookies)
+                                .cookies(cookies)
                                 .when()
                                 .get("/api/v1/users")
                                 .then()
@@ -216,7 +220,7 @@ public class ApiUserTests {
         }
 
         @Test
-        @Order(5)
+        @Order(4)
         void testGetUserById() throws JSONException {
                 // Registrar un usuario
                 JSONObject registerBody = new JSONObject();
@@ -513,6 +517,72 @@ public class ApiUserTests {
                                 .body("gmail", equalTo("newmail@test.com"))
                                 .body("direction", equalTo("New Street"))
                                 .body("nif", equalTo("44444444D"));
+        }
+
+        @Test
+        @Order(14)
+        void testUpdateUserNameChangeRefreshesCookies() throws JSONException {
+
+                JSONObject reg = new JSONObject();
+                reg.put("name", "RenameUser");
+                reg.put("password", "password123");
+                reg.put("gmail", "rename@test.com");
+                reg.put("direction", "Old Street");
+                reg.put("nif", "55555555B");
+                reg.put("image", JSONObject.NULL);
+
+                var res = given()
+                                .contentType("application/json")
+                                .body(reg.toString())
+                                .post("/api/v1/auth/register")
+                                .then()
+                                .statusCode(201)
+                                .extract()
+                                .response();
+
+                Number idNumber = res.path("id");
+                Long id = idNumber.longValue();
+
+                JSONObject login = new JSONObject();
+                login.put("username", "RenameUser");
+                login.put("password", "password123");
+
+                var cookies = given()
+                                .contentType("application/json")
+                                .body(login.toString())
+                                .post("/api/v1/auth/login")
+                                .then()
+                                .statusCode(200)
+                                .extract()
+                                .detailedCookies();
+
+                JSONObject update = new JSONObject();
+                update.put("name", "RenameUserUpdated");
+                update.put("gmail", "rename.updated@test.com");
+                update.put("direction", "New Street");
+                update.put("nif", "55555555B");
+
+                var response = given()
+                                .cookies(cookies)
+                                .contentType("application/json")
+                                .body(update.toString())
+                                .when()
+                                .put("/api/v1/users/" + id)
+                                .then()
+                                .statusCode(200)
+                                .extract()
+                                .response();
+
+                List<String> cookieHeaders = response.getHeaders().getValues("Set-Cookie");
+                assertFalse(cookieHeaders.isEmpty(), "Renaming user should return refreshed cookies");
+
+                String cookieHeader = cookieHeaders.stream()
+                                .map(setCookie -> setCookie.split(";", 2)[0])
+                                .reduce((c1, c2) -> c1 + "; " + c2)
+                                .orElse("");
+
+                assertTrue(cookieHeader.contains("AuthToken="), "Access token cookie should be refreshed");
+                assertTrue(cookieHeader.contains("RefreshToken="), "Refresh token cookie should be refreshed");
         }
 
         @Test
