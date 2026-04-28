@@ -84,25 +84,6 @@ public class InvoicesUITest {
 				ExpectedConditions.visibilityOfElementLocated(By.xpath("//button[contains(.,'Cerrar Sesi\u00f3n')]")));
 	}
 
-	private void registerUser(String username, String password) {
-		driver.get("http://localhost:4200/auth/register");
-
-		String nif = String.format("%08dA", Math.abs((int) (System.nanoTime() % 100000000L)));
-
-		wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("nombre"))).sendKeys(username);
-		driver.findElement(By.id("email")).sendKeys(username + "@example.com");
-		driver.findElement(By.id("direccion")).sendKeys("Calle Falsa 123");
-		driver.findElement(By.id("nif")).sendKeys(nif);
-		driver.findElement(By.id("password")).sendKeys(password);
-		driver.findElement(By.id("confirm-password")).sendKeys(password);
-
-		driver.findElement(By.cssSelector("button[type='submit']")).click();
-
-		Alert alert = SeleniumDialogHelper.waitForDialog(wait);
-		assertTrue(alert.getText().contains("Registro exitoso"));
-		alert.accept();
-	}
-
 	private void logout() {
 		driver.get("http://localhost:4200/");
 		WebElement logoutBtn = wait.until(ExpectedConditions.elementToBeClickable(
@@ -195,9 +176,8 @@ public class InvoicesUITest {
 
 	@Test
 	public void testAdminSeesInvoiceAfterProcessingOrder() {
-		String username = "Victor" + System.currentTimeMillis();
+		String username = "Victor";
 
-		registerUser(username, "password123");
 		login(username, "password123");
 		createOrderAsUser();
 		logout();
@@ -221,9 +201,8 @@ public class InvoicesUITest {
 
 	@Test
 	public void testUserCanSeeOnlyOwnInvoices() {
-		String username = "Victor" + System.currentTimeMillis();
+		String username = "Victor";
 
-		registerUser(username, "password123");
 		login(username, "password123");
 		createOrderAsUser();
 		logout();
@@ -245,9 +224,8 @@ public class InvoicesUITest {
 
 	@Test
 	public void testUserCanDownloadOwnInvoiceFromInvoicesPage() {
-		String username = "Victor" + System.currentTimeMillis();
+		String username = "Victor";
 
-		registerUser(username, "password123");
 		login(username, "password123");
 		createOrderAsUser();
 		logout();
