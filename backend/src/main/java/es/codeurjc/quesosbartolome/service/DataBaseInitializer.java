@@ -269,17 +269,25 @@ public class DataBaseInitializer {
 
                 // Create additional customers so the application opens with realistic activity.
                 User tiendaRiaza = createUser("Tienda Artesanal de Riaza", "riaza@ejemplo.com", "Plaza Mayor, Riaza", "70000001A");
-                tiendaRiaza.setImage(saveImage("images/image-artesanal1.avif"));
+                tiendaRiaza.setImage(saveImage("images/image-tienda1.avif"));
                 User supermercadoAldeonte = createUser("Supermercado Aldeonte", "aldeonte@ejemplo.com", "Calle Real, Aldeonte", "70000002B");
-                supermercadoAldeonte.setImage(saveImage("images/image-super1.webp"));
+                supermercadoAldeonte.setImage(saveImage("images/image-tienda2.webp"));
                 User queseriaAyllon = createUser("Queseria Ayllon", "ayllon@ejemplo.com", "Ayllon", "70000003C");
+                queseriaAyllon.setImage(saveImage("images/image-tienda3.webp"));
                 User colmadoSepulveda = createUser("Colmado Sepulveda", "sepulveda@ejemplo.com", "Sepulveda", "70000004D");
+                colmadoSepulveda.setImage(saveImage("images/image-tienda4.png"));
                 User tiendaMaderuelo = createUser("Tienda de Maderuelo", "maderuelo@ejemplo.com", "Maderuelo", "70000005E");
+                tiendaMaderuelo.setImage(saveImage("images/image-tienda5.jpg"));
                 User mercadoCantalejo = createUser("Mercado de Cantalejo", "cantalejo@ejemplo.com", "Cantalejo", "70000006F");
+                mercadoCantalejo.setImage(saveImage("images/image-tienda6.avif"));
                 User distribucionesBurgomillodo = createUser("Distribuciones Burgomillodo", "burgomillodo@ejemplo.com", "Burgomillodo", "70000007G");
+                distribucionesBurgomillodo.setImage(saveImage("images/image-tienda7.webp"));
                 User ecoValle = createUser("Eco Valle de Sepulveda", "ecovalle@ejemplo.com", "Valle de Sepulveda", "70000008H");
+                ecoValle.setImage(saveImage("images/image-tienda8.jpg"));
                 User gourmetPedraza = createUser("Gourmet Pedraza", "pedraza@ejemplo.com", "Pedraza", "70000009I");
+                gourmetPedraza.setImage(saveImage("images/image-tienda9.jpg"));
                 User charcuteriaBoceguillas = createUser("Charcuteria Boceguillas", "boceguillas@ejemplo.com", "Boceguillas", "70000010J");
+                charcuteriaBoceguillas.setImage(saveImage("images/image-tienda10.jpg"));
 
                 // Save cheeses to DB
                 cheeseRepository.save(semicurado);
