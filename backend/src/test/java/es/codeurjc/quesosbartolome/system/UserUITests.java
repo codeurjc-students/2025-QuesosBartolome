@@ -180,8 +180,7 @@ public class UserUITests {
                 String oldDirection = inputByLabel(profileContainer, "Dirección").getDomProperty("value");
                 String newDirection = oldDirection + " Test";
 
-                forceClick(profileContainer
-                                .findElement(By.xpath(".//button[contains(text(),'Editar') and not(contains(text(),'Confirmar'))]")));
+                forceClick(profileContainer.findElement(By.xpath(".//button[normalize-space()='Editar']")));
 
                 WebElement directionField = inputByLabel(profileContainer, "Dirección");
                 directionField.clear();
@@ -194,8 +193,7 @@ public class UserUITests {
                 assertEquals(newDirection, inputByLabel(profileContainer, "Dirección").getDomProperty("value"));
 
                 // Restore old value to avoid side effects
-                forceClick(profileContainer
-                                .findElement(By.xpath(".//button[contains(text(),'Editar') and not(contains(text(),'Confirmar'))]")));
+                forceClick(profileContainer.findElement(By.xpath(".//button[normalize-space()='Editar']")));
                 WebElement directionRestore = inputByLabel(profileContainer, "Dirección");
                 directionRestore.clear();
                 directionRestore.sendKeys(oldDirection);
@@ -212,8 +210,7 @@ public class UserUITests {
 
                 String originalDirection = inputByLabel(profileContainer, "Dirección").getDomProperty("value");
 
-                forceClick(profileContainer
-                                .findElement(By.xpath(".//button[contains(text(),'Editar') and not(contains(text(),'Confirmar'))]")));
+                forceClick(profileContainer.findElement(By.xpath(".//button[normalize-space()='Editar']")));
 
                 WebElement directionField = inputByLabel(profileContainer, "Dirección");
                 directionField.clear();

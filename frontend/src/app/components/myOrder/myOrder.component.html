@@ -17,10 +17,11 @@
       <button class="btn-delete" (click)="removeItem(item.id)">✖</button>
     </div>
 
-    <div class="order-total">
+    <div class="order-item order-total">
       <span class="col-name total-label">Total:</span>
       <span class="col-weight badge">{{ order.totalWeight | number:'1.2-2' }} Kg</span>
       <span class="col-price badge">€{{ order.totalPrice | number:'1.2-2' }}</span>
+      <span class="total-spacer" aria-hidden="true"></span>
     </div>
 
   </div>

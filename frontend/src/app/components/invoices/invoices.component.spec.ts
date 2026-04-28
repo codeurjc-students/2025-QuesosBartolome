@@ -45,16 +45,28 @@ describe('InvoicesComponent', () => {
     dialogServiceSpy = jasmine.createSpyObj('DialogService', ['alert']);
     userServiceSpy.getCurrentUser.and.returnValue(of({ rols: ['ADMIN'] } as any));
 
-    invoiceServiceSpy.getAllInvoices.and.returnValue(of({
-      content: mockInvoices,
-      totalPages: 2,
-      totalElements: 2,
-      size: 10,
-      number: 0,
-      first: true,
-      last: false,
-      numberOfElements: 2
-    }));
+    invoiceServiceSpy.getAllInvoices.and.returnValues(
+      of({
+        content: [mockInvoices[0]],
+        totalPages: 2,
+        totalElements: 2,
+        size: 10,
+        number: 0,
+        first: true,
+        last: false,
+        numberOfElements: 1
+      }),
+      of({
+        content: mockInvoices,
+        totalPages: 2,
+        totalElements: 2,
+        size: 10,
+        number: 1,
+        first: false,
+        last: true,
+        numberOfElements: 2
+      })
+    );
     invoiceServiceSpy.downloadInvoicePdf.and.returnValue(of(new Blob(['pdf'], { type: 'application/pdf' })));
     userServiceSpy.getMyInvoices.and.returnValue(of({
       content: [mockInvoices[0]],
@@ -87,8 +99,11 @@ describe('InvoicesComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should load invoices on init', () => {
+  it('should load invoices on init and go to last page', () => {
     expect(invoiceServiceSpy.getAllInvoices).toHaveBeenCalledWith(0, 10);
+    expect(invoiceServiceSpy.getAllInvoices).toHaveBeenCalledWith(1, 10);
+    expect(component.currentPage).toBe(1);
+    expect(component.invoices.length).toBe(2);
   });
 
   it('should render invoice rows', () => {
@@ -132,8 +147,18 @@ describe('InvoicesComponent', () => {
 
   it('should go to next page when there are more pages', () => {
     component.currentPage = 0;
-    component.totalPages = 3;
+    component.totalPages = 2;
     invoiceServiceSpy.getAllInvoices.calls.reset();
+    invoiceServiceSpy.getAllInvoices.and.returnValue(of({
+      content: mockInvoices,
+      totalPages: 2,
+      totalElements: 2,
+      size: 10,
+      number: 1,
+      first: false,
+      last: true,
+      numberOfElements: 2
+    }));
 
     component.nextPage();
 
@@ -154,7 +179,18 @@ describe('InvoicesComponent', () => {
 
   it('should go to previous page when currentPage is greater than 0', () => {
     component.currentPage = 1;
+    component.totalPages = 2;
     invoiceServiceSpy.getAllInvoices.calls.reset();
+    invoiceServiceSpy.getAllInvoices.and.returnValue(of({
+      content: [mockInvoices[0]],
+      totalPages: 2,
+      totalElements: 2,
+      size: 10,
+      number: 0,
+      first: true,
+      last: false,
+      numberOfElements: 1
+    }));
 
     component.prevPage();
 

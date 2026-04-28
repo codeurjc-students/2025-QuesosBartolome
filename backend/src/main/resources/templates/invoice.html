@@ -217,7 +217,7 @@
             <td th:text="${item.cheeseId}">001</td>
             <td th:text="${item.cheeseName}">Queso Curado</td>
             <td class="text-center" th:text="${item.boxes.size()}">2</td>
-            <td class="text-center" th:text="${item.weight}">6.87</td>
+            <td class="text-center" th:text="${#numbers.formatDecimal(item.weight != null ? item.weight : 0.0, 1, 2)}">6.87</td>
             <td class="text-right">€<span th:text="${#numbers.formatDecimal(item.cheesePrice, 1, 2)}">17.50</span></td>
             <td class="text-right">€<span th:text="${#numbers.formatDecimal(item.totalPrice, 1, 2)}">120.23</span></td>
             <td class="text-right">€<span th:text="${#numbers.formatDecimal(item.totalPrice * 0.04, 1, 2)}">4.81</span></td>

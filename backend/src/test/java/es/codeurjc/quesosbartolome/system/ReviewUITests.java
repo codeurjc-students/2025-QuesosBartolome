@@ -75,7 +75,7 @@ public class ReviewUITests {
 		String loginText = alert.getText();
 		System.out.println("[ReviewUITests] Login alert text: " + loginText);
 		alert.accept();
-		assertTrue(loginText.toLowerCase().contains("login correcto"), "Login failed with alert: " + loginText);
+		assertTrue(loginText.equals("Inicio de sesión correcto"), "Login failed with alert: " + loginText);
 
 		wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".card-grid")));
 	}

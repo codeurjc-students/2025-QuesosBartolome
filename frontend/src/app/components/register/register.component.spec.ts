@@ -90,15 +90,29 @@ describe('RegisterComponent (unit)', () => {
 
   it('should alert if passwords do not match', () => {
     component.nombre = 'Juan';
-    component.password = '123';
-    component.confirmPassword = '456';
+    component.password = 'password123';
+    component.confirmPassword = 'password456';
+    component.email = 'test@test.com';
+    component.direccion = 'dir';
+    component.nif = '12345678A';
+
+    component.register();
+
+    expect(mockDialogService.alert).toHaveBeenCalledWith('Las contraseñas no coinciden');
+    expect(mockLoginService.register).not.toHaveBeenCalled();
+  });
+
+  it('should alert if password has fewer than 8 characters', () => {
+    component.nombre = 'Juan';
+    component.password = '1234567';
+    component.confirmPassword = '1234567';
     component.email = 'test@test.com';
     component.direccion = 'dir';
     component.nif = '1234';
 
     component.register();
 
-    expect(mockDialogService.alert).toHaveBeenCalledWith('Las contraseñas no coinciden');
+    expect(mockDialogService.alert).toHaveBeenCalledWith('La contraseña debe tener al menos 8 caracteres');
     expect(mockLoginService.register).not.toHaveBeenCalled();
   });
 

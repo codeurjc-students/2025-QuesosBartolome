@@ -236,6 +236,11 @@ export class UserPageComponent implements OnInit {
     const input = event.target as HTMLInputElement;
     if (!input.files || input.files.length === 0) return;
     const file = input.files[0];
+    const MAX_BYTES = 10 * 1024 * 1024; // 10MB
+    if (file.size > MAX_BYTES) {
+      this.dialogService.alert('La imagen es demasiado grande. Tamaño máximo: 10MB.');
+      return;
+    }
     this.selectedImageFile = file;
     if (this.previewImageUrl) {
       URL.revokeObjectURL(this.previewImageUrl);

@@ -95,6 +95,22 @@ export class OrderPreviewComponent implements OnInit {
       return;
     }
 
+    this.dialogService.confirm('¿Confirmar este pedido?', () => this.createInvoiceFromOrder());
+  }
+
+  onCancel(): void {
+    if (!this.order || this.rejectingOrder || this.creatingInvoice || !this.canManageOrder) {
+      return;
+    }
+
+    this.dialogService.confirm('¿Rechazar este pedido?', () => this.rejectOrder());
+  }
+
+  private createInvoiceFromOrder(): void {
+    if (!this.order) {
+      return;
+    }
+
     this.creatingInvoice = true;
 
     this.invoiceService.createInvoiceFromOrder(this.order).subscribe({
@@ -122,8 +138,8 @@ export class OrderPreviewComponent implements OnInit {
     });
   }
 
-  onCancel(): void {
-    if (!this.order || this.rejectingOrder || this.creatingInvoice || !this.canManageOrder) {
+  private rejectOrder(): void {
+    if (!this.order) {
       return;
     }
 

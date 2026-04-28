@@ -43,8 +43,10 @@ describe('OrderPreviewComponent', () => {
     mockInvoiceService = jasmine.createSpyObj('InvoiceService', ['createInvoiceFromOrder']);
     mockRouter = jasmine.createSpyObj('Router', ['navigate']);
     mockDialogService = jasmine.createSpyObj('DialogService', ['alert']);
+      mockDialogService = jasmine.createSpyObj('DialogService', ['alert', 'confirm']);
     mockUserService = jasmine.createSpyObj('UserService', ['getCurrentUser', 'getMyOrderById']);
 
+      mockDialogService.confirm.and.callFake((_message, onConfirm) => onConfirm());
     mockOrderService.getOrderById.and.returnValue(of(mockOrder));
     mockOrderService.rejectOrder.and.returnValue(of(mockOrder));
     mockInvoiceService.createInvoiceFromOrder.and.returnValue(of({ invNo: 'FACT-Q26/12' } as any));
@@ -210,6 +212,7 @@ describe('OrderPreviewComponent', () => {
     component.order = mockOrder;
     component.onConfirm();
 
+    expect(mockDialogService.confirm).toHaveBeenCalledWith('¿Confirmar este pedido?', jasmine.any(Function));
     expect(mockInvoiceService.createInvoiceFromOrder).toHaveBeenCalledWith(mockOrder);
     expect(component.creatingInvoice).toBeFalse();
     expect(mockDialogService.alert).toHaveBeenCalledWith('Factura creada correctamente: FACT-Q26/12');
@@ -277,10 +280,29 @@ describe('OrderPreviewComponent', () => {
 
     component.onCancel();
 
+    expect(mockDialogService.confirm).toHaveBeenCalledWith('¿Rechazar este pedido?', jasmine.any(Function));
     expect(mockOrderService.rejectOrder).toHaveBeenCalledWith(12);
     expect(component.rejectingOrder).toBeFalse();
     expect(mockDialogService.alert).toHaveBeenCalledWith('Pedido rechazado.');
     expect(mockRouter.navigate).toHaveBeenCalledWith(['/orders']);
+  });
+
+  it('should request confirmation before creating invoice', () => {
+    component.order = mockOrder;
+    component.canManageOrder = true;
+
+    component.onConfirm();
+
+    expect(mockDialogService.confirm).toHaveBeenCalledWith('¿Confirmar este pedido?', jasmine.any(Function));
+  });
+
+  it('should request confirmation before rejecting order', () => {
+    component.order = mockOrder;
+    component.canManageOrder = true;
+
+    component.onCancel();
+
+    expect(mockDialogService.confirm).toHaveBeenCalledWith('¿Rechazar este pedido?', jasmine.any(Function));
   });
 
   it('should not reject when order is null', () => {

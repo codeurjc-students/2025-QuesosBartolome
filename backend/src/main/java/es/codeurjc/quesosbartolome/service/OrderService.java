@@ -107,8 +107,8 @@ public class OrderService {
             order.getItems().add(orderItem);
         }
 
-        order.setTotalWeight(cart.getTotalWeight());
-        order.setTotalPrice(cart.getTotalPrice());
+        order.setTotalWeight(round2(cart.getTotalWeight()));
+        order.setTotalPrice(round2(cart.getTotalPrice()));
 
         Order savedOrder = orderRepository.save(order);
 
@@ -121,6 +121,10 @@ public class OrderService {
         userRepository.save(user);
 
         return orderMapper.toDTO(savedOrder);
+    }
+
+    private double round2(double value) {
+        return Math.round(value * 100.0) / 100.0;
     }
 
 }

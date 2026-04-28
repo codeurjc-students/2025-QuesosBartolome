@@ -55,7 +55,7 @@ public class LoginUITests {
         button.click();
 
         Alert alert = SeleniumDialogHelper.waitForDialog(wait);
-        assertEquals("¡Login correcto! Los tokens están en las cookies.", alert.getText());
+        assertEquals("Inicio de sesión correcto", alert.getText());
         alert.accept();
 
         wait.until(ExpectedConditions.urlToBe("http://localhost:4200/cheeses"));
@@ -76,7 +76,7 @@ public class LoginUITests {
         loginButton.click();
 
         Alert loginOkAlert = SeleniumDialogHelper.waitForDialog(wait);
-        assertEquals("¡Login correcto! Los tokens están en las cookies.", loginOkAlert.getText());
+        assertEquals("Inicio de sesión correcto", loginOkAlert.getText());
         loginOkAlert.accept();
 
         wait.until(ExpectedConditions.urlToBe("http://localhost:4200/cheeses"));

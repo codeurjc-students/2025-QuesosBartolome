@@ -7,6 +7,8 @@ import es.codeurjc.quesosbartolome.model.OrderItem;
 import es.codeurjc.quesosbartolome.model.User;
 import es.codeurjc.quesosbartolome.repository.CartRepository;
 import es.codeurjc.quesosbartolome.repository.CheeseRepository;
+import es.codeurjc.quesosbartolome.repository.InvoiceRepository;
+import es.codeurjc.quesosbartolome.repository.OrderRepository;
 import es.codeurjc.quesosbartolome.repository.UserRepository;
 import es.codeurjc.quesosbartolome.service.CartService;
 import jakarta.transaction.Transactional;
@@ -43,11 +45,19 @@ public class CartServiceIntegrationTest {
     @Autowired
     private CartRepository cartRepository;
 
+    @Autowired
+    private OrderRepository orderRepository;
+
+    @Autowired
+    private InvoiceRepository invoiceRepository;
+
     private User user;
     private Cheese cheese;
 
     @BeforeEach
     void setup() {
+        invoiceRepository.deleteAll();
+        orderRepository.deleteAll();
         cartRepository.deleteAll();
         userRepository.deleteAll();
         cheeseRepository.deleteAll();
@@ -73,7 +83,11 @@ public class CartServiceIntegrationTest {
     @AfterAll
     static void afterAll(@Autowired UserRepository userRepository,
             @Autowired CartRepository cartRepository,
+            @Autowired OrderRepository orderRepository,
+            @Autowired InvoiceRepository invoiceRepository,
             @Autowired CheeseRepository cheeseRepository) {
+        invoiceRepository.deleteAll();
+        orderRepository.deleteAll();
         userRepository.deleteAll();
         cartRepository.deleteAll();
         cheeseRepository.deleteAll();

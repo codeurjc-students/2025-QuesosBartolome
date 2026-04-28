@@ -18,7 +18,7 @@
 
     <div class="cheese-info">
       <h1 class="cheese-title">{{ cheese.name }}</h1>
-      <p class="cheese-price">{{ cheese.price | currency }}</p>
+      <p class="cheese-price">{{ cheese.price | currency:'EUR':'symbol':'1.2-2' }}</p>
       <p class="cheese-description">{{ cheese.description }}</p>
       <p>Queso Graso E.S. 50 % M.G./ E.S. 45 %</p>
       <p>Se venden por cajas de 6 quesos cada una</p>

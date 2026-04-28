@@ -66,7 +66,7 @@ describe('MyOrderComponent (unit)', () => {
     it('should render order items', () => {
         const debug: DebugElement = fixture.debugElement;
 
-        const items = debug.queryAll(By.css('.order-item'));
+        const items = debug.queryAll(By.css('.order-item:not(.order-total)'));
         expect(items.length).toBe(1);
 
         const name = items[0].query(By.css('.col-name')).nativeElement.textContent.trim();

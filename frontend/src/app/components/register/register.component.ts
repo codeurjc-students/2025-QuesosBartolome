@@ -31,6 +31,11 @@ export class RegisterComponent {
       return;
     }
 
+    if (this.password.length < 8) {
+      this.dialogService.alert('La contraseña debe tener al menos 8 caracteres');
+      return;
+    }
+
     if (this.password !== this.confirmPassword) {
       this.dialogService.alert('Las contraseñas no coinciden');
       return;

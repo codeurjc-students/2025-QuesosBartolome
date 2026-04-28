@@ -79,7 +79,7 @@ public class CheeseDetailsUITests {
                 submitButton.click();
 
                 Alert alert = SeleniumDialogHelper.waitForDialog(wait);
-                assertEquals("¡Login correcto! Los tokens están en las cookies.", alert.getText());
+                assertEquals("Inicio de sesión correcto", alert.getText());
                 alert.accept();
 
                 wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".card-grid")));
@@ -128,7 +128,7 @@ public class CheeseDetailsUITests {
                 submitButton.click();
 
                 Alert alert = SeleniumDialogHelper.waitForDialog(wait);
-                assertEquals("¡Login correcto! Los tokens están en las cookies.", alert.getText());
+                assertEquals("Inicio de sesión correcto", alert.getText());
                 alert.accept();
 
                 wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".card-grid")));

@@ -43,6 +43,7 @@ describe('LoginComponent (unit)', () => {
     component.login();
 
     expect(mockLoginService.login).toHaveBeenCalledWith('Victor', 'password123');
+    expect(mockDialogService.alert).toHaveBeenCalledWith('Inicio de sesión correcto');
     expect(mockRouter.navigate).toHaveBeenCalledWith(['/']);
   });
 

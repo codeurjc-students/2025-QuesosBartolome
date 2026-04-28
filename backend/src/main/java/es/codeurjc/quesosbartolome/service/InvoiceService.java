@@ -88,10 +88,10 @@ public class InvoiceService {
             throw new IllegalStateException("Order already processed");
         }
 
-        double taxableBase = order.getTotalPrice() != null ? order.getTotalPrice() : 0.0;
-        double totalWithIva = order.getItems().stream()
+        double taxableBase = round2(order.getTotalPrice() != null ? order.getTotalPrice() : 0.0);
+        double totalWithIva = round2(order.getItems().stream()
                 .mapToDouble(item -> (item.getTotalPrice() != null ? item.getTotalPrice() : 0.0) * 1.04)
-                .sum();
+            .sum());
 
         Invoice invoice = new Invoice(order.getUser(), order);
         invoice.setTaxableBase(taxableBase);
@@ -106,5 +106,9 @@ public class InvoiceService {
         orderRepository.save(order);
 
         return invoiceMapper.toDTO(savedInvoice);
+    }
+
+    private double round2(double value) {
+        return Math.round(value * 100.0) / 100.0;
     }
 }

@@ -35,16 +35,20 @@ export class InvoicesComponent implements OnInit {
     this.userService.getCurrentUser().subscribe({
       next: (user) => {
         this.currentUser = user;
-        this.loadInvoices();
+        this.loadLastInvoices();
       },
       error: () => {
         this.currentUser = null;
-        this.loadInvoices();
+        this.loadLastInvoices();
       }
     });
   }
 
   loadInvoices(): void {
+    this.loadInvoicesPage(this.currentPage);
+  }
+
+  private loadLastInvoices(): void {
     this.loading = true;
 
     if (!this.isAdmin() && !this.currentUser?.id) {
@@ -53,13 +57,48 @@ export class InvoicesComponent implements OnInit {
     }
 
     const request = this.isAdmin()
-      ? this.invoiceService.getAllInvoices(this.currentPage, this.pageSize)
-      : this.userService.getMyInvoices(this.currentUser!.id, this.currentPage, this.pageSize);
+      ? this.invoiceService.getAllInvoices(0, this.pageSize)
+      : this.userService.getMyInvoices(this.currentUser!.id, 0, this.pageSize);
+
+    request.subscribe({
+      next: (data) => {
+        this.totalPages = data.totalPages;
+        this.currentPage = Math.max(data.totalPages - 1, 0);
+
+        if (this.currentPage === 0) {
+          this.invoices = data.content;
+          this.loading = false;
+          return;
+        }
+
+        this.loadInvoicesPage(this.currentPage);
+      },
+      error: (err) => {
+        this.loading = false;
+        if (err.status >= 500) {
+          this.router.navigate(['/error']);
+        }
+      }
+    });
+  }
+
+  private loadInvoicesPage(page: number): void {
+    this.loading = true;
+
+    if (!this.isAdmin() && !this.currentUser?.id) {
+      this.router.navigate(['/auth/login']);
+      return;
+    }
+
+    const request = this.isAdmin()
+      ? this.invoiceService.getAllInvoices(page, this.pageSize)
+      : this.userService.getMyInvoices(this.currentUser!.id, page, this.pageSize);
 
     request.subscribe({
       next: (data) => {
         this.invoices = data.content;
         this.totalPages = data.totalPages;
+        this.currentPage = data.number;
         this.loading = false;
       },
       error: (err) => {
@@ -73,15 +112,13 @@ export class InvoicesComponent implements OnInit {
 
   nextPage(): void {
     if (this.currentPage < this.totalPages - 1) {
-      this.currentPage++;
-      this.loadInvoices();
+      this.loadInvoicesPage(this.currentPage + 1);
     }
   }
 
   prevPage(): void {
     if (this.currentPage > 0) {
-      this.currentPage--;
-      this.loadInvoices();
+      this.loadInvoicesPage(this.currentPage - 1);
     }
   }
 

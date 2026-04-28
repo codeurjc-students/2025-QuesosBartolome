@@ -25,7 +25,7 @@ export class LoginComponent {
     this.loginService.login(this.username, this.password).subscribe({
       next: (response) => {
         console.log("Login ok:", response);
-        this.dialogService.alert('¡Login correcto! Los tokens están en las cookies.');
+        this.dialogService.alert('Inicio de sesión correcto');
         this.router.navigate(['/']);
       },
       error: (err) => {

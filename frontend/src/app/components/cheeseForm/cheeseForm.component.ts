@@ -83,7 +83,14 @@ export class CheeseFormComponent implements OnInit {
   }
 
   onFileSelected(event: any) {
-    this.selectedFile = event.target.files[0];
+    const file = event.target.files[0];
+    const MAX_BYTES = 10 * 1024 * 1024; // 10MB
+    if (file && file.size > MAX_BYTES) {
+      this.dialogService.alert('La imagen es demasiado grande. Tamaño máximo: 10MB.');
+      this.selectedFile = null;
+      return;
+    }
+    this.selectedFile = file;
   }
 
   createCheese(): void {
