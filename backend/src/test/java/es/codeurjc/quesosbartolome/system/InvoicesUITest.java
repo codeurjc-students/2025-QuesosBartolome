@@ -25,17 +25,12 @@ import org.springframework.boot.test.context.SpringBootTest;
 import es.codeurjc.quesosbartolome.model.Order;
 import es.codeurjc.quesosbartolome.repository.OrderRepository;
 import es.codeurjc.quesosbartolome.repository.UserRepository;
-import es.codeurjc.quesosbartolome.model.User;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
 @SpringBootTest(classes = es.codeurjc.quesosbartolome.QuesosbartolomeApplication.class)
 public class InvoicesUITest {
 
 	@Autowired
 	private UserRepository userRepository;
-
-	@Autowired
-	private PasswordEncoder passwordEncoder;
 
 	@Autowired
 	private OrderRepository orderRepository;
@@ -90,14 +85,22 @@ public class InvoicesUITest {
 	}
 
 	private void registerUser(String username, String password) {
-		// Create user directly using repository to avoid flaky UI registration in CI
+		driver.get("http://localhost:4200/auth/register");
+
 		String nif = String.format("%08dA", Math.abs((int) (System.nanoTime() % 100000000L)));
 
-		if (userRepository.findByName(username).isEmpty()) {
-			User user = new User(username, passwordEncoder.encode(password), username + "@example.com",
-					"Calle Falsa 123", nif, "USER");
-			userRepository.save(user);
-		}
+		wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("nombre"))).sendKeys(username);
+		driver.findElement(By.id("email")).sendKeys(username + "@example.com");
+		driver.findElement(By.id("direccion")).sendKeys("Calle Falsa 123");
+		driver.findElement(By.id("nif")).sendKeys(nif);
+		driver.findElement(By.id("password")).sendKeys(password);
+		driver.findElement(By.id("confirm-password")).sendKeys(password);
+
+		driver.findElement(By.cssSelector("button[type='submit']")).click();
+
+		Alert alert = SeleniumDialogHelper.waitForDialog(wait);
+		assertTrue(alert.getText().contains("Registro exitoso"));
+		alert.accept();
 	}
 
 	private void logout() {
