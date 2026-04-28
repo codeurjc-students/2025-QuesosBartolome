@@ -185,7 +185,7 @@ public class DataBaseInitializer {
                 semicurado.setExpirationDate(Date.valueOf(LocalDate.now().plusMonths(10)));
                 semicurado.setType("Pasta prensada");
                 semicurado.setBoxes(inventoryA);
-                semicurado.setImage(saveImage("images/queso-default.jpg"));
+                semicurado.setImage(saveImage("images/image-Semicurado.JPG"));
 
                 // Create Cheese 2
                 Cheese azul = new Cheese();
@@ -197,7 +197,7 @@ public class DataBaseInitializer {
                 azul.setExpirationDate(Date.valueOf(LocalDate.now().plusMonths(2)));
                 azul.setType("Maduración fúngica");
                 azul.setBoxes(inventoryB);
-                azul.setImage(saveImage("images/queso-default.jpg"));
+                azul.setImage(saveImage("images/image-Azul.JPG"));
 
                 // Create Cheese 3
                 Cheese curado = new Cheese();
@@ -209,7 +209,7 @@ public class DataBaseInitializer {
                 curado.setExpirationDate(Date.valueOf(LocalDate.now().plusMonths(3)));
                 curado.setType("Pasta prensada");
                 curado.setBoxes(inventoryA);
-                curado.setImage(saveImage("images/queso-default.jpg"));
+                curado.setImage(saveImage("images/image-Curado.JPG"));
 
                 // Create Cheese 4
                 Cheese chevrett = new Cheese();
@@ -221,7 +221,7 @@ public class DataBaseInitializer {
                 chevrett.setExpirationDate(Date.valueOf(LocalDate.now().plusMonths(1).plusWeeks(1)));
                 chevrett.setType("Cremoso");
                 chevrett.setBoxes(List.of());
-                chevrett.setImage(saveImage("images/queso-default.jpg"));
+                chevrett.setImage(saveImage("images/image-Chevrett.JPG"));
 
                 // Create Cheese 5
                 Cheese tierno = new Cheese();
@@ -233,7 +233,7 @@ public class DataBaseInitializer {
                 tierno.setExpirationDate(Date.valueOf(LocalDate.now().plusMonths(1).plusWeeks(1)));
                 tierno.setType("Pasta prensada");
                 tierno.setBoxes(inventoryA);
-                tierno.setImage(saveImage("images/queso-default.jpg"));
+                tierno.setImage(saveImage("images/image-Tierno.JPG"));
 
                 // Create user 1
                 User user1 = new User();
@@ -269,7 +269,9 @@ public class DataBaseInitializer {
 
                 // Create additional customers so the application opens with realistic activity.
                 User tiendaRiaza = createUser("Tienda Artesanal de Riaza", "riaza@ejemplo.com", "Plaza Mayor, Riaza", "70000001A");
+                tiendaRiaza.setImage(saveImage("images/image-artesanal1.avif"));
                 User supermercadoAldeonte = createUser("Supermercado Aldeonte", "aldeonte@ejemplo.com", "Calle Real, Aldeonte", "70000002B");
+                supermercadoAldeonte.setImage(saveImage("images/image-super1.webp"));
                 User queseriaAyllon = createUser("Queseria Ayllon", "ayllon@ejemplo.com", "Ayllon", "70000003C");
                 User colmadoSepulveda = createUser("Colmado Sepulveda", "sepulveda@ejemplo.com", "Sepulveda", "70000004D");
                 User tiendaMaderuelo = createUser("Tienda de Maderuelo", "maderuelo@ejemplo.com", "Maderuelo", "70000005E");
