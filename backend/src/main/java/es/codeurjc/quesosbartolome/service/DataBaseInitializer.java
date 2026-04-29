@@ -267,6 +267,16 @@ public class DataBaseInitializer {
                 userAdmin.setRols("ADMIN");
                 userAdmin.setImage(saveImage("images/default-profile.jpg"));
 
+                // Create Admin 2
+                User userAdmin2 = new User();
+                userAdmin2.setName("Admin");
+                userAdmin2.setPassword(passwordEncoder.encode("password123"));
+                userAdmin2.setGmail("Admin@example.com");
+                userAdmin2.setDirection("123 Main St");
+                userAdmin2.setNif("12345678A");
+                userAdmin2.setRols("ADMIN");
+                userAdmin2.setImage(saveImage("images/default-profile.jpg"));
+
                 // Create additional customers so the application opens with realistic activity.
                 User tiendaRiaza = createUser("Tienda Artesanal de Riaza", "riaza@ejemplo.com", "Plaza Mayor, Riaza", "70000001A");
                 tiendaRiaza.setImage(saveImage("images/image-tienda1.avif"));
@@ -300,6 +310,7 @@ public class DataBaseInitializer {
                 userRepository.save(user1);
                 userRepository.save(user2);
                 userRepository.save(userAdmin);
+                userRepository.save(userAdmin2);
                 userRepository.save(tiendaRiaza);
                 userRepository.save(supermercadoAldeonte);
                 userRepository.save(queseriaAyllon);
@@ -454,6 +465,7 @@ public class DataBaseInitializer {
                 userRepository.save(user1);
                 userRepository.save(user2);
                 userRepository.save(userAdmin);
+                userRepository.save(userAdmin2);
                 userRepository.save(tiendaRiaza);
                 userRepository.save(supermercadoAldeonte);
                 userRepository.save(queseriaAyllon);

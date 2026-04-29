@@ -79,14 +79,36 @@ public class OrdersUITests {
 
                 String nif = String.format("%08dA", Math.abs((int) (System.nanoTime() % 100000000L)));
 
-                wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("nombre"))).sendKeys(username);
-                driver.findElement(By.id("email")).sendKeys(username + "@example.com");
-                driver.findElement(By.id("direccion")).sendKeys("Calle Falsa 123");
-                driver.findElement(By.id("nif")).sendKeys(nif);
-                driver.findElement(By.id("password")).sendKeys(password);
-                driver.findElement(By.id("confirm-password")).sendKeys(password);
+                // Wait for all form elements to be present and interactable
+                WebElement nombreField = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("nombre")));
+                WebElement emailField = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("email")));
+                WebElement direccionField = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("direccion")));
+                WebElement nifField = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("nif")));
+                WebElement passwordField = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("password")));
+                WebElement confirmPasswordField = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("confirm-password")));
 
-                driver.findElement(By.cssSelector("button[type='submit']")).click();
+                // Clear fields before sending keys to ensure clean input
+                nombreField.clear();
+                nombreField.sendKeys(username);
+                
+                emailField.clear();
+                emailField.sendKeys(username + "@example.com");
+                
+                direccionField.clear();
+                direccionField.sendKeys("Calle Falsa 123");
+                
+                nifField.clear();
+                nifField.sendKeys(nif);
+                
+                passwordField.clear();
+                passwordField.sendKeys(password);
+                
+                confirmPasswordField.clear();
+                confirmPasswordField.sendKeys(password);
+
+                WebElement submitButton = wait.until(ExpectedConditions.elementToBeClickable(
+                                By.cssSelector("button[type='submit']")));
+                submitButton.click();
 
                 Alert alert = SeleniumDialogHelper.waitForDialog(wait);
                 assertTrue(alert.getText().contains("Registro exitoso"));
