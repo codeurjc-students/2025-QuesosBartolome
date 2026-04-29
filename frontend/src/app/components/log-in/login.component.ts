@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { LoginService } from '../../service/login.service';
 import { Router } from '@angular/router';
+import { DialogService } from '../../service/dialog.service';
 
 @Component({
   selector: 'app-login',
@@ -18,22 +19,22 @@ export class LoginComponent {
   username: string = '';
   password: string = '';
 
-  constructor(private loginService: LoginService, private router: Router) { }
+  constructor(private loginService: LoginService, private router: Router, private dialogService: DialogService) { }
 
   login(): void {
     this.loginService.login(this.username, this.password).subscribe({
       next: (response) => {
         console.log("Login ok:", response);
-        alert("¡Login correcto! Los tokens están en las cookies.");
+        this.dialogService.alert('Inicio de sesión correcto');
         this.router.navigate(['/']);
       },
       error: (err) => {
         console.error("Error en login:", err);
         const backendMessage = err?.error?.message;
         if (backendMessage) {
-          alert(backendMessage);
+          this.dialogService.alert(backendMessage);
         } else {
-          alert("Credenciales incorrectas.");
+          this.dialogService.alert('Credenciales incorrectas.');
         }
         if (err.status >= 500) {
           this.router.navigate(['/error']);

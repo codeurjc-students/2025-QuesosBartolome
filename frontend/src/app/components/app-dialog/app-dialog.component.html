@@ -1,0 +1,35 @@
+<div class="dialog-overlay" *ngIf="dialogState$ | async as dialogState">
+  <section
+    class="dialog-card"
+    [class.confirm-card]="dialogState.type === 'confirm'"
+    [class.alert-card]="dialogState.type === 'alert'"
+    role="alertdialog"
+    aria-modal="true"
+  >
+    <div class="dialog-badge">
+      <span *ngIf="dialogState.type === 'alert'">Aviso</span>
+      <span *ngIf="dialogState.type === 'confirm'">Confirmación</span>
+    </div>
+
+    <p class="dialog-message">{{ dialogState.message }}</p>
+
+    <div class="dialog-actions">
+      <button
+        *ngIf="dialogState.type === 'confirm'"
+        type="button"
+        class="dialog-button dialog-button-secondary"
+        (click)="cancel()"
+      >
+        {{ dialogState.cancelLabel }}
+      </button>
+
+      <button
+        type="button"
+        class="dialog-button dialog-button-primary"
+        (click)="accept()"
+      >
+        {{ dialogState.confirmLabel }}
+      </button>
+    </div>
+  </section>
+</div>

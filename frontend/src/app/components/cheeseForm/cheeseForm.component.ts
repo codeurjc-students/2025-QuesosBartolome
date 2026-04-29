@@ -6,6 +6,7 @@ import { CheeseService } from '../../service/cheese.service';
 import { CheeseDTO } from '../../dto/cheese.dto';
 import { UserDTO } from '../../dto/user.dto';
 import { UserService } from '../../service/user.service';
+import { DialogService } from '../../service/dialog.service';
 
 @Component({
   selector: 'cheese-form',
@@ -35,7 +36,8 @@ export class CheeseFormComponent implements OnInit {
     private cheeseService: CheeseService,
     private userService: UserService,
     private router: Router,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private dialogService: DialogService
   ) { }
 
   ngOnInit(): void {
@@ -74,14 +76,21 @@ export class CheeseFormComponent implements OnInit {
       },
       error: (err) => {
         console.error('Error loading cheese data', err);
-        alert('Error al cargar los datos del queso');
+        this.dialogService.alert('Error al cargar los datos del queso');
         this.router.navigate(['/']);
       }
     });
   }
 
   onFileSelected(event: any) {
-    this.selectedFile = event.target.files[0];
+    const file = event.target.files[0];
+    const MAX_BYTES = 10 * 1024 * 1024; // 10MB
+    if (file && file.size > MAX_BYTES) {
+      this.dialogService.alert('La imagen es demasiado grande. Tamaño máximo: 10MB.');
+      this.selectedFile = null;
+      return;
+    }
+    this.selectedFile = file;
   }
 
   createCheese(): void {
@@ -93,7 +102,7 @@ export class CheeseFormComponent implements OnInit {
 
     this.cheeseService.createCheese(cheeseData).subscribe({
       next: (createdCheese) => {
-        alert("Queso creado correctamente");
+        this.dialogService.alert('Queso creado correctamente');
 
         // Only upload image if there's both an ID and a selected file
         if (createdCheese.id && this.selectedFile) {
@@ -116,9 +125,9 @@ export class CheeseFormComponent implements OnInit {
       error: (err) => {
         console.error("Error creando queso", err);
         if (err.status === 400) {
-          alert("Error al crear queso. Verifica que no exista otro queso con el mismo nombre.");
+          this.dialogService.alert('Error al crear queso. Verifica que no exista otro queso con el mismo nombre.');
         } else {
-          alert("Error al crear queso");
+          this.dialogService.alert('Error al crear queso');
         }
       }
     });
@@ -134,7 +143,7 @@ export class CheeseFormComponent implements OnInit {
 
     this.cheeseService.updateCheese(this.cheeseId!, cheeseData).subscribe({
       next: (updatedCheese) => {
-        alert("Queso actualizado correctamente");
+        this.dialogService.alert('Queso actualizado correctamente');
 
         if (this.selectedFile) {
           this.cheeseService.updateCheeseImage(
@@ -155,9 +164,9 @@ export class CheeseFormComponent implements OnInit {
       error: (err) => {
         console.error("Error actualizando queso", err);
         if (err.status === 400) {
-          alert("Error al actualizar queso. Verifica que no exista otro queso con el mismo nombre.");
+          this.dialogService.alert('Error al actualizar queso. Verifica que no exista otro queso con el mismo nombre.');
         } else {
-          alert("Error al actualizar queso");
+          this.dialogService.alert('Error al actualizar queso');
         }
       }
     });
@@ -173,28 +182,28 @@ export class CheeseFormComponent implements OnInit {
 
     if (!trimmedName || !trimmedDescription || !trimmedType ||
       !trimmedManufactureDate || !trimmedExpirationDate) {
-      alert("Todos los campos son obligatorios");
+      this.dialogService.alert('Todos los campos son obligatorios');
       return false;
     }
 
     if (!this.price || this.price <= 0) {
-      alert("El precio debe ser mayor que 0");
+      this.dialogService.alert('El precio debe ser mayor que 0');
       return false;
     }
 
     const datePattern = /^\d{4}-\d{2}-\d{2}$/;
     if (!datePattern.test(this.manufactureDate)) {
-      alert("La fecha de fabricación debe estar en formato YYYY-MM-DD");
+      this.dialogService.alert('La fecha de fabricación debe estar en formato YYYY-MM-DD');
       return false;
     }
 
     if (!datePattern.test(this.expirationDate)) {
-      alert("La fecha de caducidad debe estar en formato YYYY-MM-DD");
+      this.dialogService.alert('La fecha de caducidad debe estar en formato YYYY-MM-DD');
       return false;
     }
 
     if (this.expirationDate < this.manufactureDate) {
-      alert("La fecha de caducidad debe ser posterior a la de fabricación");
+      this.dialogService.alert('La fecha de caducidad debe ser posterior a la de fabricación');
       return false;
     }
 

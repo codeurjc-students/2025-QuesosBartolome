@@ -9,5 +9,6 @@ public record OrderDTO(
     Double totalWeight,
     Double totalPrice,
     LocalDateTime orderDate,
+    boolean processed,
     List<OrderItemDTO> items
 ) {}

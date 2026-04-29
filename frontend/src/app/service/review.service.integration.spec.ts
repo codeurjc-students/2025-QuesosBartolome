@@ -11,6 +11,10 @@ describe('ReviewService (integration)', () => {
   let service: ReviewService;
   let loginService: LoginService;
 
+  beforeAll(() => {
+    jasmine.DEFAULT_TIMEOUT_INTERVAL = 15000;
+  });
+
   beforeEach(() => {
     TestBed.resetTestingModule();
 

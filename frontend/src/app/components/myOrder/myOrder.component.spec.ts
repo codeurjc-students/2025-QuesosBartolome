@@ -6,6 +6,7 @@ import { OrderService } from '../../service/order.service';
 import { CartDTO } from '../../dto/cart.dto';
 import { By } from '@angular/platform-browser';
 import { DebugElement } from '@angular/core';
+import { DialogService } from '../../service/dialog.service';
 
 describe('MyOrderComponent (unit)', () => {
 
@@ -14,6 +15,7 @@ describe('MyOrderComponent (unit)', () => {
 
     let mockCartService: jasmine.SpyObj<CartService>;
     let mockOrderService: jasmine.SpyObj<OrderService>;
+    let mockDialogService: jasmine.SpyObj<DialogService>;
 
     beforeEach(async () => {
 
@@ -25,6 +27,7 @@ describe('MyOrderComponent (unit)', () => {
         mockOrderService = jasmine.createSpyObj('OrderService', [
             'confirmOrder'
         ]);
+        mockDialogService = jasmine.createSpyObj('DialogService', ['alert']);
 
         const mockCart: CartDTO = {
             id: 1,
@@ -50,7 +53,8 @@ describe('MyOrderComponent (unit)', () => {
             imports: [MyOrderComponent],
             providers: [
                 { provide: CartService, useValue: mockCartService },
-                { provide: OrderService, useValue: mockOrderService }
+                { provide: OrderService, useValue: mockOrderService },
+                { provide: DialogService, useValue: mockDialogService }
             ]
         }).compileComponents();
 
@@ -62,7 +66,7 @@ describe('MyOrderComponent (unit)', () => {
     it('should render order items', () => {
         const debug: DebugElement = fixture.debugElement;
 
-        const items = debug.queryAll(By.css('.order-item'));
+        const items = debug.queryAll(By.css('.order-item:not(.order-total)'));
         expect(items.length).toBe(1);
 
         const name = items[0].query(By.css('.col-name')).nativeElement.textContent.trim();
@@ -91,23 +95,21 @@ describe('MyOrderComponent (unit)', () => {
     });
 
     it('should show success alert when order is confirmed', () => {
-        spyOn(window, 'alert');
         mockOrderService.confirmOrder.and.returnValue(of({} as any));
 
         component.makeOrder();
 
         expect(mockOrderService.confirmOrder).toHaveBeenCalled();
-        expect(window.alert).toHaveBeenCalledWith('Pedido realizado correctamente');
+        expect(mockDialogService.alert).toHaveBeenCalledWith('Pedido realizado correctamente');
     });
 
     it('should show error alert when order confirmation fails', () => {
-        spyOn(window, 'alert');
         mockOrderService.confirmOrder.and.returnValue(throwError(() => new Error('fail')));
 
         component.makeOrder();
 
         expect(mockOrderService.confirmOrder).toHaveBeenCalled();
-        expect(window.alert).toHaveBeenCalledWith('Error al hacer el pedido');
+        expect(mockDialogService.alert).toHaveBeenCalledWith('Error al hacer el pedido');
     });
 
 });

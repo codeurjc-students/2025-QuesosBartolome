@@ -54,8 +54,8 @@ public class LoginUITests {
         WebElement button = wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("button[type='submit']")));
         button.click();
 
-        Alert alert = wait.until(ExpectedConditions.alertIsPresent());
-        assertEquals("¡Login correcto! Los tokens están en las cookies.", alert.getText());
+        Alert alert = SeleniumDialogHelper.waitForDialog(wait);
+        assertEquals("Inicio de sesión correcto", alert.getText());
         alert.accept();
 
         wait.until(ExpectedConditions.urlToBe("http://localhost:4200/cheeses"));
@@ -75,8 +75,8 @@ public class LoginUITests {
         WebElement loginButton = wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("button[type='submit']")));
         loginButton.click();
 
-        Alert loginOkAlert = wait.until(ExpectedConditions.alertIsPresent());
-        assertEquals("¡Login correcto! Los tokens están en las cookies.", loginOkAlert.getText());
+        Alert loginOkAlert = SeleniumDialogHelper.waitForDialog(wait);
+        assertEquals("Inicio de sesión correcto", loginOkAlert.getText());
         loginOkAlert.accept();
 
         wait.until(ExpectedConditions.urlToBe("http://localhost:4200/cheeses"));
@@ -92,7 +92,7 @@ public class LoginUITests {
         ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block:'center'});", banButton);
         banButton.click();
 
-        Alert confirmBanAlert = wait.until(ExpectedConditions.alertIsPresent());
+        Alert confirmBanAlert = SeleniumDialogHelper.waitForDialog(wait);
         confirmBanAlert.accept();
 
         wait.until(ExpectedConditions.visibilityOfElementLocated(
@@ -112,7 +112,7 @@ public class LoginUITests {
         WebElement button = wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("button[type='submit']")));
         button.click();
 
-        Alert alert = wait.until(ExpectedConditions.alertIsPresent());
+        Alert alert = SeleniumDialogHelper.waitForDialog(wait);
         assertEquals("No puedes iniciar sesion: tu cuenta esta baneada.", alert.getText());
         alert.accept();
     }
@@ -130,7 +130,7 @@ public class LoginUITests {
         WebElement button = wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("button[type='submit']")));
         button.click();
 
-        Alert alert = wait.until(ExpectedConditions.alertIsPresent());
+        Alert alert = SeleniumDialogHelper.waitForDialog(wait);
         assertEquals("Credenciales incorrectas.", alert.getText());
         alert.accept();
     }

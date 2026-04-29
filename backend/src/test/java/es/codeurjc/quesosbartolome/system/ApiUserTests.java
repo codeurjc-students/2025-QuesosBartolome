@@ -12,6 +12,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.test.annotation.DirtiesContext;
 
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import static io.restassured.RestAssured.*;
 import static org.hamcrest.Matchers.*;
 
@@ -28,6 +33,89 @@ public class ApiUserTests {
                 RestAssured.port = port;
                 RestAssured.baseURI = "https://localhost";
                 RestAssured.useRelaxedHTTPSValidation();
+        }
+
+        private io.restassured.http.Cookies login(String username, String password) throws JSONException {
+                JSONObject loginBody = new JSONObject();
+                loginBody.put("username", username);
+                loginBody.put("password", password);
+
+                return given()
+                                .contentType("application/json")
+                                .body(loginBody.toString())
+                                .post("/api/v1/auth/login")
+                                .then()
+                                .statusCode(200)
+                                .extract()
+                                .detailedCookies();
+        }
+
+        private Long getCurrentUserId(io.restassured.http.Cookies cookies) {
+                Number id = given()
+                                .cookies(cookies)
+                                .when()
+                                .get("/api/v1/users")
+                                .then()
+                                .statusCode(200)
+                                .extract()
+                                .path("id");
+                return id.longValue();
+        }
+
+        private io.restassured.http.Cookies loginAsAdminGerman() throws JSONException {
+                return login("German", "password123");
+        }
+
+        private io.restassured.http.Cookies loginAsUserVictor() throws JSONException {
+                return login("Victor", "password123");
+        }
+
+        private Long createOrderAsVictor(io.restassured.http.Cookies victorCookies) {
+                given()
+                                .cookies(victorCookies)
+                                .queryParam("cheeseId", 5)
+                                .queryParam("boxes", 1)
+                                .when()
+                                .put("/api/v1/cart/addItem")
+                                .then()
+                                .statusCode(200);
+
+                Integer confirmedOrderId = given()
+                                .cookies(victorCookies)
+                                .when()
+                                .post("/api/v1/orders/confirm")
+                                .then()
+                                .statusCode(201)
+                                .extract()
+                                .path("id");
+
+                if (confirmedOrderId == null) {
+                        throw new AssertionError("Confirmed order id should not be null");
+                }
+
+                return confirmedOrderId.longValue();
+        }
+
+        private Long createInvoiceAsAdmin(io.restassured.http.Cookies adminCookies, Long orderId) throws JSONException {
+                JSONObject body = new JSONObject();
+                body.put("id", orderId);
+
+                Integer invoiceId = given()
+                                .cookies(adminCookies)
+                                .contentType("application/json")
+                                .body(body.toString())
+                                .when()
+                                .post("/api/v1/invoices")
+                                .then()
+                                .statusCode(anyOf(is(200), is(201)))
+                                .extract()
+                                .path("id");
+
+                if (invoiceId == null) {
+                        throw new AssertionError("Invoice id should not be null");
+                }
+
+                return invoiceId.longValue();
         }
 
         @Test
@@ -58,26 +146,25 @@ public class ApiUserTests {
                                 .body(registerBody.toString())
                                 .post("/api/v1/auth/register")
                                 .then()
-                                .statusCode(201); // Verify registration was successful
+                                .statusCode(201);
 
-                // Login
                 JSONObject loginBody = new JSONObject();
                 loginBody.put("username", "JorgeTestUser");
                 loginBody.put("password", "password123");
 
-                // Store the cookies from the login response
-                var responseCookies = given()
+                var loginResponse = given()
                                 .contentType("application/json")
                                 .body(loginBody.toString())
                                 .post("/api/v1/auth/login")
                                 .then()
                                 .statusCode(200)
                                 .extract()
-                                .detailedCookies();
+                                .response();
 
-                // Get current user with the stored cookies
+                var cookies = loginResponse.detailedCookies();
+
                 given()
-                                .cookies(responseCookies)
+                                .cookies(cookies)
                                 .when()
                                 .get("/api/v1/users")
                                 .then()
@@ -133,7 +220,7 @@ public class ApiUserTests {
         }
 
         @Test
-        @Order(5)
+        @Order(4)
         void testGetUserById() throws JSONException {
                 // Registrar un usuario
                 JSONObject registerBody = new JSONObject();
@@ -430,6 +517,72 @@ public class ApiUserTests {
                                 .body("gmail", equalTo("newmail@test.com"))
                                 .body("direction", equalTo("New Street"))
                                 .body("nif", equalTo("44444444D"));
+        }
+
+        @Test
+        @Order(14)
+        void testUpdateUserNameChangeRefreshesCookies() throws JSONException {
+
+                JSONObject reg = new JSONObject();
+                reg.put("name", "RenameUser");
+                reg.put("password", "password123");
+                reg.put("gmail", "rename@test.com");
+                reg.put("direction", "Old Street");
+                reg.put("nif", "55555555B");
+                reg.put("image", JSONObject.NULL);
+
+                var res = given()
+                                .contentType("application/json")
+                                .body(reg.toString())
+                                .post("/api/v1/auth/register")
+                                .then()
+                                .statusCode(201)
+                                .extract()
+                                .response();
+
+                Number idNumber = res.path("id");
+                Long id = idNumber.longValue();
+
+                JSONObject login = new JSONObject();
+                login.put("username", "RenameUser");
+                login.put("password", "password123");
+
+                var cookies = given()
+                                .contentType("application/json")
+                                .body(login.toString())
+                                .post("/api/v1/auth/login")
+                                .then()
+                                .statusCode(200)
+                                .extract()
+                                .detailedCookies();
+
+                JSONObject update = new JSONObject();
+                update.put("name", "RenameUserUpdated");
+                update.put("gmail", "rename.updated@test.com");
+                update.put("direction", "New Street");
+                update.put("nif", "55555555B");
+
+                var response = given()
+                                .cookies(cookies)
+                                .contentType("application/json")
+                                .body(update.toString())
+                                .when()
+                                .put("/api/v1/users/" + id)
+                                .then()
+                                .statusCode(200)
+                                .extract()
+                                .response();
+
+                List<String> cookieHeaders = response.getHeaders().getValues("Set-Cookie");
+                assertFalse(cookieHeaders.isEmpty(), "Renaming user should return refreshed cookies");
+
+                String cookieHeader = cookieHeaders.stream()
+                                .map(setCookie -> setCookie.split(";", 2)[0])
+                                .reduce((c1, c2) -> c1 + "; " + c2)
+                                .orElse("");
+
+                assertTrue(cookieHeader.contains("AuthToken="), "Access token cookie should be refreshed");
+                assertTrue(cookieHeader.contains("RefreshToken="), "Refresh token cookie should be refreshed");
         }
 
         @Test
@@ -919,6 +1072,252 @@ public class ApiUserTests {
                                 .then()
                                 .statusCode(200)
                                 .body("banned", equalTo(false));
+        }
+
+        @Test
+        @Order(26)
+        void testGetMyOrdersUnauthorized() {
+                given()
+                                .when()
+                                .get("/api/v1/users/1/orders")
+                                .then()
+                                .statusCode(401);
+        }
+
+        @Test
+        @Order(27)
+        void testGetMyOrdersAsVictorSuccess() throws JSONException {
+                var victorCookies = loginAsUserVictor();
+                Long victorId = getCurrentUserId(victorCookies);
+
+                given()
+                                .cookies(victorCookies)
+                                .queryParam("page", 0)
+                                .queryParam("size", 10)
+                                .when()
+                                .get("/api/v1/users/" + victorId + "/orders")
+                                .then()
+                                .statusCode(200)
+                                .body("content", notNullValue());
+        }
+
+        @Test
+        @Order(28)
+        void testGetMyOrdersForbiddenWhenVictorUsesGermanId() throws JSONException {
+                var victorCookies = loginAsUserVictor();
+                var germanCookies = loginAsAdminGerman();
+
+                Long germanId = getCurrentUserId(germanCookies);
+
+                given()
+                                .cookies(victorCookies)
+                                .when()
+                                .get("/api/v1/users/" + germanId + "/orders")
+                                .then()
+                                .statusCode(403);
+        }
+
+        @Test
+        @Order(29)
+        void testGetMyOrdersForbiddenWhenGermanUsesVictorId() throws JSONException {
+                var victorCookies = loginAsUserVictor();
+                var germanCookies = loginAsAdminGerman();
+
+                Long victorId = getCurrentUserId(victorCookies);
+
+                given()
+                                .cookies(germanCookies)
+                                .when()
+                                .get("/api/v1/users/" + victorId + "/orders")
+                                .then()
+                                .statusCode(403);
+        }
+
+        @Test
+        @Order(30)
+        void testGetMyOrderByIdUnauthorized() {
+                given()
+                                .when()
+                                .get("/api/v1/users/1/orders/1")
+                                .then()
+                                .statusCode(401);
+        }
+
+        @Test
+        @Order(31)
+        void testGetMyOrderByIdNotFoundForVictor() throws JSONException {
+                var victorCookies = loginAsUserVictor();
+                Long victorId = getCurrentUserId(victorCookies);
+
+                given()
+                                .cookies(victorCookies)
+                                .when()
+                                .get("/api/v1/users/" + victorId + "/orders/999999")
+                                .then()
+                                .statusCode(404);
+        }
+
+        @Test
+        @Order(32)
+        void testGetMyInvoicesUnauthorized() {
+                given()
+                                .when()
+                                .get("/api/v1/users/1/invoices")
+                                .then()
+                                .statusCode(401);
+        }
+
+        @Test
+        @Order(33)
+        void testGetMyInvoicesAsVictorSuccess() throws JSONException {
+                var victorCookies = loginAsUserVictor();
+                Long victorId = getCurrentUserId(victorCookies);
+
+                given()
+                                .cookies(victorCookies)
+                                .queryParam("page", 0)
+                                .queryParam("size", 10)
+                                .when()
+                                .get("/api/v1/users/" + victorId + "/invoices")
+                                .then()
+                                .statusCode(200)
+                                .body("content", notNullValue());
+        }
+
+        @Test
+        @Order(34)
+        void testGetMyInvoicesForbiddenWhenVictorUsesGermanId() throws JSONException {
+                var victorCookies = loginAsUserVictor();
+                var germanCookies = loginAsAdminGerman();
+
+                Long germanId = getCurrentUserId(germanCookies);
+
+                given()
+                                .cookies(victorCookies)
+                                .when()
+                                .get("/api/v1/users/" + germanId + "/invoices")
+                                .then()
+                                .statusCode(403);
+        }
+
+        @Test
+        @Order(35)
+        void testGetMyInvoiceByIdUnauthorized() {
+                given()
+                                .when()
+                                .get("/api/v1/users/1/invoices/1")
+                                .then()
+                                .statusCode(401);
+        }
+
+        @Test
+        @Order(36)
+        void testGetMyInvoiceByIdNotFoundForVictor() throws JSONException {
+                var victorCookies = loginAsUserVictor();
+                Long victorId = getCurrentUserId(victorCookies);
+
+                given()
+                                .cookies(victorCookies)
+                                .when()
+                                .get("/api/v1/users/" + victorId + "/invoices/999999")
+                                .then()
+                                .statusCode(404);
+        }
+
+        @Test
+        @Order(37)
+        void testDownloadMyInvoicePdfUnauthorized() {
+                given()
+                                .when()
+                                .get("/api/v1/users/1/invoices/1/download-pdf")
+                                .then()
+                                .statusCode(401);
+        }
+
+        @Test
+        @Order(38)
+        void testDownloadMyInvoicePdfForbiddenWhenVictorUsesGermanId() throws JSONException {
+                var victorCookies = loginAsUserVictor();
+                var germanCookies = loginAsAdminGerman();
+
+                Long germanId = getCurrentUserId(germanCookies);
+
+                given()
+                                .cookies(victorCookies)
+                                .when()
+                                .get("/api/v1/users/" + germanId + "/invoices/1/download-pdf")
+                                .then()
+                                .statusCode(403);
+        }
+
+        @Test
+        @Order(39)
+        void testDownloadMyInvoicePdfNotFoundForVictor() throws JSONException {
+                var victorCookies = loginAsUserVictor();
+                Long victorId = getCurrentUserId(victorCookies);
+
+                given()
+                                .cookies(victorCookies)
+                                .when()
+                                .get("/api/v1/users/" + victorId + "/invoices/999999/download-pdf")
+                                .then()
+                                .statusCode(404);
+        }
+
+        @Test
+        @Order(40)
+        void testGetMyOrderByIdSuccessForVictor() throws JSONException {
+                var victorCookies = loginAsUserVictor();
+                Long victorId = getCurrentUserId(victorCookies);
+                Long orderId = createOrderAsVictor(victorCookies);
+
+                given()
+                                .cookies(victorCookies)
+                                .when()
+                                .get("/api/v1/users/" + victorId + "/orders/" + orderId)
+                                .then()
+                                .statusCode(200)
+                                .body("id", equalTo(orderId.intValue()))
+                                .body("user.name", equalTo("Victor"));
+        }
+
+        @Test
+        @Order(41)
+        void testGetMyInvoiceByIdSuccessForVictor() throws JSONException {
+                var victorCookies = loginAsUserVictor();
+                var germanCookies = loginAsAdminGerman();
+
+                Long victorId = getCurrentUserId(victorCookies);
+                Long orderId = createOrderAsVictor(victorCookies);
+                Long invoiceId = createInvoiceAsAdmin(germanCookies, orderId);
+
+                given()
+                                .cookies(victorCookies)
+                                .when()
+                                .get("/api/v1/users/" + victorId + "/invoices/" + invoiceId)
+                                .then()
+                                .statusCode(200)
+                                .body("id", equalTo(invoiceId.intValue()))
+                                .body("user.name", equalTo("Victor"));
+        }
+
+        @Test
+        @Order(42)
+        void testDownloadMyInvoicePdfSuccessForVictor() throws JSONException {
+                var victorCookies = loginAsUserVictor();
+                var germanCookies = loginAsAdminGerman();
+
+                Long victorId = getCurrentUserId(victorCookies);
+                Long orderId = createOrderAsVictor(victorCookies);
+                Long invoiceId = createInvoiceAsAdmin(germanCookies, orderId);
+
+                given()
+                                .cookies(victorCookies)
+                                .when()
+                                .get("/api/v1/users/" + victorId + "/invoices/" + invoiceId + "/download-pdf")
+                                .then()
+                                .statusCode(200)
+                                .header("Content-Type", containsString("application/pdf"));
         }
 
 }

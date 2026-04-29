@@ -95,6 +95,42 @@ public class InvoiceServiceIntegrationTest {
     }
 
     @Test
+    void shouldReturnInvoicesForUser() {
+        User otherUser = new User();
+        otherUser.setName("ana");
+        otherUser.setOrders(new ArrayList<>());
+        userRepository.save(otherUser);
+
+        Invoice inv1 = new Invoice(user, null);
+        inv1.setTaxableBase(11.0);
+        inv1.setTotalPrice(11.44);
+        invoiceRepository.save(inv1);
+
+        Invoice inv2 = new Invoice(user, null);
+        inv2.setTaxableBase(22.0);
+        inv2.setTotalPrice(22.88);
+        invoiceRepository.save(inv2);
+
+        Invoice otherInv = new Invoice(otherUser, null);
+        otherInv.setTaxableBase(99.0);
+        otherInv.setTotalPrice(102.96);
+        invoiceRepository.save(otherInv);
+
+        Page<InvoiceDTO> page = invoiceService.getInvoicesForUser("pepe", Pageable.unpaged());
+
+        assertThat(page.getContent()).hasSize(2);
+        assertThat(page.getContent().stream().map(InvoiceDTO::taxableBase).toList())
+                .containsExactlyInAnyOrder(11.0, 22.0);
+    }
+
+    @Test
+    void getInvoicesForUserThrowsWhenUserNotFound() {
+        assertThatThrownBy(() -> invoiceService.getInvoicesForUser("ghost", Pageable.unpaged()))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("User not found");
+    }
+
+    @Test
     void shouldReturnInvoiceById() {
         Invoice inv = new Invoice(user, null);
         inv.setTaxableBase(20.0);
@@ -110,6 +146,114 @@ public class InvoiceServiceIntegrationTest {
     void shouldReturnEmptyWhenInvoiceNotFound() {
         Optional<InvoiceDTO> result = invoiceService.getInvoiceById(999L);
         assertThat(result).isEmpty();
+    }
+
+    @Test
+    void getInvoiceByIdForUserReturnsInvoiceWhenOwnedByUser() {
+        Invoice inv = new Invoice(user, null);
+        inv.setTaxableBase(40.0);
+        invoiceRepository.save(inv);
+
+        Optional<InvoiceDTO> result = invoiceService.getInvoiceByIdForUser(inv.getId(), "pepe");
+
+        assertThat(result).isPresent();
+        assertThat(result.get().id()).isEqualTo(inv.getId());
+        assertThat(result.get().taxableBase()).isEqualTo(40.0);
+    }
+
+    @Test
+    void getInvoiceByIdForUserReturnsEmptyWhenUserNotFound() {
+        Invoice inv = new Invoice(user, null);
+        invoiceRepository.save(inv);
+
+        Optional<InvoiceDTO> result = invoiceService.getInvoiceByIdForUser(inv.getId(), "ghost");
+
+        assertThat(result).isEmpty();
+    }
+
+    @Test
+    void getInvoiceByIdForUserReturnsEmptyWhenInvoiceBelongsToAnotherUser() {
+        User otherUser = new User();
+        otherUser.setName("ana");
+        otherUser.setOrders(new ArrayList<>());
+        userRepository.save(otherUser);
+
+        Invoice otherInv = new Invoice(otherUser, null);
+        invoiceRepository.save(otherInv);
+
+        Optional<InvoiceDTO> result = invoiceService.getInvoiceByIdForUser(otherInv.getId(), "pepe");
+
+        assertThat(result).isEmpty();
+    }
+
+    @Test
+    void getInvoiceEntityReturnsEntityWhenFound() {
+        Invoice inv = new Invoice(user, null);
+        invoiceRepository.save(inv);
+
+        Optional<Invoice> result = invoiceService.getInvoiceEntity(inv.getId());
+
+        assertThat(result).isPresent();
+        assertThat(result.get().getId()).isEqualTo(inv.getId());
+    }
+
+    @Test
+    void getInvoiceEntityForUserReturnsEntityWhenOwnedByUser() {
+        Invoice inv = new Invoice(user, null);
+        invoiceRepository.save(inv);
+
+        Optional<Invoice> result = invoiceService.getInvoiceEntityForUser(inv.getId(), "pepe");
+
+        assertThat(result).isPresent();
+        assertThat(result.get().getId()).isEqualTo(inv.getId());
+    }
+
+    @Test
+    void getInvoiceEntityForUserReturnsEmptyWhenUserNotFound() {
+        Invoice inv = new Invoice(user, null);
+        invoiceRepository.save(inv);
+
+        Optional<Invoice> result = invoiceService.getInvoiceEntityForUser(inv.getId(), "ghost");
+
+        assertThat(result).isEmpty();
+    }
+
+    @Test
+    void getInvoiceEntityForUserReturnsEmptyWhenInvoiceBelongsToAnotherUser() {
+        User otherUser = new User();
+        otherUser.setName("ana");
+        otherUser.setOrders(new ArrayList<>());
+        userRepository.save(otherUser);
+
+        Invoice otherInv = new Invoice(otherUser, null);
+        invoiceRepository.save(otherInv);
+
+        Optional<Invoice> result = invoiceService.getInvoiceEntityForUser(otherInv.getId(), "pepe");
+
+        assertThat(result).isEmpty();
+    }
+
+    @Test
+    void existsByOrderIdReturnsTrueWhenInvoiceExistsForOrder() {
+        Order order = new Order(user);
+        orderRepository.save(order);
+
+        Invoice inv = new Invoice(user, order);
+        invoiceRepository.save(inv);
+
+        boolean exists = invoiceService.existsByOrderId(order.getId());
+
+        assertThat(exists).isTrue();
+    }
+
+    @Test
+    void existsByOrderIdReturnsFalseWhenInvoiceDoesNotExistForOrder() {
+        Order order = new Order(user);
+        orderRepository.save(order);
+
+        boolean exists = invoiceService.existsByOrderId(order.getId());
+
+        assertThat(exists).isFalse();
     }
 
     @Test

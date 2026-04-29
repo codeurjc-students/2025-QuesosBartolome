@@ -31,9 +31,7 @@ public class OrderRestController {
     private OrderService orderService;
 
     @GetMapping
-    public ResponseEntity<Page<OrderDTO>> getAllOrders(
-            @PageableDefault(size = 10) Pageable pageable) {
-
+    public ResponseEntity<Page<OrderDTO>> getAllOrders(@PageableDefault(size = 10) Pageable pageable) {    
         Page<OrderDTO> orders = orderService.getAllOrders(pageable);
         return ResponseEntity.ok(orders);
     }

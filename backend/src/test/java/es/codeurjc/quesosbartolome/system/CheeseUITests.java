@@ -82,7 +82,7 @@ public class CheeseUITests {
                         ((JavascriptExecutor) driver).executeScript("arguments[0].click();", submitButton);
                 }
 
-                Alert alert = wait.until(ExpectedConditions.alertIsPresent());
+                Alert alert = SeleniumDialogHelper.waitForDialog(wait);
                 alert.accept();
         }
 
@@ -210,7 +210,7 @@ public class CheeseUITests {
                 }
 
                 // Accept alert
-                Alert alert = wait.until(ExpectedConditions.alertIsPresent());
+                Alert alert = SeleniumDialogHelper.waitForDialog(wait);
                 alert.accept();
 
                 // Sidebar visible
@@ -219,10 +219,10 @@ public class CheeseUITests {
 
                 // Regular USER should see:
                 assertTrue(sidebar.getText().contains("Mi pedido"), "USER should see 'Mi pedido'");
+                assertTrue(sidebar.getText().contains("Pedidos"), "USER should see 'Pedidos'");
+                assertTrue(sidebar.getText().contains("Facturas"), "USER should see 'Facturas'");
 
-                // And SHOULD NOT see admin entries
-                assertFalse(sidebar.getText().contains("Pedidos"), "USER must NOT see 'Pedidos'");
-                assertFalse(sidebar.getText().contains("Facturas"), "USER must NOT see 'Facturas'");
+                // And SHOULD NOT see admin-only entries
                 assertFalse(sidebar.getText().contains("Gráficos"), "USER must NOT see 'Gráficos'");
                 assertFalse(sidebar.getText().contains("Stock"), "USER must NOT see 'Stock'");
                 assertFalse(sidebar.getText().contains("Clientes"), "USER must NOT see 'Clientes'");
@@ -274,7 +274,7 @@ public class CheeseUITests {
                 }
 
                 // Accept alert
-                Alert alert = wait.until(ExpectedConditions.alertIsPresent());
+                Alert alert = SeleniumDialogHelper.waitForDialog(wait);
                 alert.accept();
 
                 // Sidebar visible
@@ -365,7 +365,7 @@ public class CheeseUITests {
                 }
 
                 // 5. Capture alert
-                Alert errorAlert = wait.until(ExpectedConditions.alertIsPresent());
+                Alert errorAlert = SeleniumDialogHelper.waitForDialog(wait);
                 String alertText = errorAlert.getText();
                 errorAlert.accept();
 
@@ -421,7 +421,7 @@ public class CheeseUITests {
                 }
 
                 // 5. Capture alert and verify error message
-                Alert errorAlert = wait.until(ExpectedConditions.alertIsPresent());
+                Alert errorAlert = SeleniumDialogHelper.waitForDialog(wait);
                 String alertText = errorAlert.getText();
                 errorAlert.accept();
 
@@ -486,7 +486,7 @@ public class CheeseUITests {
                 }
 
                 // 6. Verify success alert appears
-                Alert successAlert = wait.until(ExpectedConditions.alertIsPresent());
+                Alert successAlert = SeleniumDialogHelper.waitForDialog(wait);
                 successAlert.accept();
         }
 
@@ -520,11 +520,11 @@ public class CheeseUITests {
                 }
 
                 // 5. Accept confirmation dialog
-                Alert confirmAlert = wait.until(ExpectedConditions.alertIsPresent());
+                Alert confirmAlert = SeleniumDialogHelper.waitForDialog(wait);
                 confirmAlert.accept();
 
                 // 6. Wait for success alert
-                Alert successAlert = wait.until(ExpectedConditions.alertIsPresent());
+                Alert successAlert = SeleniumDialogHelper.waitForDialog(wait);
                 assertEquals("Queso eliminado correctamente", successAlert.getText());
                 successAlert.accept();
         }

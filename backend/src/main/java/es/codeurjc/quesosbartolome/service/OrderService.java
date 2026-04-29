@@ -34,8 +34,26 @@ public class OrderService {
         return orders.map(orderMapper::toDTO);
     }
 
+    public Page<OrderDTO> getOrdersForUser(String username, Pageable pageable) {
+        User user = userRepository.findByName(username)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+        return orderRepository.findByUserIdOrderByOrderDateDesc(user.getId(), pageable)
+                .map(orderMapper::toDTO);
+    }
+
     public Optional<OrderDTO> getOrderById(Long id) {
         return orderRepository.findByIdAndProcessedFalse(id)
+                .map(orderMapper::toDTO);
+    }
+
+    public Optional<OrderDTO> getOrderByIdForUser(Long id, String username) {
+        Optional<User> userOpt = userRepository.findByName(username);
+        if (userOpt.isEmpty()) {
+            return Optional.empty();
+        }
+
+        return orderRepository.findByIdAndUserId(id, userOpt.get().getId())
                 .map(orderMapper::toDTO);
     }
 
@@ -89,8 +107,8 @@ public class OrderService {
             order.getItems().add(orderItem);
         }
 
-        order.setTotalWeight(cart.getTotalWeight());
-        order.setTotalPrice(cart.getTotalPrice());
+        order.setTotalWeight(round2(cart.getTotalWeight()));
+        order.setTotalPrice(round2(cart.getTotalPrice()));
 
         Order savedOrder = orderRepository.save(order);
 
@@ -103,6 +121,10 @@ public class OrderService {
         userRepository.save(user);
 
         return orderMapper.toDTO(savedOrder);
+    }
+
+    private double round2(double value) {
+        return Math.round(value * 100.0) / 100.0;
     }
 
 }

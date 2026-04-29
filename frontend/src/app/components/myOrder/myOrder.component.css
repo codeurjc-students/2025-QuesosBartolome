@@ -18,7 +18,7 @@
 .order-item,
 .order-total {
   display: grid;
-  grid-template-columns: 1fr 150px 150px 40px;
+  grid-template-columns: 1fr 150px 150px 30px;
   align-items: center;
   padding: 12px 0;
   border-bottom: 1px solid #eee;
@@ -39,8 +39,34 @@
 
 .order-total {
   font-weight: bold;
-  border-top: 2px solid #ddd;
+  background: #2b2b2b;
+  color: #fff;
+  border-top: 2px solid #1f1f1f;
+  border-bottom: none;
+  border-radius: 10px;
   margin-top: 10px;
+}
+
+.order-total .total-label {
+  color: #fff;
+}
+
+.order-total .col-weight,
+.order-total .col-price {
+  margin-left: 0;
+  transform: none;
+}
+
+.order-total .badge {
+  background: #111;
+  color: #fff;
+}
+
+.order-total .total-spacer {
+  width: 20px;
+  height: 20px;
+  margin: 0 auto;
+  visibility: hidden;
 }
 
 .badge {
@@ -81,14 +107,6 @@
 
 .confirm:hover {
   background: #555;
-}
-
-.order-item {
-  display: grid;
-  grid-template-columns: 1fr 150px 150px 30px;
-  align-items: center;
-  padding: 12px 0;
-  border-bottom: 1px solid #eee;
 }
 
 .order-item .btn-delete {

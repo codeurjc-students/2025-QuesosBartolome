@@ -15,6 +15,7 @@ import { ReviewDTO } from '../../dto/review.dto';
 import { Page } from '../../dto/page.dto';
 import { UserBasicDTO } from '../../dto/userBasic.dto';
 import { CheeseBasicDTO } from '../../dto/cheeseBasic.dto';
+import { DialogService } from '../../service/dialog.service';
 
 
 describe('CheeseDetailsComponent (unit)', () => {
@@ -28,6 +29,7 @@ describe('CheeseDetailsComponent (unit)', () => {
   let mockReviewService: jasmine.SpyObj<ReviewService>;
   let mockRoute: any;
   let mockRouter: jasmine.SpyObj<Router>;
+  let mockDialogService: jasmine.SpyObj<DialogService>;
 
   const CHEESE_ID = 999;
 
@@ -82,6 +84,8 @@ const mockCheeseBasic: CheeseBasicDTO = {
     mockUserService = jasmine.createSpyObj('UserService', ['getCurrentUser']);
     mockCartService = jasmine.createSpyObj('CartService', ['addCheeseToOrder']);
     mockRouter = jasmine.createSpyObj('Router', ['navigate']);
+    mockDialogService = jasmine.createSpyObj('DialogService', ['alert', 'confirm']);
+    mockDialogService.confirm.and.callFake((_message, onConfirm) => onConfirm());
 
     mockRoute = { snapshot: { paramMap: new Map([['id', CHEESE_ID.toString()]]) } };
 
@@ -100,7 +104,8 @@ const mockCheeseBasic: CheeseBasicDTO = {
         { provide: CartService, useValue: mockCartService },
         { provide: ActivatedRoute, useValue: mockRoute },
         { provide: ReviewService, useValue: mockReviewService },
-        { provide: Router, useValue: mockRouter }
+        { provide: Router, useValue: mockRouter },
+        { provide: DialogService, useValue: mockDialogService }
       ]
     }).compileComponents();
 
@@ -237,37 +242,29 @@ const mockCheeseBasic: CheeseBasicDTO = {
   });
 
   it('should alert when boxesValue is empty', () => {
-    spyOn(window, 'alert');
-
     component.addToOrder("");
 
-    expect(window.alert).toHaveBeenCalledWith('Debes introducir una cantidad');
+    expect(mockDialogService.alert).toHaveBeenCalledWith('Debes introducir una cantidad');
   });
 
   it('should alert when boxesValue is invalid', () => {
-    spyOn(window, 'alert');
-
     component.cheese = { ...baseCheese };
 
     component.addToOrder("0");
 
-    expect(window.alert).toHaveBeenCalledWith('Ingrese una cantidad correcta');
+    expect(mockDialogService.alert).toHaveBeenCalledWith('Ingrese una cantidad correcta');
   });
 
   it('should alert when user is not logged in', () => {
-    spyOn(window, 'alert');
-
     component.currentUser = null;
     component.cheese = { ...baseCheese };
 
     component.addToOrder("1");
 
-    expect(window.alert).toHaveBeenCalledWith('Debes estar logueado');
+    expect(mockDialogService.alert).toHaveBeenCalledWith('Debes estar logueado');
   });
 
   it('should alert when addCheeseToOrder fails', () => {
-    spyOn(window, 'alert');
-
     component.currentUser = baseUser;
     component.cheese = { ...baseCheese };
 
@@ -277,12 +274,10 @@ const mockCheeseBasic: CheeseBasicDTO = {
 
     component.addToOrder("1");
 
-    expect(window.alert).toHaveBeenCalledWith('Error al añadir el producto');
+    expect(mockDialogService.alert).toHaveBeenCalledWith('Error al añadir el producto');
   });
 
   it('should add item to order when valid boxes are provided', fakeAsync(() => {
-    spyOn(window, 'alert');
-
     mockUserService.getCurrentUser.and.returnValue(of(baseUser));
     mockCheeseService.getCheeseById.and.returnValue(of(baseCheese));
     mockCheeseService.getCheeseImage.and.returnValue(of(new Blob(['fake'])));
@@ -315,13 +310,10 @@ const mockCheeseBasic: CheeseBasicDTO = {
     tick();
 
     expect(mockCartService.addCheeseToOrder).toHaveBeenCalledWith(1, 999, 1);
-    expect(window.alert).toHaveBeenCalledWith('Producto añadido al pedido');
+    expect(mockDialogService.alert).toHaveBeenCalledWith('Producto añadido al pedido');
   }));
 
   it('should delete cheese successfully', fakeAsync(() => {
-    spyOn(window, 'confirm').and.returnValue(true);
-    spyOn(window, 'alert');
-
     mockUserService.getCurrentUser.and.returnValue(of(baseUser));
     mockCheeseService.getCheeseById.and.returnValue(of(baseCheese));
     mockCheeseService.getCheeseImage.and.returnValue(of(new Blob(['fake'])));
@@ -334,14 +326,11 @@ const mockCheeseBasic: CheeseBasicDTO = {
     component.deleteCheese();
     tick();
 
-    expect(window.alert).toHaveBeenCalledWith('Queso eliminado correctamente');
+    expect(mockDialogService.alert).toHaveBeenCalledWith('Queso eliminado correctamente');
     expect(mockRouter.navigate).toHaveBeenCalledWith(['/cheeses']);
   }));
 
   it('should alert when deleteCheese fails', () => {
-    spyOn(window, 'confirm').and.returnValue(true);
-    spyOn(window, 'alert');
-
     component.cheese = { ...baseCheese };
 
     mockCheeseService.deleteCheese.and.returnValue(
@@ -350,7 +339,7 @@ const mockCheeseBasic: CheeseBasicDTO = {
 
     component.deleteCheese();
 
-    expect(window.alert).toHaveBeenCalledWith('Error al eliminar el queso');
+    expect(mockDialogService.alert).toHaveBeenCalledWith('Error al eliminar el queso');
   });
 
   it('should navigate to edit page when editCheese is called', () => {
@@ -372,30 +361,24 @@ const mockCheeseBasic: CheeseBasicDTO = {
 });
 
 it('should alert when rating is invalid', () => {
-  spyOn(window, 'alert');
-
   component.newRating = 10;
   component.newComment = "Comentario válido";
 
   component.submitReview();
 
-  expect(window.alert).toHaveBeenCalledWith('La puntuación debe estar entre 0 y 5');
+  expect(mockDialogService.alert).toHaveBeenCalledWith('La puntuación debe estar entre 0 y 5');
 });
 
 it('should alert when comment is empty', () => {
-  spyOn(window, 'alert');
-
   component.newRating = 5;
   component.newComment = "   ";
 
   component.submitReview();
 
-  expect(window.alert).toHaveBeenCalledWith('El comentario es obligatorio');
+  expect(mockDialogService.alert).toHaveBeenCalledWith('El comentario es obligatorio');
 });
 
 it('should create review successfully', () => {
-  spyOn(window, 'alert');
-
   component.cheese = baseCheese;
   component.newRating = 5;
   component.newComment = "Muy bueno";
@@ -411,12 +394,10 @@ it('should create review successfully', () => {
   expect(mockReviewService.createReview)
     .toHaveBeenCalledWith(5, "Muy bueno", CHEESE_ID);
 
-  expect(window.alert).toHaveBeenCalledWith('Reseña creada correctamente');
+  expect(mockDialogService.alert).toHaveBeenCalledWith('Reseña creada correctamente');
 });
 
 it('should alert when createReview fails', () => {
-  spyOn(window, 'alert');
-
   component.cheese = baseCheese;
   component.newRating = 5;
   component.newComment = "Muy bueno";
@@ -427,7 +408,7 @@ it('should alert when createReview fails', () => {
 
   component.submitReview();
 
-  expect(window.alert).toHaveBeenCalledWith('Error al crear la reseña');
+  expect(mockDialogService.alert).toHaveBeenCalledWith('Error al crear la reseña');
 });
 
 it('should show delete button only for admin', () => {
@@ -452,9 +433,6 @@ it('should show delete button only for admin', () => {
 
 
 it('should delete review successfully', () => {
-  spyOn(window, 'confirm').and.returnValue(true);
-  spyOn(window, 'alert');
-
   component.cheese = baseCheese;
   component.currentUser = { ...baseUser, rols: ['ADMIN'] };
 
@@ -467,13 +445,10 @@ it('should delete review successfully', () => {
   component.deleteReviewFromCheese(1);
 
   expect(mockReviewService.deleteReview).toHaveBeenCalledWith(1);
-  expect(window.alert).toHaveBeenCalledWith('Reseña eliminada correctamente');
+  expect(mockDialogService.alert).toHaveBeenCalledWith('Reseña eliminada correctamente');
 });
 
 it('should alert when deleteReview fails', () => {
-  spyOn(window, 'confirm').and.returnValue(true);
-  spyOn(window, 'alert');
-
   component.cheese = baseCheese;
   component.currentUser = { ...baseUser, rols: ['ADMIN'] };
 
@@ -483,7 +458,7 @@ it('should alert when deleteReview fails', () => {
 
   component.deleteReviewFromCheese(1);
 
-  expect(window.alert).toHaveBeenCalledWith('No se pudo eliminar la reseña');
+  expect(mockDialogService.alert).toHaveBeenCalledWith('No se pudo eliminar la reseña');
 });
 
 

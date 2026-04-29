@@ -60,7 +60,7 @@ public class UserUITests {
                 WebElement submitButton = driver.findElement(By.cssSelector("button[type='submit']"));
                 submitButton.click();
 
-                Alert alert = wait.until(ExpectedConditions.alertIsPresent());
+                Alert alert = SeleniumDialogHelper.waitForDialog(wait);
                 String alertText = alert.getText();
                 alert.accept();
                 if (alertText.contains("incorrectas") || alertText.toLowerCase().contains("error")) {
@@ -180,8 +180,7 @@ public class UserUITests {
                 String oldDirection = inputByLabel(profileContainer, "Dirección").getDomProperty("value");
                 String newDirection = oldDirection + " Test";
 
-                forceClick(profileContainer
-                                .findElement(By.xpath(".//button[contains(text(),'Editar') and not(contains(text(),'Confirmar'))]")));
+                forceClick(profileContainer.findElement(By.xpath(".//button[normalize-space()='Editar']")));
 
                 WebElement directionField = inputByLabel(profileContainer, "Dirección");
                 directionField.clear();
@@ -194,8 +193,7 @@ public class UserUITests {
                 assertEquals(newDirection, inputByLabel(profileContainer, "Dirección").getDomProperty("value"));
 
                 // Restore old value to avoid side effects
-                forceClick(profileContainer
-                                .findElement(By.xpath(".//button[contains(text(),'Editar') and not(contains(text(),'Confirmar'))]")));
+                forceClick(profileContainer.findElement(By.xpath(".//button[normalize-space()='Editar']")));
                 WebElement directionRestore = inputByLabel(profileContainer, "Dirección");
                 directionRestore.clear();
                 directionRestore.sendKeys(oldDirection);
@@ -212,8 +210,7 @@ public class UserUITests {
 
                 String originalDirection = inputByLabel(profileContainer, "Dirección").getDomProperty("value");
 
-                forceClick(profileContainer
-                                .findElement(By.xpath(".//button[contains(text(),'Editar') and not(contains(text(),'Confirmar'))]")));
+                forceClick(profileContainer.findElement(By.xpath(".//button[normalize-space()='Editar']")));
 
                 WebElement directionField = inputByLabel(profileContainer, "Dirección");
                 directionField.clear();
@@ -257,7 +254,7 @@ public class UserUITests {
 
                 forceClick(profileContainer.findElement(By.xpath(".//button[contains(text(),'Confirmar cambio')]")));
 
-                Alert successAlert = wait.until(ExpectedConditions.alertIsPresent());
+                Alert successAlert = SeleniumDialogHelper.waitForDialog(wait);
                 assertTrue(successAlert.getText().contains("actualizada"));
                 successAlert.accept();
 
@@ -269,7 +266,7 @@ public class UserUITests {
                 inputByLabel(profileContainer, "Nueva contraseña").sendKeys("password123");
                 inputByLabel(profileContainer, "Repite la nueva contraseña").sendKeys("password123");
                 forceClick(profileContainer.findElement(By.xpath(".//button[contains(text(),'Confirmar cambio')]")));
-                Alert restoreAlert = wait.until(ExpectedConditions.alertIsPresent());
+                Alert restoreAlert = SeleniumDialogHelper.waitForDialog(wait);
                 assertTrue(restoreAlert.getText().contains("actualizada"));
                 restoreAlert.accept();
         }
@@ -288,13 +285,13 @@ public class UserUITests {
 
                 if (banButton.getText().trim().equalsIgnoreCase("Desbanear")) {
                         forceClick(banButton);
-                        Alert unbanConfirm = wait.until(ExpectedConditions.alertIsPresent());
+                        Alert unbanConfirm = SeleniumDialogHelper.waitForDialog(wait);
                         unbanConfirm.accept();
                         wait.until(ExpectedConditions.textToBePresentInElement(banButton, "Banear"));
                 }
 
                 forceClick(banButton);
-                Alert banConfirm = wait.until(ExpectedConditions.alertIsPresent());
+                Alert banConfirm = SeleniumDialogHelper.waitForDialog(wait);
                 banConfirm.accept();
 
                 wait.until(ExpectedConditions.visibilityOfElementLocated(

@@ -7,9 +7,13 @@ import org.springframework.stereotype.Repository;
 
 import es.codeurjc.quesosbartolome.model.Order;
 
+import java.util.Optional;
+
 @Repository
 public interface OrderRepository extends JpaRepository<Order, Long> {
     Page<Order> findByProcessedFalse(Pageable pageable);
-    java.util.Optional<Order> findByIdAndProcessedFalse(Long id);
+    Optional<Order> findByIdAndProcessedFalse(Long id);
+    Page<Order> findByUserIdOrderByOrderDateDesc(Long userId, Pageable pageable);
+    Optional<Order> findByIdAndUserId(Long id, Long userId);
 
 }

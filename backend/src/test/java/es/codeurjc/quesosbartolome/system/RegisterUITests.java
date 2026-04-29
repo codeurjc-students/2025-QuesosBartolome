@@ -70,8 +70,7 @@ public class RegisterUITests {
 
         submitButton.click();
 
-        Alert alert = new WebDriverWait(driver, Duration.ofSeconds(10))
-                .until(ExpectedConditions.alertIsPresent());
+        Alert alert = SeleniumDialogHelper.waitForDialog(wait);
 
         assertEquals("Registro exitoso", alert.getText());
         alert.accept();

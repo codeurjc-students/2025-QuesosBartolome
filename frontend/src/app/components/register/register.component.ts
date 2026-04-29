@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { LoginService } from '../../service/login.service';
 import { Router } from '@angular/router';
+import { DialogService } from '../../service/dialog.service';
 
 @Component({
   selector: 'app-register',
@@ -22,16 +23,21 @@ export class RegisterComponent {
   direccion: string = '';
   nif: string = '';
 
-  constructor(private loginService: LoginService, private router: Router) { }
+  constructor(private loginService: LoginService, private router: Router, private dialogService: DialogService) { }
 
   register(): void {
     if (!this.nombre || !this.password || !this.confirmPassword || !this.email || !this.direccion || !this.nif) {
-      alert('Todos los campos son obligatorios');
+      this.dialogService.alert('Todos los campos son obligatorios');
+      return;
+    }
+
+    if (this.password.length < 8) {
+      this.dialogService.alert('La contraseña debe tener al menos 8 caracteres');
       return;
     }
 
     if (this.password !== this.confirmPassword) {
-      alert('Las contraseñas no coinciden');
+      this.dialogService.alert('Las contraseñas no coinciden');
       return;
     }
 
@@ -45,12 +51,12 @@ export class RegisterComponent {
 
     this.loginService.register(userData).subscribe({
       next: () => {
-        alert('Registro exitoso');
+        this.dialogService.alert('Registro exitoso');
         this.router.navigate(['/']);
       },
       error: (err) => {
         console.error('Error en registro', err);
-        alert(err.error?.error || 'Error desconocido');
+        this.dialogService.alert(err.error?.error || 'Error desconocido');
         if (err.status >= 500) {
           this.router.navigate(['/error']);
         }

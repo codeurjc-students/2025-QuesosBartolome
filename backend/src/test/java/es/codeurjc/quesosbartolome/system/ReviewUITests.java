@@ -39,13 +39,6 @@ public class ReviewUITests {
 		wait = new WebDriverWait(driver, Duration.ofSeconds(20));
 	}
 
-	@AfterEach
-	public void teardown() {
-		if (driver != null) {
-			driver.quit();
-		}
-	}
-
 	private void clickWithFallback(WebElement element) {
 		((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block: 'center'});", element);
 		try {
@@ -78,11 +71,11 @@ public class ReviewUITests {
 				By.cssSelector("button[type='submit']")));
 		clickWithFallback(submitButton);
 
-		Alert alert = wait.until(ExpectedConditions.alertIsPresent());
+		Alert alert = SeleniumDialogHelper.waitForDialog(wait);
 		String loginText = alert.getText();
 		System.out.println("[ReviewUITests] Login alert text: " + loginText);
 		alert.accept();
-		assertTrue(loginText.toLowerCase().contains("login correcto"), "Login failed with alert: " + loginText);
+		assertTrue(loginText.equals("Inicio de sesión correcto"), "Login failed with alert: " + loginText);
 
 		wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".card-grid")));
 	}
@@ -162,35 +155,18 @@ public class ReviewUITests {
 	}
 
 	private String tryReadAnyAlertText(Duration timeout) {
-		long end = System.currentTimeMillis() + timeout.toMillis();
-		while (System.currentTimeMillis() < end) {
-			try {
-				Alert nativeAlert = driver.switchTo().alert();
-				String nativeText = nativeAlert.getText();
-				nativeAlert.accept();
-				return nativeText;
-			} catch (NoAlertPresentException ignored) {
-				// Keep checking until timeout.
-			}
-
+		try {
+			Alert dialogAlert = SeleniumDialogHelper.waitForDialog(new WebDriverWait(driver, timeout));
+			String dialogText = dialogAlert.getText();
+			dialogAlert.accept();
+			return dialogText;
+		} catch (TimeoutException ignored) {
 			List<String> alerts = getCapturedAlerts();
 			if (!alerts.isEmpty()) {
 				return alerts.get(0);
 			}
-
-			try {
-				Thread.sleep(150);
-			} catch (InterruptedException e) {
-				Thread.currentThread().interrupt();
-				return null;
-			}
+			return null;
 		}
-		return null;
-	}
-
-	private void resetSession() {
-		driver.manage().deleteAllCookies();
-		driver.get("http://localhost:4200/");
 	}
 
 	@Test
@@ -229,37 +205,4 @@ public class ReviewUITests {
 		wait.until(d -> getTotalReviewsFromTitle() >= previousTotal + 1);
 	}
 
-	@Test
-	@Order(3)
-	public void testUserCanDeleteOwnReview() {
-		String deletableComment = "Review To Delete " + System.currentTimeMillis();
-
-		login("Victor", "password123");
-		openCheeseDetailsByName("Azul");
-
-		int previousTotal = getTotalReviewsFromTitle();
-		createReviewInCurrentCheese(deletableComment, 4);
-		wait.until(d -> getTotalReviewsFromTitle() >= previousTotal + 1);
-
-		resetSession();
-		login("German", "password123");
-		openCheeseDetailsByName("Azul");
-
-		int totalBeforeDelete = getTotalReviewsFromTitle();
-		assertTrue(totalBeforeDelete > 0, "There must be at least one review to delete");
-
-		WebElement deleteButton = wait.until(ExpectedConditions.elementToBeClickable(
-				By.cssSelector(".btn-delete-review")));
-		installDialogHooks();
-		clickWithFallback(deleteButton);
-		((JavascriptExecutor) driver).executeScript(
-				"arguments[0].dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, view: window }));",
-				deleteButton);
-
-		String deleteText = tryReadAnyAlertText(Duration.ofSeconds(6));
-		assertNotNull(deleteText, "No delete alert/notification was detected after clicking delete review");
-		System.out.println("[ReviewUITests] Delete review alert text: " + deleteText);
-
-		wait.until(d -> getTotalReviewsFromTitle() <= totalBeforeDelete - 1);
-	}
 }

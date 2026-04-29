@@ -59,7 +59,7 @@ public class StockUITests {
         WebElement submitButton = driver.findElement(By.cssSelector("button[type='submit']"));
         submitButton.click();
 
-        Alert alert = wait.until(ExpectedConditions.alertIsPresent());
+        Alert alert = SeleniumDialogHelper.waitForDialog(wait);
         alert.accept();
     }
 

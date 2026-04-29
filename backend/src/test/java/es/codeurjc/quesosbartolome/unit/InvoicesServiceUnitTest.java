@@ -9,6 +9,7 @@ import es.codeurjc.quesosbartolome.model.OrderItem;
 import es.codeurjc.quesosbartolome.model.User;
 import es.codeurjc.quesosbartolome.repository.InvoiceRepository;
 import es.codeurjc.quesosbartolome.repository.OrderRepository;
+import es.codeurjc.quesosbartolome.repository.UserRepository;
 import es.codeurjc.quesosbartolome.service.InvoiceService;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -39,6 +40,9 @@ class InvoiceServiceUnitTest {
 
     @Mock
     private OrderRepository orderRepository;
+
+    @Mock
+    private UserRepository userRepository;
 
     @Spy
     private InvoiceMapper invoiceMapper = Mappers.getMapper(InvoiceMapper.class);
@@ -88,6 +92,144 @@ class InvoiceServiceUnitTest {
         Optional<InvoiceDTO> result = invoiceService.getInvoiceById(99L);
 
         assertThat(result).isEmpty();
+    }
+
+    @Test
+    void getInvoicesForUserReturnsMappedPageWhenUserExists() {
+        User user = new User();
+        user.setId(8L);
+        user.setName("maria");
+
+        Invoice i1 = new Invoice();
+        i1.setId(30L);
+        Invoice i2 = new Invoice();
+        i2.setId(31L);
+
+        Page<Invoice> page = new PageImpl<>(List.of(i1, i2));
+
+        when(userRepository.findByName("maria")).thenReturn(Optional.of(user));
+        when(invoiceRepository.findByUserIdOrderByInvoiceDateDesc(8L, Pageable.unpaged())).thenReturn(page);
+
+        Page<InvoiceDTO> result = invoiceService.getInvoicesForUser("maria", Pageable.unpaged());
+
+        assertThat(result).hasSize(2);
+        assertThat(result.map(InvoiceDTO::id).toList()).containsExactly(30L, 31L);
+        verify(userRepository).findByName("maria");
+        verify(invoiceRepository).findByUserIdOrderByInvoiceDateDesc(8L, Pageable.unpaged());
+    }
+
+    @Test
+    void getInvoicesForUserThrowsWhenUserNotFound() {
+        when(userRepository.findByName("ghost")).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> invoiceService.getInvoicesForUser("ghost", Pageable.unpaged()))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("User not found");
+
+        verify(userRepository).findByName("ghost");
+        verify(invoiceRepository, never()).findByUserIdOrderByInvoiceDateDesc(anyLong(), any(Pageable.class));
+    }
+
+    @Test
+    void getInvoiceByIdForUserReturnsEmptyWhenUserNotFound() {
+        when(userRepository.findByName("unknown")).thenReturn(Optional.empty());
+
+        Optional<InvoiceDTO> result = invoiceService.getInvoiceByIdForUser(2L, "unknown");
+
+        assertThat(result).isEmpty();
+        verify(userRepository).findByName("unknown");
+        verify(invoiceRepository, never()).findByIdAndUserId(anyLong(), anyLong());
+    }
+
+    @Test
+    void getInvoiceByIdForUserReturnsDTOWhenFound() {
+        User user = new User();
+        user.setId(14L);
+        user.setName("pepe");
+
+        Invoice invoice = new Invoice();
+        invoice.setId(77L);
+
+        when(userRepository.findByName("pepe")).thenReturn(Optional.of(user));
+        when(invoiceRepository.findByIdAndUserId(77L, 14L)).thenReturn(Optional.of(invoice));
+
+        Optional<InvoiceDTO> result = invoiceService.getInvoiceByIdForUser(77L, "pepe");
+
+        assertThat(result).isPresent();
+        assertThat(result.get().id()).isEqualTo(77L);
+    }
+
+    @Test
+    void getInvoiceByIdForUserReturnsEmptyWhenInvoiceNotFoundForUser() {
+        User user = new User();
+        user.setId(15L);
+        user.setName("ana");
+
+        when(userRepository.findByName("ana")).thenReturn(Optional.of(user));
+        when(invoiceRepository.findByIdAndUserId(101L, 15L)).thenReturn(Optional.empty());
+
+        Optional<InvoiceDTO> result = invoiceService.getInvoiceByIdForUser(101L, "ana");
+
+        assertThat(result).isEmpty();
+    }
+
+    @Test
+    void getInvoiceEntityReturnsEntityWhenFound() {
+        Invoice invoice = new Invoice();
+        invoice.setId(200L);
+
+        when(invoiceRepository.findById(200L)).thenReturn(Optional.of(invoice));
+
+        Optional<Invoice> result = invoiceService.getInvoiceEntity(200L);
+
+        assertThat(result).isPresent();
+        assertThat(result.get().getId()).isEqualTo(200L);
+    }
+
+    @Test
+    void getInvoiceEntityForUserReturnsEmptyWhenUserNotFound() {
+        when(userRepository.findByName("unknown")).thenReturn(Optional.empty());
+
+        Optional<Invoice> result = invoiceService.getInvoiceEntityForUser(5L, "unknown");
+
+        assertThat(result).isEmpty();
+        verify(invoiceRepository, never()).findByIdAndUserId(anyLong(), anyLong());
+    }
+
+    @Test
+    void getInvoiceEntityForUserReturnsEntityWhenFound() {
+        User user = new User();
+        user.setId(17L);
+        user.setName("raul");
+
+        Invoice invoice = new Invoice();
+        invoice.setId(300L);
+
+        when(userRepository.findByName("raul")).thenReturn(Optional.of(user));
+        when(invoiceRepository.findByIdAndUserId(300L, 17L)).thenReturn(Optional.of(invoice));
+
+        Optional<Invoice> result = invoiceService.getInvoiceEntityForUser(300L, "raul");
+
+        assertThat(result).isPresent();
+        assertThat(result.get().getId()).isEqualTo(300L);
+    }
+
+    @Test
+    void existsByOrderIdReturnsTrueWhenInvoiceExists() {
+        when(invoiceRepository.findByOrderId(9L)).thenReturn(Optional.of(new Invoice()));
+
+        boolean result = invoiceService.existsByOrderId(9L);
+
+        assertThat(result).isTrue();
+    }
+
+    @Test
+    void existsByOrderIdReturnsFalseWhenInvoiceDoesNotExist() {
+        when(invoiceRepository.findByOrderId(10L)).thenReturn(Optional.empty());
+
+        boolean result = invoiceService.existsByOrderId(10L);
+
+        assertThat(result).isFalse();
     }
 
     @Test

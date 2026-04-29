@@ -79,11 +79,15 @@ public class CartService {
         return cartMapper.toDTO(cart);
     }
 
+    private double round2(double value) {
+        return Math.round(value * 100.0) / 100.0;
+    }
+
     private void addCheeseToCart(Cart cart, Cheese cheese, int boxes) {
 
         List<Double> selectedBoxes = cheese.getBoxes().subList(0, boxes);
-        double totalWeight = selectedBoxes.stream().mapToDouble(Double::doubleValue).sum();
-        double totalPrice = totalWeight * cheese.getPrice();
+        double totalWeight = round2(selectedBoxes.stream().mapToDouble(Double::doubleValue).sum());
+        double totalPrice = round2(totalWeight * cheese.getPrice());
         // Update cheese boxes
         cheese.setBoxes(new ArrayList<>(
                 cheese.getBoxes().subList(boxes, cheese.getBoxes().size())));
@@ -94,8 +98,8 @@ public class CartService {
                 new ArrayList<>(selectedBoxes), totalWeight, totalPrice);
         cart.getItems().add(item);
 
-        cart.setTotalWeight(cart.getTotalWeight() + totalWeight);
-        cart.setTotalPrice(cart.getTotalPrice() + totalPrice);
+        cart.setTotalWeight(round2(cart.getTotalWeight() + totalWeight));
+        cart.setTotalPrice(round2(cart.getTotalPrice() + totalPrice));
 
         cartRepository.save(cart);
     }
@@ -124,8 +128,8 @@ public class CartService {
             // since the cheese is gone and won't be ordered
         }
 
-        cart.setTotalWeight(cart.getTotalWeight() - item.getWeight());
-        cart.setTotalPrice(cart.getTotalPrice() - item.getTotalPrice());
+        cart.setTotalWeight(round2(cart.getTotalWeight() - item.getWeight()));
+        cart.setTotalPrice(round2(cart.getTotalPrice() - item.getTotalPrice()));
 
         cart.getItems().remove(item);
 

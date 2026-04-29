@@ -6,12 +6,16 @@ import { By } from '@angular/platform-browser';
 import { InvoicesComponent } from './invoices.component';
 import { InvoiceService } from '../../service/invoice.service';
 import { InvoiceDTO } from '../../dto/invoice.dto';
+import { UserService } from '../../service/user.service';
+import { DialogService } from '../../service/dialog.service';
 
 describe('InvoicesComponent', () => {
   let component: InvoicesComponent;
   let fixture: ComponentFixture<InvoicesComponent>;
   let invoiceServiceSpy: jasmine.SpyObj<InvoiceService>;
   let routerSpy: jasmine.SpyObj<Router>;
+  let userServiceSpy: jasmine.SpyObj<UserService>;
+  let dialogServiceSpy: jasmine.SpyObj<DialogService>;
 
   const mockInvoices: InvoiceDTO[] = [
     {
@@ -35,24 +39,53 @@ describe('InvoicesComponent', () => {
   ];
 
   beforeEach(async () => {
-    invoiceServiceSpy = jasmine.createSpyObj('InvoiceService', ['getAllInvoices']);
+    invoiceServiceSpy = jasmine.createSpyObj('InvoiceService', ['getAllInvoices', 'downloadInvoicePdf']);
     routerSpy = jasmine.createSpyObj('Router', ['navigate']);
+    userServiceSpy = jasmine.createSpyObj('UserService', ['getCurrentUser', 'getMyInvoices', 'downloadMyInvoicePdf']);
+    dialogServiceSpy = jasmine.createSpyObj('DialogService', ['alert']);
+    userServiceSpy.getCurrentUser.and.returnValue(of({ rols: ['ADMIN'] } as any));
 
-    invoiceServiceSpy.getAllInvoices.and.returnValue(of({
-      content: mockInvoices,
-      totalPages: 2,
-      totalElements: 2,
+    invoiceServiceSpy.getAllInvoices.and.returnValues(
+      of({
+        content: [mockInvoices[0]],
+        totalPages: 2,
+        totalElements: 2,
+        size: 10,
+        number: 0,
+        first: true,
+        last: false,
+        numberOfElements: 1
+      }),
+      of({
+        content: mockInvoices,
+        totalPages: 2,
+        totalElements: 2,
+        size: 10,
+        number: 1,
+        first: false,
+        last: true,
+        numberOfElements: 2
+      })
+    );
+    invoiceServiceSpy.downloadInvoicePdf.and.returnValue(of(new Blob(['pdf'], { type: 'application/pdf' })));
+    userServiceSpy.getMyInvoices.and.returnValue(of({
+      content: [mockInvoices[0]],
+      totalPages: 1,
+      totalElements: 1,
       size: 10,
       number: 0,
       first: true,
-      last: false,
-      numberOfElements: 2
+      last: true,
+      numberOfElements: 1
     }));
+    userServiceSpy.downloadMyInvoicePdf.and.returnValue(of(new Blob(['pdf'], { type: 'application/pdf' })));
 
     await TestBed.configureTestingModule({
       imports: [InvoicesComponent],
       providers: [
         { provide: InvoiceService, useValue: invoiceServiceSpy },
+        { provide: UserService, useValue: userServiceSpy },
+        { provide: DialogService, useValue: dialogServiceSpy },
         { provide: Router, useValue: routerSpy }
       ]
     }).compileComponents();
@@ -66,8 +99,11 @@ describe('InvoicesComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should load invoices on init', () => {
+  it('should load invoices on init and go to last page', () => {
     expect(invoiceServiceSpy.getAllInvoices).toHaveBeenCalledWith(0, 10);
+    expect(invoiceServiceSpy.getAllInvoices).toHaveBeenCalledWith(1, 10);
+    expect(component.currentPage).toBe(1);
+    expect(component.invoices.length).toBe(2);
   });
 
   it('should render invoice rows', () => {
@@ -111,8 +147,18 @@ describe('InvoicesComponent', () => {
 
   it('should go to next page when there are more pages', () => {
     component.currentPage = 0;
-    component.totalPages = 3;
+    component.totalPages = 2;
     invoiceServiceSpy.getAllInvoices.calls.reset();
+    invoiceServiceSpy.getAllInvoices.and.returnValue(of({
+      content: mockInvoices,
+      totalPages: 2,
+      totalElements: 2,
+      size: 10,
+      number: 1,
+      first: false,
+      last: true,
+      numberOfElements: 2
+    }));
 
     component.nextPage();
 
@@ -133,7 +179,18 @@ describe('InvoicesComponent', () => {
 
   it('should go to previous page when currentPage is greater than 0', () => {
     component.currentPage = 1;
+    component.totalPages = 2;
     invoiceServiceSpy.getAllInvoices.calls.reset();
+    invoiceServiceSpy.getAllInvoices.and.returnValue(of({
+      content: [mockInvoices[0]],
+      totalPages: 2,
+      totalElements: 2,
+      size: 10,
+      number: 0,
+      first: true,
+      last: false,
+      numberOfElements: 1
+    }));
 
     component.prevPage();
 
@@ -149,6 +206,84 @@ describe('InvoicesComponent', () => {
 
     expect(component.currentPage).toBe(0);
     expect(invoiceServiceSpy.getAllInvoices).not.toHaveBeenCalled();
+  });
+
+  it('should load user invoices when current user is USER', () => {
+    userServiceSpy.getCurrentUser.and.returnValue(of({ id: 7, rols: ['USER'] } as any));
+    invoiceServiceSpy.getAllInvoices.calls.reset();
+
+    component.ngOnInit();
+
+    expect(userServiceSpy.getMyInvoices).toHaveBeenCalledWith(7, 0, 10);
+    expect(invoiceServiceSpy.getAllInvoices).not.toHaveBeenCalled();
+    expect(component.invoices.length).toBe(1);
+    expect(component.invoices[0].user.name).toBe('Victor');
+  });
+
+  it('should navigate to login when user has no id and is not admin', () => {
+    component.currentUser = { rols: ['USER'] } as any;
+    routerSpy.navigate.calls.reset();
+    invoiceServiceSpy.getAllInvoices.calls.reset();
+    userServiceSpy.getMyInvoices.calls.reset();
+
+    component.loadInvoices();
+
+    expect(routerSpy.navigate).toHaveBeenCalledWith(['/auth/login']);
+    expect(invoiceServiceSpy.getAllInvoices).not.toHaveBeenCalled();
+    expect(userServiceSpy.getMyInvoices).not.toHaveBeenCalled();
+  });
+
+  it('should use admin download endpoint for ADMIN user', () => {
+    const invoice = mockInvoices[0];
+
+    component.currentUser = { id: 1, rols: ['ADMIN'] } as any;
+    component.downloadInvoice(invoice);
+
+    expect(invoiceServiceSpy.downloadInvoicePdf).toHaveBeenCalledWith(invoice.id);
+    expect(userServiceSpy.downloadMyInvoicePdf).not.toHaveBeenCalled();
+  });
+
+  it('should use user download endpoint for USER user', () => {
+    const invoice = mockInvoices[0];
+
+    component.currentUser = { id: 7, rols: ['USER'] } as any;
+    component.downloadInvoice(invoice);
+
+    expect(userServiceSpy.downloadMyInvoicePdf).toHaveBeenCalledWith(7, invoice.id);
+    expect(invoiceServiceSpy.downloadInvoicePdf).not.toHaveBeenCalled();
+  });
+
+  it('should show not found dialog when download returns 404', () => {
+    const invoice = mockInvoices[0];
+
+    component.currentUser = { id: 1, rols: ['ADMIN'] } as any;
+    invoiceServiceSpy.downloadInvoicePdf.and.returnValue(throwError(() => ({ status: 404 })));
+
+    component.downloadInvoice(invoice);
+
+    expect(dialogServiceSpy.alert).toHaveBeenCalledWith('Factura no encontrada.');
+  });
+
+  it('should show generic dialog when download returns non-404 error', () => {
+    const invoice = mockInvoices[0];
+
+    component.currentUser = { id: 1, rols: ['ADMIN'] } as any;
+    invoiceServiceSpy.downloadInvoicePdf.and.returnValue(throwError(() => ({ status: 500 })));
+
+    component.downloadInvoice(invoice);
+
+    expect(dialogServiceSpy.alert).toHaveBeenCalledWith('Error al descargar la factura. Intenta de nuevo.');
+  });
+
+  it('should navigate to login on download when user has no id and is not admin', () => {
+    component.currentUser = { rols: ['USER'] } as any;
+    routerSpy.navigate.calls.reset();
+
+    component.downloadInvoice(mockInvoices[0]);
+
+    expect(routerSpy.navigate).toHaveBeenCalledWith(['/auth/login']);
+    expect(invoiceServiceSpy.downloadInvoicePdf).not.toHaveBeenCalled();
+    expect(userServiceSpy.downloadMyInvoicePdf).not.toHaveBeenCalled();
   });
 
 });

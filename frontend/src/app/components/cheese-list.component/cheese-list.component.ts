@@ -7,6 +7,7 @@ import { Router } from '@angular/router';
 import { UserService } from '../../service/user.service';
 import { LoginService } from '../../service/login.service';
 import { UserDTO } from '../../dto/user.dto';
+import { DialogService } from '../../service/dialog.service';
 
 @Component({
   selector: 'app-cheese-list',
@@ -43,7 +44,8 @@ export class CheeseListComponent implements OnInit {
     private cheeseService: CheeseService,
     private router: Router,
     private userService: UserService,
-    private loginService: LoginService
+    private loginService: LoginService,
+    private dialogService: DialogService
   ) { }
 
   ngOnInit(): void {
@@ -128,7 +130,7 @@ export class CheeseListComponent implements OnInit {
   }
 
   openNewCheeseModal(): void {
-    alert('Open modal for creating a new cheese (not implemented)');
+    this.dialogService.alert('Open modal for creating a new cheese (not implemented)');
   }
 
   isAdmin(): boolean {

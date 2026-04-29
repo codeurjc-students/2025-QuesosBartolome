@@ -21,10 +21,16 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import es.codeurjc.quesosbartolome.dto.InvoiceDTO;
+import es.codeurjc.quesosbartolome.dto.OrderDTO;
 import es.codeurjc.quesosbartolome.dto.PasswordChangeDTO;
 import es.codeurjc.quesosbartolome.dto.UserDTO;
+import es.codeurjc.quesosbartolome.model.Invoice;
 import es.codeurjc.quesosbartolome.security.jwt.JwtTokenProvider;
 import es.codeurjc.quesosbartolome.security.jwt.TokenType;
+import es.codeurjc.quesosbartolome.service.InvoicePdfService;
+import es.codeurjc.quesosbartolome.service.InvoiceService;
+import es.codeurjc.quesosbartolome.service.OrderService;
 import es.codeurjc.quesosbartolome.service.UserService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -36,6 +42,15 @@ public class UserRestController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private OrderService orderService;
+
+    @Autowired
+    private InvoiceService invoiceService;
+
+    @Autowired
+    private InvoicePdfService invoicePdfService;
 
     @Autowired
     private JwtTokenProvider jwtTokenProvider;
@@ -58,6 +73,128 @@ public class UserRestController {
                 .orElseGet(() -> ResponseEntity // 404
                         .status(HttpStatus.NOT_FOUND)
                         .build());
+    }
+
+    @GetMapping("/{id}/orders")
+    public ResponseEntity<Page<OrderDTO>> getMyOrders(
+            @PathVariable Long id,
+            HttpServletRequest request,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+
+        Principal principal = request.getUserPrincipal();
+        if (principal == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        Optional<UserDTO> callerOpt = userService.findByName(principal.getName());
+        if (callerOpt.isEmpty() || !callerOpt.get().id().equals(id)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+
+        Pageable pageable = PageRequest.of(page, size);
+        try {
+            return ResponseEntity.ok(orderService.getOrdersForUser(principal.getName(), pageable));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+    }
+
+    @GetMapping("/{id}/orders/{orderId}")
+    public ResponseEntity<OrderDTO> getMyOrderById(
+            @PathVariable Long id,
+            @PathVariable Long orderId,
+            HttpServletRequest request) {
+        Principal principal = request.getUserPrincipal();
+        if (principal == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        Optional<UserDTO> callerOpt = userService.findByName(principal.getName());
+        if (callerOpt.isEmpty() || !callerOpt.get().id().equals(id)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+
+        return orderService.getOrderByIdForUser(orderId, principal.getName())
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).build());
+    }
+
+    @GetMapping("/{id}/invoices")
+    public ResponseEntity<Page<InvoiceDTO>> getMyInvoices(
+            @PathVariable Long id,
+            HttpServletRequest request,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+
+        Principal principal = request.getUserPrincipal();
+        if (principal == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        Optional<UserDTO> callerOpt = userService.findByName(principal.getName());
+        if (callerOpt.isEmpty() || !callerOpt.get().id().equals(id)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+
+        Pageable pageable = PageRequest.of(page, size);
+        try {
+            return ResponseEntity.ok(invoiceService.getInvoicesForUser(principal.getName(), pageable));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+    }
+
+    @GetMapping("/{id}/invoices/{invoiceId}")
+    public ResponseEntity<InvoiceDTO> getMyInvoiceById(
+            @PathVariable Long id,
+            @PathVariable Long invoiceId,
+            HttpServletRequest request) {
+        Principal principal = request.getUserPrincipal();
+        if (principal == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        Optional<UserDTO> callerOpt = userService.findByName(principal.getName());
+        if (callerOpt.isEmpty() || !callerOpt.get().id().equals(id)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+
+        return invoiceService.getInvoiceByIdForUser(invoiceId, principal.getName())
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).build());
+    }
+
+    @GetMapping("/{id}/invoices/{invoiceId}/download-pdf")
+    public ResponseEntity<byte[]> downloadMyInvoicePdf(
+            @PathVariable Long id,
+            @PathVariable Long invoiceId,
+            HttpServletRequest request) {
+        try {
+            Principal principal = request.getUserPrincipal();
+            if (principal == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            }
+
+            Optional<UserDTO> callerOpt = userService.findByName(principal.getName());
+            if (callerOpt.isEmpty() || !callerOpt.get().id().equals(id)) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+            }
+
+            Invoice invoice = invoiceService.getInvoiceEntityForUser(invoiceId, principal.getName())
+                    .orElseThrow(() -> new IllegalArgumentException("Invoice not found"));
+
+            byte[] pdfContent = invoicePdfService.generateInvoicePdf(invoice);
+
+            return ResponseEntity.ok()
+                    .header("Content-Type", "application/pdf")
+                    .header("Content-Disposition", "attachment; filename=" + invoice.getInvNo() + ".pdf")
+                    .body(pdfContent);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
     @GetMapping("/{id}/image")

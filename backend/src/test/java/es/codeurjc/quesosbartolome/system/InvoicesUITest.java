@@ -11,6 +11,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
@@ -18,134 +19,233 @@ import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+
+import es.codeurjc.quesosbartolome.model.Order;
+import es.codeurjc.quesosbartolome.repository.OrderRepository;
+import es.codeurjc.quesosbartolome.repository.UserRepository;
 
 @SpringBootTest(classes = es.codeurjc.quesosbartolome.QuesosbartolomeApplication.class)
 public class InvoicesUITest {
 
-    private WebDriver driver;
-    private WebDriverWait wait;
+	@Autowired
+	private UserRepository userRepository;
 
-    @BeforeEach
-    public void setup() {
-	ChromeOptions options = new ChromeOptions();
-	options.addArguments("--headless=new");
-	options.addArguments("--window-size=1920,1080");
-	options.addArguments("--no-sandbox");
-	options.addArguments("--disable-dev-shm-usage");
-	options.addArguments("--disable-gpu");
-	options.addArguments("--remote-allow-origins=*");
-	options.addArguments("--ignore-certificate-errors");
-	options.setAcceptInsecureCerts(true);
+	@Autowired
+	private OrderRepository orderRepository;
 
-	driver = new ChromeDriver(options);
-	wait = new WebDriverWait(driver, Duration.ofSeconds(20));
-    }
+	private WebDriver driver;
+	private WebDriverWait wait;
 
-    @AfterEach
-    public void teardown() {
-	if (driver != null) {
-	    driver.quit();
+	@BeforeEach
+	public void setup() {
+		ChromeOptions options = new ChromeOptions();
+		options.addArguments("--headless=new");
+		options.addArguments("--window-size=1920,1080");
+		options.addArguments("--no-sandbox");
+		options.addArguments("--disable-dev-shm-usage");
+		options.addArguments("--disable-gpu");
+		options.addArguments("--remote-allow-origins=*");
+		options.addArguments("--ignore-certificate-errors");
+		options.setAcceptInsecureCerts(true);
+
+		driver = new ChromeDriver(options);
+		wait = new WebDriverWait(driver, Duration.ofSeconds(20));
 	}
-    }
 
-    private void login(String username, String password) {
-	driver.get("http://localhost:4200/");
+	@AfterEach
+	public void teardown() {
+		if (driver != null) {
+			driver.quit();
+		}
+	}
 
-	WebElement loginBtn = wait.until(ExpectedConditions.elementToBeClickable(
-		By.xpath("//button[contains(text(),'Iniciar Sesión')]")));
-	loginBtn.click();
+	private void login(String username, String password) {
+		driver.get("http://localhost:4200/");
 
-	WebElement usernameInput = wait.until(ExpectedConditions.visibilityOfElementLocated(
-		By.cssSelector("input[name='username']")));
-	WebElement passwordInput = driver.findElement(By.cssSelector("input[name='password']"));
+		WebElement loginBtn = wait.until(ExpectedConditions.elementToBeClickable(
+				By.xpath("//button[contains(text(),'Iniciar Sesión')]")));
+		loginBtn.click();
 
-	usernameInput.sendKeys(username);
-	passwordInput.sendKeys(password);
+		WebElement usernameInput = wait.until(ExpectedConditions.visibilityOfElementLocated(
+				By.cssSelector("input[name='username']")));
+		WebElement passwordInput = driver.findElement(By.cssSelector("input[name='password']"));
 
-	WebElement submitButton = driver.findElement(By.cssSelector("button[type='submit']"));
-	submitButton.click();
+		usernameInput.sendKeys(username);
+		passwordInput.sendKeys(password);
 
-	Alert alert = wait.until(ExpectedConditions.alertIsPresent());
-	alert.accept();
-    }
+		WebElement submitButton = driver.findElement(By.cssSelector("button[type='submit']"));
+		submitButton.click();
 
-    private void logout() {
-	driver.get("http://localhost:4200/");
-	WebElement logoutBtn = wait.until(ExpectedConditions.elementToBeClickable(
-		By.xpath("//button[contains(.,'Cerrar Sesión')]")));
-	wait.until(ExpectedConditions.elementToBeClickable(logoutBtn)).click();
-    }
+		Alert alert = SeleniumDialogHelper.waitForDialog(wait);
+		alert.accept();
+		wait.until(
+				ExpectedConditions.visibilityOfElementLocated(By.xpath("//button[contains(.,'Cerrar Sesi\u00f3n')]")));
+	}
 
-    private void createOrderAsUser() {
-	driver.get("http://localhost:4200/cheeses/2");
+	private void logout() {
+		driver.get("http://localhost:4200/");
+		WebElement logoutBtn = wait.until(ExpectedConditions.elementToBeClickable(
+				By.xpath("//button[contains(.,'Cerrar Sesión')]")));
+		wait.until(ExpectedConditions.elementToBeClickable(logoutBtn)).click();
+	}
 
-	WebElement boxesInput = wait.until(
-		ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".cajas-input")));
-	boxesInput.sendKeys("1");
+	private void createOrderAsUser() {
+		driver.get("http://localhost:4200/cheeses/2");
 
-	WebElement addButton = wait.until(
-		ExpectedConditions.elementToBeClickable(By.cssSelector(".add-btn")));
-	new Actions(driver).moveToElement(addButton).pause(200).click().perform();
+		WebElement boxesInput = wait.until(
+				ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".cajas-input")));
+		boxesInput.sendKeys("1");
 
-	Alert addAlert = wait.until(ExpectedConditions.alertIsPresent());
-	addAlert.accept();
+		WebElement addButton = wait.until(
+				ExpectedConditions.elementToBeClickable(By.cssSelector(".add-btn")));
+		new Actions(driver).moveToElement(addButton).pause(200).click().perform();
 
-	driver.get("http://localhost:4200/myorder");
+		Alert addAlert = SeleniumDialogHelper.waitForDialog(wait);
+		addAlert.accept();
 
-	WebElement confirmBtn = wait.until(
-		ExpectedConditions.elementToBeClickable(By.cssSelector(".btn.confirm")));
-	confirmBtn.click();
+		driver.get("http://localhost:4200/myorder");
 
-	Alert orderAlert = wait.until(ExpectedConditions.alertIsPresent());
-	assertTrue(orderAlert.getText().contains("Pedido realizado correctamente"));
-	orderAlert.accept();
-    }
+		WebElement confirmBtn = wait.until(
+				ExpectedConditions.elementToBeClickable(By.cssSelector(".btn.confirm")));
+		confirmBtn.click();
 
-    @Test
-    public void testAdminSeesInvoiceAfterProcessingOrder() {
-	String username = "Victor";
+		Alert orderAlert = SeleniumDialogHelper.waitForDialog(wait);
+		assertTrue(orderAlert.getText().contains("Pedido realizado correctamente"));
+		orderAlert.accept();
+	}
 
-	login(username, "password123");
-	createOrderAsUser();
-	logout();
+	private Long getLatestOrderIdForUser(String username) {
+		Long userId = userRepository.findByName(username)
+				.map(user -> user.getId())
+				.orElseThrow(() -> new AssertionError("User not found: " + username));
 
-	login("German", "password123");
-	driver.get("http://localhost:4200/orders");
+		return orderRepository
+				.findByUserIdOrderByOrderDateDesc(userId, org.springframework.data.domain.Pageable.unpaged())
+				.stream()
+				.findFirst()
+				.map(Order::getId)
+				.orElseThrow(() -> new AssertionError("No order found for user " + username));
+	}
 
-	List<WebElement> orderRows = wait.until(
-		ExpectedConditions.visibilityOfAllElementsLocatedBy(By.cssSelector(".orders-row")));
-	WebElement userOrder = orderRows.stream()
-		.filter(row -> row.getText().contains(username))
-		.findFirst()
-		.orElseThrow(() -> new AssertionError("No pending order found for user " + username));
+	private void processFirstPendingOrderForUserAsAdmin(String username) {
+		Long orderId = getLatestOrderIdForUser(username);
+		driver.get("http://localhost:4200/orders/" + orderId + "/preview");
 
-	WebElement processBtn = userOrder.findElement(By.cssSelector(".btn-process"));
-	wait.until(ExpectedConditions.elementToBeClickable(processBtn)).click();
+		WebElement previewCard = wait.until(
+				ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".preview-card")));
+		assertTrue(previewCard.getText().contains("Vista previa del pedido"));
 
-	WebElement previewCard = wait.until(
-		ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".preview-card")));
-	assertTrue(previewCard.getText().contains("Vista previa del pedido"));
+		WebElement confirmBtn = wait.until(
+				ExpectedConditions.elementToBeClickable(By.cssSelector(".btn.btn-confirm")));
+		confirmBtn.click();
 
-	WebElement confirmBtn = wait.until(
-		ExpectedConditions.elementToBeClickable(By.cssSelector(".btn.btn-confirm")));
-	confirmBtn.click();
+		Alert confirmDialog = SeleniumDialogHelper.waitForDialog(wait);
+		assertTrue(confirmDialog.getText().contains("Confirmar"));
+		confirmDialog.accept();
 
-	Alert invoiceAlert = wait.until(ExpectedConditions.alertIsPresent());
-	assertTrue(invoiceAlert.getText().contains("Factura creada correctamente"));
-	invoiceAlert.accept();
+		Alert invoiceAlert = SeleniumDialogHelper.waitForDialog(wait);
+		assertTrue(invoiceAlert.getText().contains("Factura creada correctamente"));
+		invoiceAlert.accept();
+	}
 
-	driver.get("http://localhost:4200/invoices");
+	private void openInvoicesPageAsUser() {
+		driver.get("http://localhost:4200/invoices");
+		wait.until(ExpectedConditions.urlContains("/invoices"));
+		wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".invoices-card")));
+	}
 
-	List<WebElement> invoiceRows = wait.until(
-		ExpectedConditions.visibilityOfAllElementsLocatedBy(By.cssSelector(".invoices-row")));
-	assertFalse(invoiceRows.isEmpty(), "Admin should see at least one invoice");
+	private List<WebElement> waitForInvoiceRowsWithRetry() {
+		for (int attempt = 0; attempt < 3; attempt++) {
+			try {
+				wait.until(driver -> !driver.findElements(By.cssSelector(".invoices-row")).isEmpty());
+				List<WebElement> rows = driver.findElements(By.cssSelector(".invoices-row"));
+				if (!rows.isEmpty()) {
+					return rows;
+				}
+			} catch (TimeoutException ignored) {
+				// Retry by refreshing because Angular data loading can be delayed in headless
+				// mode.
+			}
+			driver.navigate().refresh();
+			wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".invoices-card")));
+		}
+		return driver.findElements(By.cssSelector(".invoices-row"));
+	}
 
-	boolean foundUserInvoice = invoiceRows.stream().anyMatch(row -> {
-	    String rowText = row.getText();
-	    return rowText.contains(username) && rowText.contains("FACT-Q");
-	});
+	@Test
+	public void testAdminSeesInvoiceAfterProcessingOrder() {
+		String username = "Victor";
 
-	assertTrue(foundUserInvoice, "Invoice for processed order should appear in invoices section");
-    }
+		login(username, "password123");
+		createOrderAsUser();
+		logout();
+
+		login("German", "password123");
+		processFirstPendingOrderForUserAsAdmin(username);
+
+		driver.get("http://localhost:4200/invoices");
+
+		List<WebElement> invoiceRows = wait.until(
+				ExpectedConditions.visibilityOfAllElementsLocatedBy(By.cssSelector(".invoices-row")));
+		assertFalse(invoiceRows.isEmpty(), "Admin should see at least one invoice");
+
+		boolean foundUserInvoice = invoiceRows.stream().anyMatch(row -> {
+			String rowText = row.getText();
+			return rowText.contains(username) && rowText.contains("FACT-Q");
+		});
+
+		assertTrue(foundUserInvoice, "Invoice for processed order should appear in invoices section");
+	}
+
+	@Test
+	public void testUserCanSeeOnlyOwnInvoices() {
+		String username = "Victor";
+
+		login(username, "password123");
+		createOrderAsUser();
+		logout();
+
+		login("German", "password123");
+		processFirstPendingOrderForUserAsAdmin(username);
+		logout();
+
+		login(username, "password123");
+		openInvoicesPageAsUser();
+
+		List<WebElement> invoiceRows = waitForInvoiceRowsWithRetry();
+		assertFalse(invoiceRows.isEmpty(), "User should see at least one own invoice");
+		assertTrue(invoiceRows.stream().allMatch(row -> row.getText().contains(username)),
+				"User invoices list should only contain own invoices");
+		assertTrue(invoiceRows.stream().allMatch(row -> !row.findElements(By.cssSelector(".btn-download")).isEmpty()),
+				"Each invoice row should include download button");
+	}
+
+	@Test
+	public void testUserCanDownloadOwnInvoiceFromInvoicesPage() {
+		String username = "Victor";
+
+		login(username, "password123");
+		createOrderAsUser();
+		logout();
+
+		login("German", "password123");
+		processFirstPendingOrderForUserAsAdmin(username);
+		logout();
+
+		login(username, "password123");
+		openInvoicesPageAsUser();
+
+		WebElement invoiceRow = waitForInvoiceRowsWithRetry().stream()
+				.filter(row -> row.getText().contains(username) && row.getText().contains("FACT-Q"))
+				.findFirst()
+				.orElseThrow(() -> new AssertionError("No invoice row found for user " + username));
+
+		WebElement downloadBtn = invoiceRow.findElement(By.cssSelector(".btn-download"));
+		wait.until(ExpectedConditions.elementToBeClickable(downloadBtn)).click();
+
+		assertTrue(driver.findElements(By.cssSelector(".invoices-card")).size() == 1,
+				"Invoices page should remain visible after download action");
+	}
 }

@@ -4,6 +4,7 @@ import { OrderService } from '../../service/order.service';
 import { CartDTO } from '../../dto/cart.dto';
 import { CartService } from '../../service/cart.service';
 import { Router } from '@angular/router';
+import { DialogService } from '../../service/dialog.service';
 
 @Component({
   selector: 'app-myOrder',
@@ -24,7 +25,7 @@ export class MyOrderComponent implements OnInit {
 
   loading = true;
 
-  constructor(private orderService: OrderService, private cartService: CartService, private router: Router) { }
+  constructor(private orderService: OrderService, private cartService: CartService, private router: Router, private dialogService: DialogService) { }
 
   ngOnInit(): void {
     this.cartService.getMyCart().subscribe({
@@ -61,12 +62,12 @@ export class MyOrderComponent implements OnInit {
   makeOrder() {
     this.orderService.confirmOrder().subscribe({
       next: () => {
-        alert('Pedido realizado correctamente');
+        this.dialogService.alert('Pedido realizado correctamente');
         this.ngOnInit();
       },
       error: err => {
         console.error('Error al hacer pedido', err)
-        alert('Error al hacer el pedido');
+        this.dialogService.alert('Error al hacer el pedido');
         if (err.status >= 500) {
           this.router.navigate(['/error']);
         }

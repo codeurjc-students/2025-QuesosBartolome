@@ -5,6 +5,7 @@ import { UserService } from '../../service/user.service';
 import { UserDTO } from '../../dto/user.dto';
 import { By } from '@angular/platform-browser';
 import { Router } from '@angular/router';
+import { DialogService } from '../../service/dialog.service';
 
 describe('ClientsComponent (unit)', () => {
   let component: ClientsComponent;
@@ -12,6 +13,7 @@ describe('ClientsComponent (unit)', () => {
 
   let mockUserService: jasmine.SpyObj<UserService>;
   let mockRouter: jasmine.SpyObj<Router>;
+  let mockDialogService: jasmine.SpyObj<DialogService>;
 
   const mockUsers: UserDTO[] = [
     { id: 1, name: 'Victor', password: '', gmail: 'victor@example.com', direction: '123 Main St', nif: '12345678A', rols: ['USER'], banned: false },
@@ -37,6 +39,8 @@ describe('ClientsComponent (unit)', () => {
     ]);
 
     mockRouter = jasmine.createSpyObj('Router', ['navigate']);
+    mockDialogService = jasmine.createSpyObj('DialogService', ['alert', 'confirm']);
+    mockDialogService.confirm.and.callFake((_message, onConfirm) => onConfirm());
 
     const freshUsers = mockUsers.map(u => ({ ...u }));
     const freshPage = { ...mockPage, content: freshUsers };
@@ -47,7 +51,8 @@ describe('ClientsComponent (unit)', () => {
       imports: [ClientsComponent],
       providers: [
         { provide: UserService, useValue: mockUserService },
-        { provide: Router, useValue: mockRouter }
+        { provide: Router, useValue: mockRouter },
+        { provide: DialogService, useValue: mockDialogService }
       ]
     }).compileComponents();
 
@@ -160,8 +165,6 @@ describe('ClientsComponent (unit)', () => {
     const user = component.users[0];
     mockUserService.toggleUserBan.and.returnValue(of({ ...user, banned: true }));
 
-    spyOn(window, 'confirm').and.returnValue(true);
-
     const button = fixture.debugElement.queryAll(By.css('.btn-ban'))[0];
     button.triggerEventHandler('click', new Event('click'));
 
@@ -171,7 +174,7 @@ describe('ClientsComponent (unit)', () => {
 
   it('should NOT call toggleUserBan if confirm is cancelled', () => {
     const user = component.users[0];
-    spyOn(window, 'confirm').and.returnValue(false);
+    mockDialogService.confirm.and.callFake(() => undefined);
 
     const button = fixture.debugElement.queryAll(By.css('.btn-ban'))[0];
     button.triggerEventHandler('click', new Event('click'));
@@ -186,13 +189,10 @@ describe('ClientsComponent (unit)', () => {
       throwError(() => ({ status: 500 }))
     );
 
-    spyOn(window, 'confirm').and.returnValue(true);
-    spyOn(window, 'alert');
-
     const button = fixture.debugElement.queryAll(By.css('.btn-ban'))[0];
     button.triggerEventHandler('click', new Event('click'));
 
-    expect(window.alert).toHaveBeenCalled();
+    expect(mockDialogService.alert).toHaveBeenCalledWith('No se pudo actualizar el estado de baneo del usuario.');
   });
 
   it('should navigate to user profile when row is clicked', () => {
@@ -203,7 +203,6 @@ describe('ClientsComponent (unit)', () => {
   });
 
   it('should NOT navigate when clicking ban button', () => {
-    spyOn(window, 'confirm').and.returnValue(true);
     mockUserService.toggleUserBan.and.returnValue(of({ ...component.users[0], banned: true }));
 
     const button = fixture.debugElement.queryAll(By.css('.btn-ban'))[0];

@@ -17,7 +17,7 @@
           Mi pedido
         </li>
 
-        <ng-container *ngIf="isLoggedIn && isAdmin()">
+        <ng-container *ngIf="isLoggedIn && (isAdmin() || isUser())">
 
           <li (click)="goToOrders()">
             Pedidos
@@ -26,6 +26,10 @@
           <li (click)="goToInvoices()">
             Facturas
           </li>
+
+        </ng-container>
+
+        <ng-container *ngIf="isLoggedIn && isAdmin()">
 
           <li>
             Gráficos
@@ -84,7 +88,7 @@
         </div>
         <div class="card-body">
           <p>{{ cheese.name }}</p>
-          <p class="price">{{ cheese.price | currency }}</p>
+          <p class="price">{{ cheese.price | currency:'EUR':'symbol':'1.2-2' }}</p>
         </div>
       </div>
 

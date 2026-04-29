@@ -6,6 +6,7 @@ import es.codeurjc.quesosbartolome.model.Invoice;
 import es.codeurjc.quesosbartolome.model.Order;
 import es.codeurjc.quesosbartolome.repository.InvoiceRepository;
 import es.codeurjc.quesosbartolome.repository.OrderRepository;
+import es.codeurjc.quesosbartolome.repository.UserRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,10 +24,22 @@ public class InvoiceService {
     private OrderRepository orderRepository;
 
     @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
     private InvoiceMapper invoiceMapper;
 
     public Page<InvoiceDTO> getAllInvoices(Pageable pageable) {
         return invoiceRepository.findAll(pageable)
+                .map(invoiceMapper::toDTO);
+    }
+
+    public Page<InvoiceDTO> getInvoicesForUser(String username, Pageable pageable) {
+        Long userId = userRepository.findByName(username)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"))
+                .getId();
+
+        return invoiceRepository.findByUserIdOrderByInvoiceDateDesc(userId, pageable)
                 .map(invoiceMapper::toDTO);
     }
 
@@ -35,8 +48,27 @@ public class InvoiceService {
                 .map(invoiceMapper::toDTO);
     }
 
+    public Optional<InvoiceDTO> getInvoiceByIdForUser(Long invoiceId, String username) {
+        Optional<Long> userId = userRepository.findByName(username).map(user -> user.getId());
+        if (userId.isEmpty()) {
+            return Optional.empty();
+        }
+
+        return invoiceRepository.findByIdAndUserId(invoiceId, userId.get())
+                .map(invoiceMapper::toDTO);
+    }
+
     public Optional<Invoice> getInvoiceEntity(Long invoiceId) {
         return invoiceRepository.findById(invoiceId);
+    }
+
+    public Optional<Invoice> getInvoiceEntityForUser(Long invoiceId, String username) {
+        Optional<Long> userId = userRepository.findByName(username).map(user -> user.getId());
+        if (userId.isEmpty()) {
+            return Optional.empty();
+        }
+
+        return invoiceRepository.findByIdAndUserId(invoiceId, userId.get());
     }
 
     public boolean existsByOrderId(Long orderId) {
@@ -56,10 +88,10 @@ public class InvoiceService {
             throw new IllegalStateException("Order already processed");
         }
 
-        double taxableBase = order.getTotalPrice() != null ? order.getTotalPrice() : 0.0;
-        double totalWithIva = order.getItems().stream()
+        double taxableBase = round2(order.getTotalPrice() != null ? order.getTotalPrice() : 0.0);
+        double totalWithIva = round2(order.getItems().stream()
                 .mapToDouble(item -> (item.getTotalPrice() != null ? item.getTotalPrice() : 0.0) * 1.04)
-                .sum();
+            .sum());
 
         Invoice invoice = new Invoice(order.getUser(), order);
         invoice.setTaxableBase(taxableBase);
@@ -74,5 +106,9 @@ public class InvoiceService {
         orderRepository.save(order);
 
         return invoiceMapper.toDTO(savedInvoice);
+    }
+
+    private double round2(double value) {
+        return Math.round(value * 100.0) / 100.0;
     }
 }
