@@ -44,7 +44,7 @@ public class ChartUITests {
 			driver.quit();
 		}
 	}
-
+ 
 	@Test
 	public void chartsPageShowsGrafico1AndGrafico2Switches() {
 		loginAsAdmin();
