@@ -49,7 +49,7 @@ public class ApiCheeseTests {
 
     /**
      * Create an auxiliary cheese temporarily for edit/delete tests
-     * 
+     *  
      * @param cookies Admin authentication cookies
      * @param name    Name of the auxiliary cheese
      * @return ID of the created cheese
