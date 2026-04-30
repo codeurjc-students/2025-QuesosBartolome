@@ -46,7 +46,7 @@ public class ApiCheeseTests {
                 .extract()
                 .detailedCookies();
     }
-
+ 
     /**
      * Create an auxiliary cheese temporarily for edit/delete tests
      *  
