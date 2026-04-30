@@ -93,7 +93,8 @@ public class SecurityConfiguration {
                         .requestMatchers(HttpMethod.GET, "/api/v1/reviews/**").permitAll()
 
                         // Endpoint de perfil
-                        .requestMatchers(HttpMethod.GET, "/api/v1/users").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/users").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/v1/users/allUsers").hasAnyRole("ADMIN")
                         .requestMatchers(HttpMethod.GET, "/api/v1/cart").hasAnyRole("USER")
                         .requestMatchers(HttpMethod.PUT, "/api/v1/cart/**").hasAnyRole("USER")
                         .requestMatchers(HttpMethod.POST, "/api/v1/orders/confirm").hasAnyRole("USER")
@@ -102,6 +103,7 @@ public class SecurityConfiguration {
                         .requestMatchers(HttpMethod.PUT, "/api/v1/orders/*/reject").hasAnyRole("ADMIN")
                         .requestMatchers(HttpMethod.POST, "/api/v1/invoices").hasAnyRole("ADMIN")
                         .requestMatchers(HttpMethod.GET, "/api/v1/invoices").hasAnyRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/v1/invoices/all").hasAnyRole("ADMIN")
                         .requestMatchers(HttpMethod.GET, "/api/v1/invoices/*").hasAnyRole("ADMIN")
                         .requestMatchers(HttpMethod.GET, "/api/v1/users/*/orders/**").hasAnyRole("USER")
                         .requestMatchers(HttpMethod.GET, "/api/v1/users/*/invoices/**").hasAnyRole("USER")

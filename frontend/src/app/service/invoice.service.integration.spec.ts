@@ -10,7 +10,6 @@ import { OrderDTO } from '../dto/order.dto';
 import { Page } from '../dto/page.dto';
 
 describe('InvoiceService (integration)', () => {
-
 	let service: InvoiceService;
 	let loginService: LoginService;
 	let cartService: CartService;
@@ -57,7 +56,6 @@ describe('InvoiceService (integration)', () => {
 
 	it('should retrieve paginated invoices after admin login', (done) => {
 		loginAs('German', 'password123').then(() => {
-
 			service.getAllInvoices(0, 10).subscribe({
 				next: (page: Page<InvoiceDTO>) => {
 					expect(page).toBeTruthy();
@@ -71,20 +69,73 @@ describe('InvoiceService (integration)', () => {
 					done();
 				}
 			});
-
 		}).catch(err => {
 			fail(err);
 			done();
 		});
 	});
 
+	it('should return all invoices for charts after admin login', (done) => {
+		loginAs('German', 'password123').then(() => {
+			service.getAllInvoicesForCharts().subscribe({
+				next: (invoices: InvoiceDTO[]) => {
+					expect(invoices).toBeTruthy();
+					expect(Array.isArray(invoices)).toBeTrue();
+
+					if (invoices.length > 0) {
+						const firstInvoice = invoices[0];
+						expect(firstInvoice.id).toBeDefined();
+						expect(firstInvoice.invNo).toBeDefined();
+						expect(firstInvoice.user).toBeDefined();
+						expect(firstInvoice.order).toBeDefined();
+					}
+
+					done();
+				},
+				error: (err) => {
+					fail('Failed to get all invoices for charts: ' + err.message);
+					done();
+				}
+			});
+		}).catch(err => {
+			fail(err);
+			done();
+		});
+	});
+
+	it('should return 401 when getting invoices for charts without authentication', (done) => {
+		loginService.logout().subscribe({
+			next: () => {
+				service.getAllInvoicesForCharts().subscribe({
+					next: () => {
+						fail('Request should not succeed without authentication');
+						done();
+					},
+					error: (err) => {
+						expect(err.status).toBe(401);
+						done();
+					}
+				});
+			},
+			error: () => {
+				service.getAllInvoicesForCharts().subscribe({
+					next: () => {
+						fail('Request should not succeed without authentication');
+						done();
+					},
+					error: (err) => {
+						expect(err.status).toBe(401);
+						done();
+					}
+				});
+			}
+		});
+	});
+
 	it('should create invoice from order and fetch it by id', (done) => {
 		createOrderAsUser('Victor', 'password123').then((order) => {
-
 			return loginAs('German', 'password123').then(() => order);
-
 		}).then((order) => {
-
 			const orderRef = { id: order.id } as OrderDTO;
 
 			service.createInvoiceFromOrder(orderRef).subscribe({
@@ -111,7 +162,6 @@ describe('InvoiceService (integration)', () => {
 					done();
 				}
 			});
-
 		}).catch(err => {
 			fail(err);
 			done();

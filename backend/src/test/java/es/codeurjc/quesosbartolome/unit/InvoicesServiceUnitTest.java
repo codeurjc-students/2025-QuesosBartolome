@@ -23,6 +23,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.LocalDateTime;
@@ -70,6 +71,34 @@ class InvoiceServiceUnitTest {
         assertThat(result).hasSize(2);
         assertThat(result.map(InvoiceDTO::id).toList()).contains(1L, 2L);
         verify(invoiceRepository).findAll(any(Pageable.class));
+    }
+
+    @Test
+    void getAllInvoicesListReturnsMappedSortedList() {
+        Invoice first = new Invoice();
+        first.setId(11L);
+        Invoice second = new Invoice();
+        second.setId(12L);
+
+        when(invoiceRepository.findAll(Sort.by(Sort.Direction.DESC, "invoiceDate")))
+                .thenReturn(List.of(first, second));
+
+        List<InvoiceDTO> result = invoiceService.getAllInvoicesList();
+
+        assertThat(result).hasSize(2);
+        assertThat(result).extracting(InvoiceDTO::id).containsExactly(11L, 12L);
+        verify(invoiceRepository).findAll(Sort.by(Sort.Direction.DESC, "invoiceDate"));
+    }
+
+    @Test
+    void getAllInvoicesListReturnsEmptyListWhenNoInvoicesExist() {
+        when(invoiceRepository.findAll(Sort.by(Sort.Direction.DESC, "invoiceDate")))
+                .thenReturn(List.of());
+
+        List<InvoiceDTO> result = invoiceService.getAllInvoicesList();
+
+        assertThat(result).isEmpty();
+        verify(invoiceRepository).findAll(Sort.by(Sort.Direction.DESC, "invoiceDate"));
     }
 
     @Test

@@ -182,7 +182,7 @@ public class InvoicesUITest {
 		createOrderAsUser();
 		logout();
 
-		login("German", "password123");
+		login("Admin", "password123");
 		processFirstPendingOrderForUserAsAdmin(username);
 
 		driver.get("http://localhost:4200/invoices");
@@ -207,7 +207,7 @@ public class InvoicesUITest {
 		createOrderAsUser();
 		logout();
 
-		login("German", "password123");
+		login("Admin", "password123");
 		processFirstPendingOrderForUserAsAdmin(username);
 		logout();
 
@@ -230,7 +230,7 @@ public class InvoicesUITest {
 		createOrderAsUser();
 		logout();
 
-		login("German", "password123");
+		login("Admin", "password123");
 		processFirstPendingOrderForUserAsAdmin(username);
 		logout();
 

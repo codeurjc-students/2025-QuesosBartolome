@@ -71,4 +71,8 @@ export class UserService {
   toggleUserBan(id: number): Observable<UserDTO> {
     return this.http.put<UserDTO>(`${this.apiUrl}/${id}/ban`, {}, { withCredentials: true });
   }
+
+  getAllUsersForCharts(): Observable<UserDTO[]> {
+    return this.http.get<UserDTO[]>(`${this.apiUrl}/allUsers`, { withCredentials: true });
+  }
 }

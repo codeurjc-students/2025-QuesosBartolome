@@ -1320,4 +1320,91 @@ public class ApiUserTests {
                                 .header("Content-Type", containsString("application/pdf"));
         }
 
+        @Test
+        @Order(43)
+        void testAllUsers_Unauthorized() {
+                // Sin login → 401
+                given()
+                                .when()
+                                .get("/api/v1/users/allUsers")
+                                .then()
+                                .statusCode(401);
+        }
+
+        @Test
+        @Order(44)
+        void testAllUsers_Forbidden_ForNormalUser() throws JSONException {
+
+                JSONObject login = new JSONObject();
+                login.put("username", "Tienda Artesanal de Riaza");
+                login.put("password", "password123");
+
+                var cookies = given()
+                                .contentType("application/json")
+                                .body(login.toString())
+                                .post("/api/v1/auth/login")
+                                .then()
+                                .statusCode(200)
+                                .extract()
+                                .detailedCookies();
+
+                given()
+                                .cookies(cookies)
+                                .when()
+                                .get("/api/v1/users/allUsers")
+                                .then()
+                                .statusCode(403);
+        }
+
+        @Test
+        @Order(45)
+        void testAllUsers_AsAdmin() throws JSONException {
+                JSONObject login = new JSONObject();
+                login.put("username", "Admin");
+                login.put("password", "password123");
+
+                var cookies = given()
+                                .contentType("application/json")
+                                .body(login.toString())
+                                .post("/api/v1/auth/login")
+                                .then()
+                                .statusCode(200)
+                                .extract()
+                                .detailedCookies();
+
+                given()
+                                .cookies(cookies)
+                                .when()
+                                .get("/api/v1/users/allUsers")
+                                .then()
+                                .statusCode(200)
+                                .body("$", notNullValue());
+        }
+
+        @Test
+        @Order(46)
+        void testAllUsers_AsAdmin_ListContainsUsers() throws JSONException {
+                JSONObject login = new JSONObject();
+                login.put("username", "Admin");
+                login.put("password", "password123");
+
+                var cookies = given()
+                                .contentType("application/json")
+                                .body(login.toString())
+                                .post("/api/v1/auth/login")
+                                .then()
+                                .statusCode(200)
+                                .extract()
+                                .detailedCookies();
+
+                given()
+                                .cookies(cookies)
+                                .when()
+                                .get("/api/v1/users/allUsers")
+                                .then()
+                                .statusCode(200)
+                                .body("size()", greaterThanOrEqualTo(1))
+                                .body("[0].id", notNullValue());
+        }
+
 }

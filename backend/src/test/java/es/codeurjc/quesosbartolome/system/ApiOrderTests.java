@@ -66,7 +66,7 @@ public class ApiOrderTests {
     }
 
         private io.restassured.http.Cookies loginAsAdmin() throws JSONException {
-                return login("German", "password123");
+                                return login("Admin", "password123");
         }
 
     @Test

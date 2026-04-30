@@ -8,6 +8,15 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
+
+import es.codeurjc.quesosbartolome.model.User;
+import es.codeurjc.quesosbartolome.repository.CartRepository;
+import es.codeurjc.quesosbartolome.repository.InvoiceRepository;
+import es.codeurjc.quesosbartolome.repository.OrderRepository;
+import es.codeurjc.quesosbartolome.repository.ReviewRepository;
+import es.codeurjc.quesosbartolome.repository.UserRepository;
 
 import static io.restassured.RestAssured.*;
 import static org.hamcrest.Matchers.*;
@@ -18,31 +27,43 @@ public class ApiInvoiceTests {
         @LocalServerPort
         int port;
 
+        @Autowired
+        private UserRepository userRepository;
+
+        @Autowired
+        private CartRepository cartRepository;
+
+        @Autowired
+        private ReviewRepository reviewRepository;
+
+        @Autowired
+        private OrderRepository orderRepository;
+
+        @Autowired
+        private InvoiceRepository invoiceRepository;
+
+        @Autowired
+        private PasswordEncoder passwordEncoder;
+
         @BeforeEach
         void setup() {
+                invoiceRepository.deleteAll();
+                orderRepository.deleteAll();
+                reviewRepository.deleteAll();
+                cartRepository.deleteAll();
+                userRepository.deleteAll();
+
+                User admin = new User("Admin", passwordEncoder.encode("password123"), "admin@example.com",
+                                "Admin Street", "12345678A", "ADMIN");
+                userRepository.save(admin);
+
+                User testUser = new User("InvoiceUser", passwordEncoder.encode("password123"),
+                                "invoiceuser@example.com", "User Street", "12345678B", "USER");
+                userRepository.save(testUser);
+
                 RestAssured.port = port;
                 RestAssured.baseURI = "https://localhost";
                 RestAssured.useRelaxedHTTPSValidation();
-        }
-
-        private io.restassured.http.Cookies registerAndLoginTestUser(String name, String password)
-                        throws JSONException {
-                JSONObject registerBody = new JSONObject();
-                registerBody.put("name", name);
-                registerBody.put("password", password);
-                registerBody.put("gmail", name.toLowerCase() + "@example.com");
-                registerBody.put("direction", "Street of " + name);
-                registerBody.put("nif", "12345678Z");
-                registerBody.put("image", JSONObject.NULL);
-
-                given()
-                                .contentType("application/json")
-                                .body(registerBody.toString())
-                                .post("/api/v1/auth/register")
-                                .then()
-                                .statusCode(anyOf(is(200), is(201)));
-
-                return login(name, password);
         }
 
         private io.restassured.http.Cookies login(String username, String password) throws JSONException {
@@ -61,7 +82,45 @@ public class ApiInvoiceTests {
         }
 
         private io.restassured.http.Cookies loginAsAdmin() throws JSONException {
-                return login("German", "password123");
+                return login("Admin", "password123");
+        }
+
+        private io.restassured.http.Cookies loginAsTestUser() throws JSONException {
+                return login("InvoiceUser", "password123");
+        }
+
+        @Test
+        void testGetAllInvoicesList_Unauthorized() {
+                given()
+                                .when()
+                                .get("/api/v1/invoices/all")
+                                .then()
+                                .statusCode(401);
+        }
+
+        @Test
+        void testGetAllInvoicesList_ForbiddenForNonAdmin() throws JSONException {
+                var userCookies = loginAsTestUser();
+
+                given()
+                                .cookies(userCookies)
+                                .when()
+                                .get("/api/v1/invoices/all")
+                                .then()
+                                .statusCode(403);
+        }
+
+        @Test
+        void testGetAllInvoicesList_OkAsAdmin() throws JSONException {
+                var adminCookies = loginAsAdmin();
+
+                given()
+                                .cookies(adminCookies)
+                                .when()
+                                .get("/api/v1/invoices/all")
+                                .then()
+                                .statusCode(200)
+                                .body("size()", greaterThanOrEqualTo(0));
         }
 
         @Test
@@ -91,7 +150,7 @@ public class ApiInvoiceTests {
 
         @Test
         void testGetInvoiceById_Ok() throws Exception {
-                var userCookies = registerAndLoginTestUser("InvoiceUser1", "password123");
+                var userCookies = loginAsTestUser();
                 var adminCookies = loginAsAdmin();
 
                 given()
@@ -171,7 +230,7 @@ public class ApiInvoiceTests {
         @Disabled("Failed only CI")
         @Test
         void testCreateInvoice_ReturnsExistingInvoice_WhenOrderAlreadyProcessed() throws Exception {
-                var userCookies = registerAndLoginTestUser("InvoiceUser2", "password123");
+                var userCookies = loginAsTestUser();
                 var adminCookies = loginAsAdmin();
 
                 given()
@@ -222,7 +281,7 @@ public class ApiInvoiceTests {
         @Disabled("Failed only CI")
         @Test
         void testCreateInvoice_Ok() throws Exception {
-                var userCookies = registerAndLoginTestUser("InvoiceUser3", "password123");
+                var userCookies = loginAsTestUser();
                 var adminCookies = loginAsAdmin();
 
                 given()

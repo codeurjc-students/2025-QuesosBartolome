@@ -9,10 +9,11 @@ import es.codeurjc.quesosbartolome.repository.OrderRepository;
 import es.codeurjc.quesosbartolome.repository.UserRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class InvoiceService {
@@ -32,6 +33,13 @@ public class InvoiceService {
     public Page<InvoiceDTO> getAllInvoices(Pageable pageable) {
         return invoiceRepository.findAll(pageable)
                 .map(invoiceMapper::toDTO);
+    }
+
+    public List<InvoiceDTO> getAllInvoicesList() {
+        return invoiceRepository.findAll(Sort.by(Sort.Direction.DESC, "invoiceDate"))
+                .stream()
+                .map(invoiceMapper::toDTO)
+                .toList();
     }
 
     public Page<InvoiceDTO> getInvoicesForUser(String username, Pageable pageable) {
