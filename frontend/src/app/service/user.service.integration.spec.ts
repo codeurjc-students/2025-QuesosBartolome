@@ -638,5 +638,63 @@ describe('UserService (integration with real login)', () => {
 
   });
 
+  it('should return all users for charts after admin login', (done) => {
+    loginAs('German', 'password123').then(() => {
+
+      service.getAllUsersForCharts().subscribe({
+        next: (users: UserDTO[]) => {
+          expect(users).toBeTruthy();
+          expect(Array.isArray(users)).toBeTrue();
+          expect(users.length).toBeGreaterThan(0);
+
+          if (users.length > 0) {
+            const firstUser = users[0];
+            expect(firstUser.id).toBeDefined();
+            expect(firstUser.name).toBeDefined();
+            expect(firstUser.gmail).toBeDefined();
+          }
+
+          done();
+        },
+        error: (err) => {
+          fail('Failed to get all users for charts: ' + err.message);
+          done();
+        }
+      });
+
+    }).catch(err => {
+      fail(err);
+      done();
+    });
+  });
+
+  it('should return 401 when getting users for charts without authentication', (done) => {
+    loginService.logout().subscribe({
+      next: () => {
+        service.getAllUsersForCharts().subscribe({
+          next: () => {
+            fail('Request should not succeed without authentication');
+            done();
+          },
+          error: (err) => {
+            expect(err.status).toBe(401);
+            done();
+          }
+        });
+      },
+      error: () => {
+        service.getAllUsersForCharts().subscribe({
+          next: () => {
+            fail('Request should not succeed without authentication');
+            done();
+          },
+          error: (err) => {
+            expect(err.status).toBe(401);
+            done();
+          }
+        });
+      }
+    });
+  });
 
 });

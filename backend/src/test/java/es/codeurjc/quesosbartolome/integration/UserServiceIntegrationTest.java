@@ -4,6 +4,10 @@ import es.codeurjc.quesosbartolome.dto.PasswordChangeDTO;
 import es.codeurjc.quesosbartolome.dto.UserDTO;
 import es.codeurjc.quesosbartolome.dto.UserMapper;
 import es.codeurjc.quesosbartolome.model.User;
+import es.codeurjc.quesosbartolome.repository.CartRepository;
+import es.codeurjc.quesosbartolome.repository.InvoiceRepository;
+import es.codeurjc.quesosbartolome.repository.OrderRepository;
+import es.codeurjc.quesosbartolome.repository.ReviewRepository;
 import es.codeurjc.quesosbartolome.repository.UserRepository;
 import es.codeurjc.quesosbartolome.service.UserService;
 
@@ -36,6 +40,14 @@ public class UserServiceIntegrationTest {
         @Autowired
         private UserRepository userRepository;
         @Autowired
+        private InvoiceRepository invoiceRepository;
+        @Autowired
+        private OrderRepository orderRepository;
+        @Autowired
+        private ReviewRepository reviewRepository;
+        @Autowired
+        private CartRepository cartRepository;
+        @Autowired
         private UserMapper userMapper;
 
         @Autowired
@@ -43,6 +55,10 @@ public class UserServiceIntegrationTest {
 
         @BeforeEach
         void setup() {
+                invoiceRepository.deleteAll();
+                orderRepository.deleteAll();
+                reviewRepository.deleteAll();
+                cartRepository.deleteAll();
                 userRepository.deleteAll();
         }
 
@@ -120,6 +136,48 @@ public class UserServiceIntegrationTest {
                 assertThat(result.get().gmail()).isEqualTo("carlos@gmail.com");
                 assertThat(result.get().direction()).isEqualTo("Calle 3");
                 assertThat(result.get().nif()).isEqualTo("99999999C");
+        }
+
+        @Test
+        void shouldFindAllUsers() {
+
+                // Given
+                User user1 = new User(
+                                "ana",
+                                passwordEncoder.encode("pwd1"),
+                                "ana@gmail.com",
+                                "Calle 1",
+                                "11111111A",
+                                "USER");
+
+                User user2 = new User(
+                                "pedro",
+                                passwordEncoder.encode("pwd2"),
+                                "pedro@gmail.com",
+                                "Calle 2",
+                                "22222222B",
+                                "USER");
+
+                User admin = new User(
+                                "admin",
+                                passwordEncoder.encode("adminpwd"),
+                                "admin@gmail.com",
+                                "Calle Admin",
+                                "99999999Z",
+                                "ADMIN");
+
+                userRepository.save(user1);
+                userRepository.save(user2);
+                userRepository.save(admin);
+
+                // When
+                java.util.List<UserDTO> result = userService.findAllUsers();
+
+                // Then
+                assertThat(result).hasSize(2);
+                assertThat(result)
+                                .extracting(UserDTO::name)
+                                .containsExactlyInAnyOrder("ana", "pedro");
         }
 
         @Test

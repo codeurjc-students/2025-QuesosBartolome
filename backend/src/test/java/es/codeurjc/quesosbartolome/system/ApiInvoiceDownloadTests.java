@@ -7,6 +7,15 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
+
+import es.codeurjc.quesosbartolome.model.User;
+import es.codeurjc.quesosbartolome.repository.CartRepository;
+import es.codeurjc.quesosbartolome.repository.InvoiceRepository;
+import es.codeurjc.quesosbartolome.repository.OrderRepository;
+import es.codeurjc.quesosbartolome.repository.ReviewRepository;
+import es.codeurjc.quesosbartolome.repository.UserRepository;
 
 import static io.restassured.RestAssured.*;
 import static org.hamcrest.Matchers.*;
@@ -17,8 +26,40 @@ public class ApiInvoiceDownloadTests {
     @LocalServerPort
     int port;
 
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private CartRepository cartRepository;
+
+    @Autowired
+    private ReviewRepository reviewRepository;
+
+    @Autowired
+    private OrderRepository orderRepository;
+
+    @Autowired
+    private InvoiceRepository invoiceRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     @BeforeEach
     void setup() {
+        invoiceRepository.deleteAll();
+        orderRepository.deleteAll();
+        reviewRepository.deleteAll();
+        cartRepository.deleteAll();
+        userRepository.deleteAll();
+
+        User admin = new User("Admin", passwordEncoder.encode("password123"), "admin@example.com",
+                "Admin Street", "12345678A", "ADMIN");
+        userRepository.save(admin);
+
+        User pdfUser = new User("PdfTestUser", passwordEncoder.encode("password123"), "pdftest@example.com",
+                "Pdf Street", "12345678B", "USER");
+        userRepository.save(pdfUser);
+
         RestAssured.port = port;
         RestAssured.baseURI = "https://localhost";
         RestAssured.useRelaxedHTTPSValidation();
@@ -28,26 +69,6 @@ public class ApiInvoiceDownloadTests {
      * Helper to register and log in a test user,
      * returning the session cookies.
      */
-    private io.restassured.http.Cookies registerAndLoginTestUser(String name, String password) throws JSONException {
-        // Register user
-        JSONObject registerBody = new JSONObject();
-        registerBody.put("name", name);
-        registerBody.put("password", password);
-        registerBody.put("gmail", name.toLowerCase() + "@example.com");
-        registerBody.put("direction", "Street of " + name);
-        registerBody.put("nif", "12345678Z");
-        registerBody.put("image", JSONObject.NULL);
-
-        given()
-                .contentType("application/json")
-                .body(registerBody.toString())
-                .post("/api/v1/auth/register")
-                .then()
-                .statusCode(anyOf(is(200), is(201)));
-
-        return login(name, password);
-    }
-
     private io.restassured.http.Cookies login(String name, String password) throws JSONException {
         JSONObject loginBody = new JSONObject();
         loginBody.put("username", name);
@@ -64,7 +85,11 @@ public class ApiInvoiceDownloadTests {
     }
 
     private io.restassured.http.Cookies loginAsAdmin() throws JSONException {
-        return login("German", "password123");
+        return login("Admin", "password123");
+    }
+
+    private io.restassured.http.Cookies loginAsPdfTestUser() throws JSONException {
+        return login("PdfTestUser", "password123");
     }
 
     @Test
@@ -82,8 +107,7 @@ public class ApiInvoiceDownloadTests {
     @Test
     void testDownloadInvoicePdfSuccess() throws Exception {
         // GIVEN: Create an invoice
-        String uniqueUser = "PdfTestUser" + System.nanoTime();
-        var userCookies = registerAndLoginTestUser(uniqueUser, "password123");
+        var userCookies = loginAsPdfTestUser();
         var adminCookies = loginAsAdmin();
 
         given()

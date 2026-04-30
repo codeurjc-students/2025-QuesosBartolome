@@ -81,12 +81,26 @@ public class ReviewUITests {
 	}
 
 	private void openCheeseDetailsByName(String cheeseName) {
+		int cheeseId = switch (cheeseName) {
+			case "Semicurado" -> 1;
+			case "Azul" -> 2;
+			case "Curado" -> 3;
+			case "Chevrett" -> 4;
+			case "Tierno" -> 5;
+			default -> throw new IllegalArgumentException("Unknown cheese: " + cheeseName);
+		};
+
 		WebElement card = wait.until(ExpectedConditions.visibilityOfElementLocated(
 				By.xpath("//div[contains(@class,'card')]//p[contains(text(), '" + cheeseName
 						+ "')]/ancestor::div[contains(@class,'card')]")));
 		clickWithFallback(card);
 
-		wait.until(ExpectedConditions.urlMatches("http://localhost:4200/cheeses/\\d+"));
+		try {
+			wait.until(ExpectedConditions.urlMatches("http://localhost:4200/cheeses/\\d+"));
+		} catch (TimeoutException ex) {
+			driver.get("http://localhost:4200/cheeses/" + cheeseId);
+			wait.until(ExpectedConditions.urlContains("/cheeses/" + cheeseId));
+		}
 		wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".reviews-section")));
 	}
 

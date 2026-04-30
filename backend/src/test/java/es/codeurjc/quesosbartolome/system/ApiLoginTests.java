@@ -112,7 +112,7 @@ public class ApiLoginTests {
     void testLoginFailsWhenUserIsBanned() throws JSONException {
 
         JSONObject adminLogin = new JSONObject();
-        adminLogin.put("username", "German");
+        adminLogin.put("username", "Admin");
         adminLogin.put("password", "password123");
 
         var adminResponse = given()

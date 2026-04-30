@@ -13,6 +13,7 @@ import { CheeseFormComponent } from './components/cheeseForm/cheeseForm.componen
 import { StockComponent } from './components/stock/stock.component';
 import { OrderPreviewComponent } from './components/orderPreview/orderPreview.component';
 import { InvoicesComponent } from './components/invoices/invoices.component';
+import { ChartsComponent } from './components/charts/charts.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: '/cheeses', pathMatch: 'full' },
@@ -30,6 +31,7 @@ export const routes: Routes = [
   { path: 'orders', component: OrdersComponent },
   { path: 'orders/:id/preview', component: OrderPreviewComponent },
   { path: 'invoices', component: InvoicesComponent },
+  { path: 'charts', component: ChartsComponent },
   { path: 'users', component: ClientsComponent },
   { path: 'error', component: ErrorPageComponent },
   { path: '**', component: ErrorPageComponent }

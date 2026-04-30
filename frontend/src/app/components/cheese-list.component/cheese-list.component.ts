@@ -112,6 +112,10 @@ export class CheeseListComponent implements OnInit {
     this.router.navigate(['/stock']);
   }
 
+  goToCharts(): void {
+    this.router.navigate(['/charts']);
+  }
+
   logout(): void {
     this.loginService.logout().subscribe({
       next: () => {

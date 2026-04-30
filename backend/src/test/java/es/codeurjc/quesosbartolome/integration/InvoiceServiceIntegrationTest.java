@@ -20,6 +20,7 @@ import org.springframework.test.context.ActiveProfiles;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.time.LocalDateTime;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -76,6 +77,36 @@ public class InvoiceServiceIntegrationTest {
 
         assertThat(page).isNotEmpty();
         assertThat(page.getContent().get(0).taxableBase()).isEqualTo(10.0);
+    }
+
+    @Test
+    void shouldReturnAllInvoicesListSortedByInvoiceDateDesc() {
+        Invoice oldest = new Invoice(user, null);
+        oldest.setTaxableBase(10.0);
+        oldest.setTotalPrice(10.4);
+        oldest = invoiceRepository.save(oldest);
+        oldest.setInvoiceDate(LocalDateTime.of(2024, 1, 1, 10, 0));
+        invoiceRepository.save(oldest);
+
+        Invoice newest = new Invoice(user, null);
+        newest.setTaxableBase(20.0);
+        newest.setTotalPrice(20.8);
+        newest = invoiceRepository.save(newest);
+        newest.setInvoiceDate(LocalDateTime.of(2024, 3, 1, 10, 0));
+        invoiceRepository.save(newest);
+
+        Invoice middle = new Invoice(user, null);
+        middle.setTaxableBase(15.0);
+        middle.setTotalPrice(15.6);
+        middle = invoiceRepository.save(middle);
+        middle.setInvoiceDate(LocalDateTime.of(2024, 2, 1, 10, 0));
+        invoiceRepository.save(middle);
+
+        List<InvoiceDTO> result = invoiceService.getAllInvoicesList();
+
+        assertThat(result).hasSize(3);
+        assertThat(result).extracting(InvoiceDTO::taxableBase).containsExactly(20.0, 15.0, 10.0);
+        assertThat(result).extracting(InvoiceDTO::totalPrice).containsExactly(20.8, 15.6, 10.4);
     }
 
     @Test

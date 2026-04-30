@@ -2,6 +2,7 @@ package es.codeurjc.quesosbartolome.service;
 
 import java.io.InputStream;
 import java.sql.Blob;
+import java.util.List;
 import java.util.Optional;
 
 import org.hibernate.engine.jdbc.BlobProxy;
@@ -38,6 +39,13 @@ public class UserService {
         } else {
             return Optional.empty();
         }
+    }
+
+    public List<UserDTO> findAllUsers() {
+        return repository.findByRolsContaining("USER")
+                .stream()
+                .map(mapper::toDTO)
+                .toList();
     }
 
     public UserDTO createUser(UserDTO userDTO) {

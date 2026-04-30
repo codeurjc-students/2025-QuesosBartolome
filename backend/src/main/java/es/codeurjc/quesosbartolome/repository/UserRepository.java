@@ -1,5 +1,6 @@
 package es.codeurjc.quesosbartolome.repository;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
@@ -13,4 +14,5 @@ import es.codeurjc.quesosbartolome.model.User;
 public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByName(String name);
     Page<User> findByRolsContaining(String rol, Pageable pageable);
+    List<User> findByRolsContaining(String rol);
 }

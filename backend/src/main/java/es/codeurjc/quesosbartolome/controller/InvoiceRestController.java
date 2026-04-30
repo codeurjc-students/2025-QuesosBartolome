@@ -5,6 +5,7 @@ import es.codeurjc.quesosbartolome.dto.OrderDTO;
 import es.codeurjc.quesosbartolome.model.Invoice;
 import es.codeurjc.quesosbartolome.service.InvoiceService;
 import es.codeurjc.quesosbartolome.service.InvoicePdfService;
+import es.codeurjc.quesosbartolome.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -19,6 +20,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.security.Principal;
+import java.util.List;
+
+import jakarta.servlet.http.HttpServletRequest;
+
 @RestController
 @RequestMapping("/api/v1/invoices")
 public class InvoiceRestController {
@@ -29,9 +35,27 @@ public class InvoiceRestController {
     @Autowired
     private InvoicePdfService invoicePdfService;
 
+    @Autowired
+    private UserService userService;
+
     @GetMapping
     public ResponseEntity<Page<InvoiceDTO>> getAllInvoices(Pageable pageable) {
         return ResponseEntity.ok(invoiceService.getAllInvoices(pageable));
+    }
+
+    @GetMapping("/all")
+    public ResponseEntity<List<InvoiceDTO>> getAllInvoicesList(HttpServletRequest request) {
+
+        Principal principal = request.getUserPrincipal();
+        if (principal == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        if (!userService.isAdmin(principal.getName())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+
+        return ResponseEntity.ok(invoiceService.getAllInvoicesList());
     }
 
     @GetMapping("/{id}")

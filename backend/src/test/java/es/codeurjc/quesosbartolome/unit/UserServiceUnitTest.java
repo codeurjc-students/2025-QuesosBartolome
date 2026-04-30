@@ -159,6 +159,39 @@ class UserServiceTest {
         }
 
         @Test
+        void shouldFindAllUsers() {
+
+                // Given
+                User user1 = new User(
+                                "ana",
+                                "pwd1",
+                                "ana@gmail.com",
+                                "Calle 4",
+                                "11111111A",
+                                "USER");
+
+                User user2 = new User(
+                                "pedro",
+                                "pwd2",
+                                "pedro@gmail.com",
+                                "Calle 5",
+                                "22222222B",
+                                "USER");
+
+                when(userRepository.findByRolsContaining("USER")).thenReturn(List.of(user1, user2));
+
+                // When
+                List<UserDTO> result = userService.findAllUsers();
+
+                // Then
+                assertThat(result).hasSize(2);
+                assertThat(result)
+                                .extracting(UserDTO::name)
+                                .containsExactly("ana", "pedro");
+                verify(userRepository).findByRolsContaining("USER");
+        }
+
+        @Test
         void shouldFindAllUsersWithUserRole() {
 
                 // Given

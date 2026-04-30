@@ -2,6 +2,7 @@ package es.codeurjc.quesosbartolome.controller;
 
 import java.security.Principal;
 import java.sql.Blob;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -73,6 +74,21 @@ public class UserRestController {
                 .orElseGet(() -> ResponseEntity // 404
                         .status(HttpStatus.NOT_FOUND)
                         .build());
+    }
+
+    @GetMapping("/allUsers")
+    public ResponseEntity<List<UserDTO>> getAllUsers(HttpServletRequest request) {
+
+        Principal principal = request.getUserPrincipal();
+        if (principal == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        if (!userService.isAdmin(principal.getName())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+
+        return ResponseEntity.ok(userService.findAllUsers());
     }
 
     @GetMapping("/{id}/orders")
@@ -313,7 +329,6 @@ public class UserRestController {
 
         return ResponseEntity.ok().build();
     }
-    
 
     @PutMapping("/{id}/password")
     public ResponseEntity<Void> changePassword(

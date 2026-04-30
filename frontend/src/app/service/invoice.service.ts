@@ -45,4 +45,11 @@ export class InvoiceService {
       }
     );
   }
+
+  getAllInvoicesForCharts(): Observable<InvoiceDTO[]> {
+    return this.http.get<InvoiceDTO[]>(
+      `${this.apiUrl}/all`,
+      { withCredentials: true }
+    );
+  }
 }
