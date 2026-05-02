@@ -37,7 +37,7 @@ describe('ReviewService (integration)', () => {
   }
 
   it('should create a review after login', (done) => {
-    loginAs('Victor', 'password123').then(() => {
+    loginAs('Tienda Artesanal de Riaza', 'password123').then(() => {
 
       service.createReview(5, 'Review desde test', 5).subscribe({
         next: (review: ReviewDTO) => {
@@ -60,7 +60,7 @@ describe('ReviewService (integration)', () => {
   });
 
   it('should retrieve reviews by cheese id', (done) => {
-    loginAs('Victor', 'password123').then(() => {
+    loginAs('Tienda Artesanal de Riaza', 'password123').then(() => {
 
       service.getReviewsByCheeseId(5, 0, 3).subscribe({
         next: (page: Page<ReviewDTO>) => {
@@ -83,7 +83,7 @@ describe('ReviewService (integration)', () => {
   });
 
   it('should retrieve reviews by user id', (done) => {
-    loginAs('Victor', 'password123').then(() => {
+    loginAs('Tienda Artesanal de Riaza', 'password123').then(() => {
 
       service.getReviewsByUserId(1, 0, 10).subscribe({
         next: (page: Page<ReviewDTO>) => {
@@ -106,7 +106,7 @@ describe('ReviewService (integration)', () => {
   });
 
   it('should retrieve a review by id', (done) => {
-    loginAs('Victor', 'password123').then(() => {
+    loginAs('Tienda Artesanal de Riaza', 'password123').then(() => {
 
       service.createReview(4, 'Review para buscar', 5).subscribe({
         next: (created: ReviewDTO) => {
@@ -138,7 +138,7 @@ describe('ReviewService (integration)', () => {
   });
 
   it('should delete a review after login', (done) => {
-    loginAs('Victor', 'password123').then(() => {
+    loginAs('Tienda Artesanal de Riaza', 'password123').then(() => {
 
       service.createReview(3, 'Review para borrar', 5).subscribe({
         next: (created: ReviewDTO) => {

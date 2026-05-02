@@ -27,7 +27,7 @@ beforeEach(() => {
 
 
   it('should confirm order using real API after login', (done) => {
-    loginService.login('Victor', 'password123').subscribe({
+    loginService.login('Tienda Artesanal de Riaza', 'password123').subscribe({
       next: () => {
 
         cartService.addCheeseToOrder(1, 1, 1).subscribe({
@@ -63,7 +63,7 @@ beforeEach(() => {
 
 
   it('should retrieve paginated orders after login', (done) => {
-    loginService.login('German', 'password123').subscribe({ //Admin Login
+    loginService.login('Admin', 'password123').subscribe({ //Admin Login
       next: () => {
 
         service.getAllOrders(0, 10).subscribe({
@@ -89,13 +89,13 @@ beforeEach(() => {
   });
 
   it('should retrieve order by id after creating order (admin access)', (done) => {
-    loginService.login('Victor', 'password123').subscribe({
+    loginService.login('Tienda Artesanal de Riaza', 'password123').subscribe({
       next: () => {
         cartService.addCheeseToOrder(1, 1, 1).subscribe({
           next: () => {
             service.confirmOrder().subscribe({
               next: (createdOrder: OrderDTO) => {
-                loginService.login('German', 'password123').subscribe({
+                loginService.login('Admin', 'password123').subscribe({
                   next: () => {
                     service.getOrderById(createdOrder.id).subscribe({
                       next: (fetchedOrder: OrderDTO) => {
@@ -136,13 +136,13 @@ beforeEach(() => {
   });
 
   it('should reject order by id after creating order (admin access)', (done) => {
-    loginService.login('Victor', 'password123').subscribe({
+    loginService.login('Tienda Artesanal de Riaza', 'password123').subscribe({
       next: () => {
         cartService.addCheeseToOrder(1, 1, 1).subscribe({
           next: () => {
             service.confirmOrder().subscribe({
               next: (createdOrder: OrderDTO) => {
-                loginService.login('German', 'password123').subscribe({
+                loginService.login('Admin', 'password123').subscribe({
                   next: () => {
                     service.rejectOrder(createdOrder.id).subscribe({
                       next: (rejectedOrder: OrderDTO) => {

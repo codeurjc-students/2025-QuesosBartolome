@@ -21,7 +21,7 @@ describe('InvoicesComponent', () => {
     {
       id: 1,
       invNo: 'FACT-Q26/1',
-      user: { id: 1, name: 'Victor' },
+      user: { id: 1, name: 'User1' },
       order: {} as any,
       taxableBase: 100,
       totalPrice: 104,
@@ -30,7 +30,7 @@ describe('InvoicesComponent', () => {
     {
       id: 2,
       invNo: 'FACT-Q26/2',
-      user: { id: 2, name: 'German' },
+      user: { id: 2, name: 'User2' },
       order: {} as any,
       taxableBase: 50,
       totalPrice: 52,
@@ -112,9 +112,9 @@ describe('InvoicesComponent', () => {
 
     const text = rows.map(r => r.nativeElement.textContent);
     expect(text.join(' ')).toContain('FACT-Q26/1');
-    expect(text.join(' ')).toContain('Victor');
+    expect(text.join(' ')).toContain('User1');
     expect(text.join(' ')).toContain('FACT-Q26/2');
-    expect(text.join(' ')).toContain('German');
+    expect(text.join(' ')).toContain('User2');
   });
 
   it('should show empty state when no invoices and not loading', () => {
@@ -217,7 +217,7 @@ describe('InvoicesComponent', () => {
     expect(userServiceSpy.getMyInvoices).toHaveBeenCalledWith(7, 0, 10);
     expect(invoiceServiceSpy.getAllInvoices).not.toHaveBeenCalled();
     expect(component.invoices.length).toBe(1);
-    expect(component.invoices[0].user.name).toBe('Victor');
+    expect(component.invoices[0].user.name).toBe('User1');
   });
 
   it('should navigate to login when user has no id and is not admin', () => {

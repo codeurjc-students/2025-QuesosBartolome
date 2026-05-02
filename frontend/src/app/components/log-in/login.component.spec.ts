@@ -35,14 +35,14 @@ describe('LoginComponent (unit)', () => {
 
   it('should call login service and navigate on success', () => {
 
-    component.username = 'Victor';
+    component.username = 'User1';
     component.password = 'password123';
 
     mockLoginService.login.and.returnValue(of({ status: 'SUCCESS' }));
 
     component.login();
 
-    expect(mockLoginService.login).toHaveBeenCalledWith('Victor', 'password123');
+    expect(mockLoginService.login).toHaveBeenCalledWith('User1', 'password123');
     expect(mockDialogService.alert).toHaveBeenCalledWith('Inicio de sesión correcto');
     expect(mockRouter.navigate).toHaveBeenCalledWith(['/']);
   });
@@ -69,7 +69,7 @@ describe('LoginComponent (unit)', () => {
       }))
     );
 
-    component.username = 'German';
+    component.username = 'User2';
     component.password = 'password123';
 
     component.login();

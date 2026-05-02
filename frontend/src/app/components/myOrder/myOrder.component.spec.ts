@@ -31,7 +31,7 @@ describe('MyOrderComponent (unit)', () => {
 
         const mockCart: CartDTO = {
             id: 1,
-            user: { id: 1, name: 'Victor' },
+            user: { id: 1, name: 'User1' },
             totalWeight: 2.5,
             totalPrice: 30,
             items: [
@@ -79,7 +79,7 @@ describe('MyOrderComponent (unit)', () => {
     it('should remove an item when removeItem is called', () => {
         const updatedCart: CartDTO = {
             id: 1,
-            user: { id: 1, name: 'Victor' },
+            user: { id: 1, name: 'User1' },
             totalWeight: 0,
             totalPrice: 0,
             items: []

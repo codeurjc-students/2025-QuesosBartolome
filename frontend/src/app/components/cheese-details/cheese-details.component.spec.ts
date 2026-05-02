@@ -284,7 +284,7 @@ const mockCheeseBasic: CheeseBasicDTO = {
 
     const mockCart: CartDTO = {
       id: 1,
-      user: { id: 1, name: "Victor" },
+      user: { id: 1, name: "User1" },
       totalWeight: 12.38,
       totalPrice: 216.65,
       items: [

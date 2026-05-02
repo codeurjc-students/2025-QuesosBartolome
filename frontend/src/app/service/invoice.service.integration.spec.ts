@@ -55,7 +55,7 @@ describe('InvoiceService (integration)', () => {
 	}
 
 	it('should retrieve paginated invoices after admin login', (done) => {
-		loginAs('German', 'password123').then(() => {
+		loginAs('Admin', 'password123').then(() => {
 			service.getAllInvoices(0, 10).subscribe({
 				next: (page: Page<InvoiceDTO>) => {
 					expect(page).toBeTruthy();
@@ -76,7 +76,7 @@ describe('InvoiceService (integration)', () => {
 	});
 
 	it('should return all invoices for charts after admin login', (done) => {
-		loginAs('German', 'password123').then(() => {
+		loginAs('Admin', 'password123').then(() => {
 			service.getAllInvoicesForCharts().subscribe({
 				next: (invoices: InvoiceDTO[]) => {
 					expect(invoices).toBeTruthy();
@@ -133,8 +133,8 @@ describe('InvoiceService (integration)', () => {
 	});
 
 	it('should create invoice from order and fetch it by id', (done) => {
-		createOrderAsUser('Victor', 'password123').then((order) => {
-			return loginAs('German', 'password123').then(() => order);
+		createOrderAsUser('Tienda Artesanal de Riaza', 'password123').then((order) => {
+			return loginAs('Admin', 'password123').then(() => order);
 		}).then((order) => {
 			const orderRef = { id: order.id } as OrderDTO;
 

@@ -29,7 +29,7 @@ describe('OrdersComponent (unit)', () => {
     const mockOrders: OrderDTO[] = [
       {
         id: 1,
-        user: { id: 1, name: 'Victor' },
+        user: { id: 1, name: 'User1' },
         totalWeight: 6.32,
         totalPrice: 110.6,
         orderDate: '2025-12-21T03:26:53.824654',
@@ -89,7 +89,7 @@ describe('OrdersComponent (unit)', () => {
     const userName = rows[0].query(By.css('span:nth-child(2)'))
       .nativeElement.textContent.trim();
 
-    expect(userName).toBe('Victor');
+    expect(userName).toBe('User1');
   });
 
   it('should load user orders when current user is USER', () => {

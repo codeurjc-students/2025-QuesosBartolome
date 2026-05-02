@@ -70,7 +70,7 @@ describe('CheeseService (integration)', () => {
 
   it('should create a new cheese in the real API', (done) => {
 
-    loginService.login('German', 'password123').subscribe({
+    loginService.login('Admin', 'password123').subscribe({
       next: () => {
 
         const uniqueName = 'TestCheese_' + Date.now();
@@ -108,7 +108,7 @@ describe('CheeseService (integration)', () => {
 
   it('should upload an image for a cheese in the real API', (done) => {
 
-    loginService.login('German', 'password123').subscribe({
+    loginService.login('Admin', 'password123').subscribe({
       next: () => {
 
         const uniqueName = 'CheeseWithImage_' + Date.now();
@@ -161,7 +161,7 @@ describe('CheeseService (integration)', () => {
 
   it('should fail when creating an invalid cheese (400)', (done) => {
 
-    loginService.login('German', 'password123').subscribe({
+    loginService.login('Admin', 'password123').subscribe({
       next: () => {
 
         const invalidCheese: CheeseDTO = {
@@ -195,7 +195,7 @@ describe('CheeseService (integration)', () => {
 
   it('should edit an existing cheese in the real API', (done) => {
 
-    loginService.login('German', 'password123').subscribe({
+    loginService.login('Admin', 'password123').subscribe({
       next: () => {
 
         const updatedCheese: CheeseDTO = {
@@ -254,7 +254,7 @@ describe('CheeseService (integration)', () => {
 
   it('should delete a cheese in the real API', (done) => {
 
-    loginService.login('German', 'password123').subscribe({
+    loginService.login('Admin', 'password123').subscribe({
       next: () => {
 
         // first create a cheese to delete
@@ -309,7 +309,7 @@ describe('CheeseService (integration)', () => {
 
   it('should add a box to a cheese in the real API', (done) => {
 
-    loginService.login('German', 'password123').subscribe({
+    loginService.login('Admin', 'password123').subscribe({
       next: () => {
 
         const uniqueName = 'CheeseAddBox_' + Date.now();
@@ -358,7 +358,7 @@ describe('CheeseService (integration)', () => {
 
   it('should return 400 when adding invalid box weight', (done) => {
 
-    loginService.login('German', 'password123').subscribe({
+    loginService.login('Admin', 'password123').subscribe({
       next: () => {
 
         service.addBox(1, -5).subscribe({
@@ -383,7 +383,7 @@ describe('CheeseService (integration)', () => {
 
   it('should remove a box from a cheese in the real API', (done) => {
 
-    loginService.login('German', 'password123').subscribe({
+    loginService.login('Admin', 'password123').subscribe({
       next: () => {
 
         const uniqueName = 'CheeseRemoveBox_' + Date.now();
@@ -433,7 +433,7 @@ describe('CheeseService (integration)', () => {
 
   it('should return 404 when removing a box from non-existing cheese', (done) => {
 
-    loginService.login('German', 'password123').subscribe({
+    loginService.login('Admin', 'password123').subscribe({
       next: () => {
 
         service.removeBox(999999, 0).subscribe({

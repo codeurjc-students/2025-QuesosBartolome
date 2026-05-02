@@ -16,7 +16,7 @@ describe('LoginService (integration)', () => {
   });
 
   it('should login successfully with valid credentials', (done) => {
-    service.login('Victor', 'password123').subscribe({
+    service.login('Tienda Artesanal de Riaza', 'password123').subscribe({
       next: (response) => {
         expect(response.status).toBe('SUCCESS');
         expect(response.message).toContain('Auth successful');

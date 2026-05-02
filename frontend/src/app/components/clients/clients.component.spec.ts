@@ -16,8 +16,8 @@ describe('ClientsComponent (unit)', () => {
   let mockDialogService: jasmine.SpyObj<DialogService>;
 
   const mockUsers: UserDTO[] = [
-    { id: 1, name: 'Victor', password: '', gmail: 'victor@example.com', direction: '123 Main St', nif: '12345678A', rols: ['USER'], banned: false },
-    { id: 2, name: 'German', password: '', gmail: 'german@example.com', direction: '456 Oak Ave', nif: '87654321B', rols: ['ADMIN'], banned: true }
+    { id: 1, name: 'User1', password: '', gmail: 'User1@example.com', direction: '123 Main St', nif: '12345678A', rols: ['USER'], banned: false },
+    { id: 2, name: 'User2', password: '', gmail: 'User2@example.com', direction: '456 Oak Ave', nif: '87654321B', rols: ['ADMIN'], banned: true }
   ];
 
   const mockPage = {
@@ -66,8 +66,8 @@ describe('ClientsComponent (unit)', () => {
     expect(rows.length).toBe(2);
 
     const names = rows.map(r => r.query(By.css('span:nth-child(3)')).nativeElement.textContent.trim());
-    expect(names).toContain('Victor');
-    expect(names).toContain('German');
+    expect(names).toContain('User1');
+    expect(names).toContain('User2');
   });
 
   it('should render default avatar images', () => {

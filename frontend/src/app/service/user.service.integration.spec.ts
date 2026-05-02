@@ -88,7 +88,7 @@ describe('UserService (integration with real login)', () => {
 
   function createInvoiceForUser(username: string, password: string): Promise<InvoiceDTO> {
     return createOrderAsUser(username, password)
-      .then((order) => loginAs('German', 'password123').then(() => order))
+      .then((order) => loginAs('Admin', 'password123').then(() => order))
       .then((order) =>
         new Promise<InvoiceDTO>((resolve, reject) => {
           invoiceService.createInvoiceFromOrder({ id: order.id } as any).subscribe({
@@ -130,7 +130,7 @@ describe('UserService (integration with real login)', () => {
   });
 
   it('should return current user after real login', (done) => {
-    loginAs('Victor', 'password123').then(() => {
+    loginAs('Tienda Artesanal de Riaza', 'password123').then(() => {
 
       service.getCurrentUser().subscribe({
         next: (user: UserDTO) => {
@@ -155,7 +155,7 @@ describe('UserService (integration with real login)', () => {
   });
 
   it('should return user image as Blob after login', (done) => {
-    loginAs('Victor', 'password123').then(() => {
+    loginAs('Tienda Artesanal de Riaza', 'password123').then(() => {
 
       service.getCurrentUser().subscribe({
         next: (user: UserDTO) => {
@@ -186,7 +186,7 @@ describe('UserService (integration with real login)', () => {
   });
 
   it('should return user by ID after login', (done) => {
-    loginAs('Victor', 'password123').then(() => {
+    loginAs('Tienda Artesanal de Riaza', 'password123').then(() => {
 
       service.getUserById(1).subscribe({
         next: (user: UserDTO) => {
@@ -209,7 +209,7 @@ describe('UserService (integration with real login)', () => {
   });
 
   it('should return a paginated list of users after login', (done) => {
-    loginAs('German', 'password123').then(() => {
+    loginAs('Admin', 'password123').then(() => {
 
       service.getAllUsers(0, 10).subscribe({
         next: (page: Page<UserDTO>) => {
@@ -240,7 +240,7 @@ describe('UserService (integration with real login)', () => {
   });
 
   it('should return my paginated orders after user login', (done) => {
-    loginAs('Victor', 'password123').then(() => {
+    loginAs('Tienda Artesanal de Riaza', 'password123').then(() => {
 
       service.getCurrentUser().subscribe({
         next: (user) => {
@@ -271,7 +271,7 @@ describe('UserService (integration with real login)', () => {
   });
 
   it('should return my order by id after creating an order', (done) => {
-    createOrderAsUser('Victor', 'password123').then((order) => {
+    createOrderAsUser('Tienda Artesanal de Riaza', 'password123').then((order) => {
 
       return firstValueFrom(service.getCurrentUser()).then((user) => ({ order, user }));
 
@@ -295,7 +295,7 @@ describe('UserService (integration with real login)', () => {
   });
 
   it('should return my paginated invoices after user login', (done) => {
-    loginAs('Victor', 'password123').then(() => {
+    loginAs('Tienda Artesanal de Riaza', 'password123').then(() => {
 
       service.getCurrentUser().subscribe({
         next: (user) => {
@@ -326,9 +326,9 @@ describe('UserService (integration with real login)', () => {
   });
 
   it('should download my invoice pdf as Blob', (done) => {
-    createInvoiceForUser('Victor', 'password123').then((invoice) => {
+    createInvoiceForUser('Tienda Artesanal de Riaza', 'password123').then((invoice) => {
 
-      return loginAs('Victor', 'password123').then(() => invoice);
+      return loginAs('Tienda Artesanal de Riaza', 'password123').then(() => invoice);
 
     }).then((invoice) => {
       service.getCurrentUser().subscribe({
@@ -365,8 +365,8 @@ describe('UserService (integration with real login)', () => {
           const suffix = Date.now().toString();
 
           const updatePayload = {
-            name: 'VictorUpdated',
-            gmail: `victor.updated.${suffix}@example.com`,
+            name: 'TiendaArtesanaldeRiazaUpdated',
+            gmail: `TiendaArtesanaldeRiaza.updated.${suffix}@example.com`,
             direction: 'Nueva dirección 123',
             nif: user.nif
           };
@@ -374,7 +374,7 @@ describe('UserService (integration with real login)', () => {
           service.updateUser(user.id, updatePayload).subscribe({
             next: (updated) => {
               expect(updated).toBeTruthy();
-              expect(updated.name).toBe('VictorUpdated');
+              expect(updated.name).toBe('TiendaArtesanaldeRiazaUpdated');
               expect(updated.gmail).toBe(updatePayload.gmail);
               expect(updated.direction).toBe('Nueva dirección 123');
               expect(updated.nif).toBe(user.nif);
@@ -523,14 +523,14 @@ describe('UserService (integration with real login)', () => {
   });
 
   it('should toggle user ban status successfully after login', (done) => {
-    loginAs('German', 'password123').then(() => {
+    loginAs('Admin', 'password123').then(() => {
 
       createAndLoginTempUser('BanTarget', 'password123').then(({ username }) => {
 
         service.getCurrentUser().subscribe({
           next: (targetUser) => {
 
-            loginAs('German', 'password123').then(() => {
+            loginAs('Admin', 'password123').then(() => {
 
               service.toggleUserBan(targetUser.id).subscribe({
                 next: (updated) => {
@@ -607,7 +607,7 @@ describe('UserService (integration with real login)', () => {
   });
 
   it('should return all users for charts after admin login', (done) => {
-    loginAs('German', 'password123').then(() => {
+    loginAs('Admin', 'password123').then(() => {
 
       service.getAllUsersForCharts().subscribe({
         next: (users: UserDTO[]) => {
