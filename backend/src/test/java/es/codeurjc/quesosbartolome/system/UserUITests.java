@@ -183,24 +183,28 @@ public class UserUITests {
                 String oldDirection = inputByLabel(profileContainer, "Dirección").getDomProperty("value");
                 String newDirection = oldDirection + " Test";
 
-                forceClick(profileContainer.findElement(By.xpath(".//button[normalize-space()='Editar']")));
+                forceClick(wait.until(ExpectedConditions.elementToBeClickable(
+                                By.xpath("//div[contains(@class,'profile-container')]//button[normalize-space()='Editar']"))));
 
                 WebElement directionField = inputByLabel(profileContainer, "Dirección");
                 directionField.clear();
                 directionField.sendKeys(newDirection);
 
-                forceClick(profileContainer.findElement(By.xpath(".//button[contains(text(),'Confirmar edición')]")));
+                forceClick(wait.until(ExpectedConditions.elementToBeClickable(
+                                By.xpath("//div[contains(@class,'profile-container')]//button[contains(text(),'Confirmar edición')]"))));
 
                 wait.until(ExpectedConditions.textToBePresentInElementValue(
                                 By.xpath("//label[text()='Dirección']/following-sibling::input"), newDirection));
                 assertEquals(newDirection, inputByLabel(profileContainer, "Dirección").getDomProperty("value"));
 
                 // Restore old value to avoid side effects
-                forceClick(profileContainer.findElement(By.xpath(".//button[normalize-space()='Editar']")));
+                forceClick(wait.until(ExpectedConditions.elementToBeClickable(
+                                By.xpath("//div[contains(@class,'profile-container')]//button[normalize-space()='Editar']"))));
                 WebElement directionRestore = inputByLabel(profileContainer, "Dirección");
                 directionRestore.clear();
                 directionRestore.sendKeys(oldDirection);
-                forceClick(profileContainer.findElement(By.xpath(".//button[contains(text(),'Confirmar edición')]")));
+                forceClick(wait.until(ExpectedConditions.elementToBeClickable(
+                                By.xpath("//div[contains(@class,'profile-container')]//button[contains(text(),'Confirmar edición')]"))));
                 wait.until(ExpectedConditions.textToBePresentInElementValue(
                                 By.xpath("//label[text()='Dirección']/following-sibling::input"), oldDirection));
         }
@@ -213,13 +217,15 @@ public class UserUITests {
 
                 String originalDirection = inputByLabel(profileContainer, "Dirección").getDomProperty("value");
 
-                forceClick(profileContainer.findElement(By.xpath(".//button[normalize-space()='Editar']")));
+                forceClick(wait.until(ExpectedConditions.elementToBeClickable(
+                                By.xpath("//div[contains(@class,'profile-container')]//button[normalize-space()='Editar']"))));
 
                 WebElement directionField = inputByLabel(profileContainer, "Dirección");
                 directionField.clear();
                 directionField.sendKeys("DireccionQueNoDebeGuardarse");
 
-                forceClick(profileContainer.findElement(By.xpath(".//button[contains(text(),'Cancelar edición')]")));
+                forceClick(wait.until(ExpectedConditions.elementToBeClickable(
+                                By.xpath("//div[contains(@class,'profile-container')]//button[contains(text(),'Cancelar edición')]"))));
 
                 assertEquals(originalDirection, inputByLabel(profileContainer, "Dirección").getDomProperty("value"));
         }
@@ -230,13 +236,15 @@ public class UserUITests {
                 login("Tienda Artesanal de Riaza", "password123");
                 WebElement profileContainer = openOwnProfile();
 
-                forceClick(profileContainer.findElement(By.xpath(".//button[contains(text(),'Cambiar Contraseña')]")));
+                forceClick(wait.until(ExpectedConditions.elementToBeClickable(
+                                By.xpath("//div[contains(@class,'profile-container')]//button[contains(text(),'Cambiar Contraseña')]"))));
 
                 inputByLabel(profileContainer, "Contraseña actual").sendKeys("password123");
                 inputByLabel(profileContainer, "Nueva contraseña").sendKeys("newPassword123");
                 inputByLabel(profileContainer, "Repite la nueva contraseña").sendKeys("differentPassword123");
 
-                forceClick(profileContainer.findElement(By.xpath(".//button[contains(text(),'Confirmar cambio')]")));
+                forceClick(wait.until(ExpectedConditions.elementToBeClickable(
+                                By.xpath("//div[contains(@class,'profile-container')]//button[contains(text(),'Confirmar cambio')]"))));
 
                 WebElement error = wait.until(ExpectedConditions
                                 .visibilityOfElementLocated(By.cssSelector(".form-message.error")));
@@ -249,13 +257,15 @@ public class UserUITests {
                 login("Tienda Artesanal de Riaza", "password123");
                 WebElement profileContainer = openOwnProfile();
 
-                forceClick(profileContainer.findElement(By.xpath(".//button[contains(text(),'Cambiar Contraseña')]")));
+                forceClick(wait.until(ExpectedConditions.elementToBeClickable(
+                                By.xpath("//div[contains(@class,'profile-container')]//button[contains(text(),'Cambiar Contraseña')]"))));
 
                 inputByLabel(profileContainer, "Contraseña actual").sendKeys("password123");
                 inputByLabel(profileContainer, "Nueva contraseña").sendKeys("password1234");
                 inputByLabel(profileContainer, "Repite la nueva contraseña").sendKeys("password1234");
 
-                forceClick(profileContainer.findElement(By.xpath(".//button[contains(text(),'Confirmar cambio')]")));
+                forceClick(wait.until(ExpectedConditions.elementToBeClickable(
+                                By.xpath("//div[contains(@class,'profile-container')]//button[contains(text(),'Confirmar cambio')]"))));
 
                 Alert successAlert = SeleniumDialogHelper.waitForDialog(wait);
                 assertTrue(successAlert.getText().contains("actualizada"));
@@ -263,12 +273,13 @@ public class UserUITests {
 
                 // Restore old password in the same session — no logout/re-login needed.
                 // The component resets isPasswordMode to false on success, so click the button again.
-                forceClick(wait.until(ExpectedConditions
-                                .elementToBeClickable(By.xpath("//button[contains(text(),'Cambiar Contraseña')]"))));
+                forceClick(wait.until(ExpectedConditions.elementToBeClickable(
+                                By.xpath("//div[contains(@class,'profile-container')]//button[contains(text(),'Cambiar Contraseña')]"))));
                 inputByLabel(profileContainer, "Contraseña actual").sendKeys("password1234");
                 inputByLabel(profileContainer, "Nueva contraseña").sendKeys("password123");
                 inputByLabel(profileContainer, "Repite la nueva contraseña").sendKeys("password123");
-                forceClick(profileContainer.findElement(By.xpath(".//button[contains(text(),'Confirmar cambio')]")));
+                forceClick(wait.until(ExpectedConditions.elementToBeClickable(
+                                By.xpath("//div[contains(@class,'profile-container')]//button[contains(text(),'Confirmar cambio')]"))));
                 Alert restoreAlert = SeleniumDialogHelper.waitForDialog(wait);
                 assertTrue(restoreAlert.getText().contains("actualizada"));
                 restoreAlert.accept();
