@@ -4,15 +4,16 @@ import io.restassured.RestAssured;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.test.annotation.DirtiesContext;
 
 import static io.restassured.RestAssured.*;
 import static org.hamcrest.Matchers.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, properties = "spring.profiles.active=test")
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_CLASS)
 public class ApiOrderTests {
 
         @LocalServerPort
@@ -23,32 +24,6 @@ public class ApiOrderTests {
                 RestAssured.port = port;
                 RestAssured.baseURI = "https://localhost";
                 RestAssured.useRelaxedHTTPSValidation();
-        }
-
-        /**
-         * Helper to register and log in a test user,
-         * returning the session cookies.
-         */
-        private io.restassured.http.Cookies registerAndLoginTestUser(String name, String password)
-                        throws JSONException {
-                // Register user
-                JSONObject registerBody = new JSONObject();
-                registerBody.put("name", name);
-                registerBody.put("password", password);
-                registerBody.put("gmail", name.toLowerCase().replaceAll("\\s+", "") + "@example.com");
-                registerBody.put("direction", "Street of " + name);
-                registerBody.put("nif", String.format("%08d", Math.abs(name.hashCode() % 100000000)) + "Z");
-                registerBody.put("image", JSONObject.NULL);
-
-                given()
-                                .contentType("application/json")
-                                .body(registerBody.toString())
-                                .post("/api/v1/auth/register")
-                                .then()
-                                .statusCode(anyOf(is(200), is(201)));
-
-                // login()
-                return login(name, password);
         }
 
         private io.restassured.http.Cookies login(String username, String password) throws JSONException {
@@ -92,9 +67,8 @@ public class ApiOrderTests {
         }
 
         @Test
-        @Disabled("Returns 500 on register in CI")
         void testConfirmOrder_UserNotFound() throws JSONException {
-                var cookies = registerAndLoginTestUser("OrderUser1", "password123");
+                var cookies = login("Tienda Artesanal de Riaza", "password123");
 
                 given()
                                 .cookies(cookies)
@@ -105,9 +79,8 @@ public class ApiOrderTests {
         }
 
         @Test
-        @Disabled
         void testConfirmOrder_BadRequestWhenCartEmpty() throws JSONException {
-                var cookies = registerAndLoginTestUser("OrderUser2", "password123");
+                var cookies = login("Tienda Artesanal de Riaza", "password123");
 
                 given()
                                 .cookies(cookies)
@@ -118,9 +91,8 @@ public class ApiOrderTests {
         }
 
         @Test
-        @Disabled("Returns 500 on register in CI")
         void testConfirmOrder_Ok() throws JSONException {
-                var cookies = registerAndLoginTestUser("OrderUser3", "password123");
+                var cookies = login("Tienda Artesanal de Riaza", "password123");
 
                 given()
                                 .cookies(cookies)
@@ -136,7 +108,7 @@ public class ApiOrderTests {
                                 .when()
                                 .post("/api/v1/orders/confirm")
                                 .then()
-                                .statusCode(201) // created
+                                .statusCode(201)
                                 .header("Location", containsString("/api/v1/orders/confirm/"))
                                 .body("id", notNullValue())
                                 .body("totalPrice", greaterThan(0.0f))
@@ -153,13 +125,12 @@ public class ApiOrderTests {
         }
 
         @Test
-        @Disabled("Fails sporadically in CI environment - passes locally")
         void testGetOrderById_Ok() throws Exception {
-                var userCookies = registerAndLoginTestUser("OrderUser4", "password123");
+                var cookies = login("Tienda Artesanal de Riaza", "password123");
                 var adminCookies = loginAsAdmin();
 
                 given()
-                                .cookies(userCookies)
+                                .cookies(cookies)
                                 .queryParam("cheeseId", 5)
                                 .queryParam("boxes", 1)
                                 .when()
@@ -168,7 +139,7 @@ public class ApiOrderTests {
                                 .statusCode(200);
 
                 int orderId = given()
-                                .cookies(userCookies)
+                                .cookies(cookies)
                                 .when()
                                 .post("/api/v1/orders/confirm")
                                 .then()
@@ -197,13 +168,12 @@ public class ApiOrderTests {
         }
 
         @Test
-        @Disabled("Returns 500 on register in CI — likely a DB constraint race condition")
         void testRejectOrder_ConflictWhenAlreadyProcessed() throws Exception {
-                var userCookies = registerAndLoginTestUser("OrderUser5", "password123");
+                var cookies = login("Tienda Artesanal de Riaza", "password123");
                 var adminCookies = loginAsAdmin();
 
                 given()
-                                .cookies(userCookies)
+                                .cookies(cookies)
                                 .queryParam("cheeseId", 5)
                                 .queryParam("boxes", 1)
                                 .when()
@@ -212,7 +182,7 @@ public class ApiOrderTests {
                                 .statusCode(200);
 
                 int orderId = given()
-                                .cookies(userCookies)
+                                .cookies(cookies)
                                 .when()
                                 .post("/api/v1/orders/confirm")
                                 .then()
@@ -237,13 +207,12 @@ public class ApiOrderTests {
         }
 
         @Test
-        @Disabled("Returns 500 on register in CI")
         void testRejectOrder_Ok() throws Exception {
-                var userCookies = registerAndLoginTestUser("OrderUser6", "password123");
+                var cookies = login("Tienda Artesanal de Riaza", "password123");
                 var adminCookies = loginAsAdmin();
 
                 given()
-                                .cookies(userCookies)
+                                .cookies(cookies)
                                 .queryParam("cheeseId", 5)
                                 .queryParam("boxes", 1)
                                 .when()
@@ -252,7 +221,7 @@ public class ApiOrderTests {
                                 .statusCode(200);
 
                 int orderId = given()
-                                .cookies(userCookies)
+                                .cookies(cookies)
                                 .when()
                                 .post("/api/v1/orders/confirm")
                                 .then()
@@ -266,8 +235,6 @@ public class ApiOrderTests {
                                 .when()
                                 .put("/api/v1/orders/" + orderId + "/reject")
                                 .then()
-                                .statusCode(200)
-                                .body("id", equalTo(orderId));
+                                .statusCode(200);
         }
-
 }

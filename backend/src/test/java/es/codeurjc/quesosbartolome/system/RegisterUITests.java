@@ -42,7 +42,6 @@ public class RegisterUITests {
         }
     }
 
-    //@Disabled("Flaky in CI: intermittently returns Internal Server Error during UI registration flow")
     @Test
     public void testRegisterUser() throws InterruptedException {
         driver.get("http://localhost:4200/auth/register");

@@ -4,7 +4,6 @@ import io.restassured.RestAssured;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
@@ -42,28 +41,6 @@ public class ApiInvoiceTests {
                                 .detailedCookies();
         }
 
-        private io.restassured.http.Cookies registerAndLoginTestUser(String name, String password)
-                        throws JSONException {
-                String uniqueNif = String.format("%08d", Math.abs(name.hashCode() % 100000000)) + "Z";
-
-                JSONObject registerBody = new JSONObject();
-                registerBody.put("name", name);
-                registerBody.put("password", password);
-                registerBody.put("gmail", name.toLowerCase() + "@example.com");
-                registerBody.put("direction", "Street of " + name);
-                registerBody.put("nif", uniqueNif);
-                registerBody.put("image", JSONObject.NULL);
-
-                given()
-                                .contentType("application/json")
-                                .body(registerBody.toString())
-                                .post("/api/v1/auth/register")
-                                .then()
-                                .statusCode(anyOf(is(201)));
-
-                return login(name, password);
-        }
-
         private io.restassured.http.Cookies loginAsAdmin() throws JSONException {
                 return login("Admin", "password123");
         }
@@ -79,7 +56,7 @@ public class ApiInvoiceTests {
 
         @Test
         void testGetAllInvoicesList_ForbiddenForNonAdmin() throws JSONException {
-                var userCookies = registerAndLoginTestUser("InvoiceUser1", "password123");
+                var userCookies = login("Tienda Artesanal de Riaza", "password123");
 
                 given()
                                 .cookies(userCookies)
@@ -129,7 +106,7 @@ public class ApiInvoiceTests {
 
         @Test
         void testGetInvoiceById_Ok() throws Exception {
-                var userCookies = registerAndLoginTestUser("InvoiceUser2", "password123");
+                var userCookies = login("Tienda Artesanal de Riaza", "password123");
                 var adminCookies = loginAsAdmin();
 
                 given()
@@ -206,10 +183,9 @@ public class ApiInvoiceTests {
                                 .statusCode(404);
         }
 
-        //@Disabled("Failed only CI")
         @Test
         void testCreateInvoice_ReturnsExistingInvoice_WhenOrderAlreadyProcessed() throws Exception {
-                var userCookies = registerAndLoginTestUser("InvoiceUser3", "password123");
+                var userCookies = login("Tienda Artesanal de Riaza", "password123");
                 var adminCookies = loginAsAdmin();
 
                 given()
@@ -257,10 +233,9 @@ public class ApiInvoiceTests {
                                 .body("id", equalTo(firstInvoiceId));
         }
 
-        //@Disabled("Failed only CI")
         @Test
         void testCreateInvoice_Ok() throws Exception {
-                var userCookies = registerAndLoginTestUser("InvoiceUser4", "password123");
+                var userCookies = login("Tienda Artesanal de Riaza", "password123");
                 var adminCookies = loginAsAdmin();
 
                 given()

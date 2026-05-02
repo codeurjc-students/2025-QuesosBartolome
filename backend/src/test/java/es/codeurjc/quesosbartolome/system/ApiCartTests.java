@@ -31,43 +31,23 @@ public class ApiCartTests {
     }
 
     /**
-     * Helper to register and log in a test user,
+     * Helper to log in a test user,
      * returning the session cookies.
      */
-    private io.restassured.http.Cookies registerAndLoginTestUser(String name, String password) throws JSONException {
-        // Generate unique NIF based on name to avoid conflicts
-        String uniqueNif = String.format("%08d", Math.abs(name.hashCode() % 100000000)) + "Z";
+    private io.restassured.http.Cookies login(String username, String password) throws JSONException {
+                JSONObject loginBody = new JSONObject();
+                loginBody.put("username", username);
+                loginBody.put("password", password);
 
-        // Register user
-        JSONObject registerBody = new JSONObject();
-        registerBody.put("name", name);
-        registerBody.put("password", password);
-        registerBody.put("gmail", name.toLowerCase() + "@example.com");
-        registerBody.put("direction", "Street of " + name);
-        registerBody.put("nif", uniqueNif);
-        registerBody.put("image", JSONObject.NULL);
-
-        given()
-                .contentType("application/json")
-                .body(registerBody.toString())
-                .post("/api/v1/auth/register")
-                .then()
-                .statusCode(anyOf(is(201)));
-
-        // Login
-        JSONObject loginBody = new JSONObject();
-        loginBody.put("username", name);
-        loginBody.put("password", password);
-
-        return given()
-                .contentType("application/json")
-                .body(loginBody.toString())
-                .post("/api/v1/auth/login")
-                .then()
-                .statusCode(200)
-                .extract()
-                .detailedCookies();
-    }
+                return given()
+                                .contentType("application/json")
+                                .body(loginBody.toString())
+                                .post("/api/v1/auth/login")
+                                .then()
+                                .statusCode(200)
+                                .extract()
+                                .detailedCookies();
+        }
 
     @Test
     @Order(1)
@@ -81,7 +61,7 @@ public class ApiCartTests {
     @Test
     @Order(2)
     void testGetMyCart_Ok() throws JSONException {
-        var cookies = registerAndLoginTestUser("CartUser", "password123");
+        var cookies = login("Tienda Artesanal de Riaza", "password123");
 
         given()
                 .cookies(cookies)
@@ -96,7 +76,7 @@ public class ApiCartTests {
     @Test
     @Order(3)
     void testAddItemToCart_Ok() throws JSONException {
-        var cookies = registerAndLoginTestUser("CartUser2", "password123");
+        var cookies = login("Tienda Artesanal de Riaza", "password123");
 
         given()
                 .cookies(cookies)
@@ -112,7 +92,7 @@ public class ApiCartTests {
     @Test
     @Order(4)
     void testAddItemToCart_BadRequest() throws JSONException {
-        var cookies = registerAndLoginTestUser("CartUser3", "password123");
+        var cookies = login("Tienda Artesanal de Riaza", "password123");
 
         given()
                 .cookies(cookies)
@@ -127,7 +107,7 @@ public class ApiCartTests {
     @Test
     @Order(5)
     void testRemoveItemFromCart_Ok() throws JSONException {
-        var cookies = registerAndLoginTestUser("CartUser4", "password123");
+        var cookies = login("Tienda Artesanal de Riaza", "password123");
 
         // First add an item and extract the itemId
         io.restassured.response.Response response = given()

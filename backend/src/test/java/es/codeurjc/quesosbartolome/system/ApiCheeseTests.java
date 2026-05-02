@@ -49,27 +49,6 @@ public class ApiCheeseTests {
                 .detailedCookies();
     }
 
-    private io.restassured.http.Cookies registerAndLoginTestUser(String name, String password) throws JSONException {
-        String uniqueNif = String.format("%08d", Math.abs(name.hashCode() % 100000000)) + "Z";
-
-        JSONObject registerBody = new JSONObject();
-        registerBody.put("name", name);
-        registerBody.put("password", password);
-        registerBody.put("gmail", name.toLowerCase() + "@example.com");
-        registerBody.put("direction", "Street of " + name);
-        registerBody.put("nif", uniqueNif);
-        registerBody.put("image", JSONObject.NULL);
-
-        given()
-                .contentType("application/json")
-                .body(registerBody.toString())
-                .post("/api/v1/auth/register")
-                .then()
-                .statusCode(anyOf(is(201)));
-
-        return login(name, password);
-    }
-
     private io.restassured.http.Cookies loginAsAdmin() throws JSONException {
         return login("Admin", "password123");
     }
@@ -164,7 +143,7 @@ public class ApiCheeseTests {
     @Test
     @Order(7)
     void testCreateCheese_Forbidden() throws JSONException {
-        var cookies = registerAndLoginTestUser("CheeseUser7", "password123");
+        var cookies = login("Tienda Artesanal de Riaza", "password123");
 
         given()
                 .cookies(cookies)
@@ -233,7 +212,7 @@ public class ApiCheeseTests {
     @Test
     @Order(11)
     void testUpdateCheese_Forbidden() throws JSONException {
-        var cookies = registerAndLoginTestUser("CheeseUser11", "password123");
+        var cookies = login("Tienda Artesanal de Riaza", "password123");
 
         given()
                 .cookies(cookies)
@@ -302,7 +281,7 @@ public class ApiCheeseTests {
     @Test
     @Order(15)
     void testUpdateCheeseImage_Forbidden() throws JSONException {
-        var cookies = registerAndLoginTestUser("CheeseUser15", "password123");
+        var cookies = login("Tienda Artesanal de Riaza", "password123");
 
         given()
                 .cookies(cookies)
@@ -357,7 +336,7 @@ public class ApiCheeseTests {
     @Test
     @Order(19)
     void testUploadCheeseImage_Forbidden() throws JSONException {
-        var cookies = registerAndLoginTestUser("CheeseUser19", "password123");
+        var cookies = login("Tienda Artesanal de Riaza", "password123");
 
         given()
                 .cookies(cookies)
@@ -410,7 +389,7 @@ public class ApiCheeseTests {
     @Test
     @Order(23)
     void testDeleteCheese_Forbidden() throws JSONException {
-        var cookies = registerAndLoginTestUser("CheeseUser23", "password123");
+        var cookies = login("Tienda Artesanal de Riaza", "password123");
 
         given()
                 .cookies(cookies)
@@ -463,7 +442,7 @@ public class ApiCheeseTests {
     @Test
     @Order(27)
     void testAddBox_Forbidden() throws Exception {
-        var cookies = registerAndLoginTestUser("CheeseUser27", "password123");
+        var cookies = login("Tienda Artesanal de Riaza", "password123");
 
         given()
                 .cookies(cookies)
@@ -538,7 +517,7 @@ public class ApiCheeseTests {
     @Test
     @Order(32)
     void testRemoveBox_Forbidden() throws Exception {
-        var cookies = registerAndLoginTestUser("CheeseUser32", "password123");
+        var cookies = login("Tienda Artesanal de Riaza", "password123");
 
         given()
                 .cookies(cookies)
