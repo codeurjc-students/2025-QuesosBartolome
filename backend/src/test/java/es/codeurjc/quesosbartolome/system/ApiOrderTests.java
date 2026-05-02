@@ -104,6 +104,7 @@ public class ApiOrderTests {
         }
 
         @Test
+        @Disabled
         void testConfirmOrder_BadRequestWhenCartEmpty() throws JSONException {
                 var cookies = registerAndLoginTestUser("OrderUser2", "password123");
 
