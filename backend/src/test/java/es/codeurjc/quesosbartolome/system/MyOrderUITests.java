@@ -55,6 +55,9 @@ public class MyOrderUITests {
         driver.findElement(By.cssSelector("input[name='password']")).sendKeys(password);
         driver.findElement(By.cssSelector("button[type='submit']")).click();
         SeleniumDialogHelper.waitForDialog(wait).accept();
+        // Wait for post-login navigation to complete
+        wait.until(ExpectedConditions.visibilityOfElementLocated(
+                By.xpath("//button[contains(text(),'Cerrar Sesión')]")));
     }
 
     private void loginAsUser() {

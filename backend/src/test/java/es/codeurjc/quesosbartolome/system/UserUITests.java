@@ -72,8 +72,11 @@ public class UserUITests {
                 WebElement profileButton = wait.until(ExpectedConditions
                                 .elementToBeClickable(By.cssSelector("button[aria-label='Mi perfil']")));
                 profileButton.click();
-                return wait.until(ExpectedConditions
-                                .visibilityOfElementLocated(By.cssSelector(".profile-container")));
+                wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".profile-container")));
+                // Wait until isOwnProfile is true (buttons only appear after async profile load)
+                wait.until(ExpectedConditions.presenceOfElementLocated(
+                                By.xpath("//div[contains(@class,'profile-container')]//button[normalize-space()='Editar']")));
+                return driver.findElement(By.cssSelector(".profile-container"));
         }
 
         private WebElement inputByLabel(WebElement container, String labelText) {
@@ -96,9 +99,11 @@ public class UserUITests {
                                 .elementToBeClickable(By.cssSelector("button[aria-label='Mi perfil']")));
                 profileButton.click();
 
-                // Wait for profile container to be visible
-                WebElement profileContainer = wait.until(ExpectedConditions
-                                .visibilityOfElementLocated(By.cssSelector(".profile-container")));
+                // Wait for profile container and data to load
+                wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".profile-container")));
+                wait.until(ExpectedConditions.attributeToBeNotEmpty(
+                                driver.findElement(By.xpath("//label[text()='Nombre']/following-sibling::input")), "value"));
+                WebElement profileContainer = driver.findElement(By.cssSelector(".profile-container"));
 
                 WebElement nameField = profileContainer
                                 .findElement(By.xpath("//label[text()='Nombre']/following-sibling::input"));

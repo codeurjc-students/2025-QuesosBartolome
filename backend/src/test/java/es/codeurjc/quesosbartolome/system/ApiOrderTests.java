@@ -35,9 +35,9 @@ public class ApiOrderTests {
                 JSONObject registerBody = new JSONObject();
                 registerBody.put("name", name);
                 registerBody.put("password", password);
-                registerBody.put("gmail", name.toLowerCase() + "@example.com");
+                registerBody.put("gmail", name.toLowerCase().replaceAll("\\s+", "") + "@example.com");
                 registerBody.put("direction", "Street of " + name);
-                registerBody.put("nif", "12345678Z");
+                registerBody.put("nif", String.format("%08d", Math.abs(name.hashCode() % 100000000)) + "Z");
                 registerBody.put("image", JSONObject.NULL);
 
                 given()
