@@ -28,6 +28,7 @@ public class Invoice {
 
     private LocalDateTime invoiceDate;
 
+    // Constructor
     public Invoice() {
     }
 
@@ -39,6 +40,7 @@ public class Invoice {
         this.invoiceDate = LocalDateTime.now();
     }
 
+    // Getters & Setters
     public Long getId() {
         return id;
     }

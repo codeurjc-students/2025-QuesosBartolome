@@ -24,10 +24,19 @@ describe('CheeseListComponent (unit)', () => {
     mockLoginService = jasmine.createSpyObj('LoginService', ['logout']);
     mockRouter = jasmine.createSpyObj('Router', ['navigate']);
 
-    mockCheeseService.getAllCheeses.and.returnValue(of([
-      { id: 1, name: 'Semicurado', price: 10, description: '', type: '', manufactureDate: '', expirationDate: '', boxes: [] },
-      { id: 2, name: 'Azul', price: 12, description: '', type: '', manufactureDate: '', expirationDate: '', boxes: [] }
-    ]));
+    mockCheeseService.getAllCheeses.and.returnValue(of({
+      content: [
+        { id: 1, name: 'Semicurado', price: 10, description: '', type: '', manufactureDate: '', expirationDate: '', boxes: [] },
+        { id: 2, name: 'Azul', price: 12, description: '', type: '', manufactureDate: '', expirationDate: '', boxes: [] }
+      ],
+      totalPages: 1,
+      totalElements: 2,
+      size: 10,
+      number: 0,
+      first: true,
+      last: true,
+      numberOfElements: 2
+    } as any));
 
     // Default: not logged in
     mockUserService.getCurrentUser.and.returnValue(throwError(() => new Error()));
@@ -137,11 +146,20 @@ describe('CheeseListComponent (unit)', () => {
   });
 
   it('should filter cheeses by type when selectType is called', () => {
-    mockCheeseService.getAllCheeses.and.returnValue(of([
-      { id: 1, name: 'Semicurado', price: 10, description: '', type: 'Pasta prensada', manufactureDate: '', expirationDate: '', boxes: [] },
-      { id: 2, name: 'Azul', price: 12, description: '', type: 'Maduración fúngica', manufactureDate: '', expirationDate: '', boxes: [] },
-      { id: 3, name: 'Chevrett', price: 20, description: '', type: 'Cremoso', manufactureDate: '', expirationDate: '', boxes: [] }
-    ]));
+    mockCheeseService.getAllCheeses.and.returnValue(of({
+      content: [
+        { id: 1, name: 'Semicurado', price: 10, description: '', type: 'Pasta prensada', manufactureDate: '', expirationDate: '', boxes: [] },
+        { id: 2, name: 'Azul', price: 12, description: '', type: 'Maduración fúngica', manufactureDate: '', expirationDate: '', boxes: [] },
+        { id: 3, name: 'Chevrett', price: 20, description: '', type: 'Cremoso', manufactureDate: '', expirationDate: '', boxes: [] }
+      ],
+      totalPages: 1,
+      totalElements: 3,
+      size: 10,
+      number: 0,
+      first: true,
+      last: true,
+      numberOfElements: 3
+    } as any));
 
     fixture = TestBed.createComponent(CheeseListComponent);
     component = fixture.componentInstance;
@@ -155,11 +173,20 @@ describe('CheeseListComponent (unit)', () => {
   });
 
   it('should show all cheeses when "Todos" filter is selected', () => {
-    mockCheeseService.getAllCheeses.and.returnValue(of([
-      { id: 1, name: 'Semicurado', price: 10, description: '', type: 'Pasta prensada', manufactureDate: '', expirationDate: '', boxes: [] },
-      { id: 2, name: 'Azul', price: 12, description: '', type: 'Maduración fúngica', manufactureDate: '', expirationDate: '', boxes: [] },
-      { id: 3, name: 'Chevrett', price: 20, description: '', type: 'Cremoso', manufactureDate: '', expirationDate: '', boxes: [] }
-    ]));
+    mockCheeseService.getAllCheeses.and.returnValue(of({
+      content: [
+        { id: 1, name: 'Semicurado', price: 10, description: '', type: 'Pasta prensada', manufactureDate: '', expirationDate: '', boxes: [] },
+        { id: 2, name: 'Azul', price: 12, description: '', type: 'Maduración fúngica', manufactureDate: '', expirationDate: '', boxes: [] },
+        { id: 3, name: 'Chevrett', price: 20, description: '', type: 'Cremoso', manufactureDate: '', expirationDate: '', boxes: [] }
+      ],
+      totalPages: 1,
+      totalElements: 3,
+      size: 10,
+      number: 0,
+      first: true,
+      last: true,
+      numberOfElements: 3
+    } as any));
 
     fixture = TestBed.createComponent(CheeseListComponent);
     component = fixture.componentInstance;

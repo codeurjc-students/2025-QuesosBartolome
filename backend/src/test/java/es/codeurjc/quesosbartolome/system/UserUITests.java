@@ -89,7 +89,7 @@ public class UserUITests {
         @Order(1)
         @Test
         public void testUserProfileVisibleAfterLogin() {
-                login("Victor", "password123");
+                login("Tienda Artesanal de Riaza", "password123");
 
                 // Click on profile button
                 WebElement profileButton = wait.until(ExpectedConditions
@@ -109,10 +109,10 @@ public class UserUITests {
                 WebElement nifField = profileContainer
                                 .findElement(By.xpath("//label[text()='NIF']/following-sibling::input"));
 
-                assertEquals("Victor", nameField.getDomProperty("value"));
-                assertEquals("victor@example.com", gmailField.getDomProperty("value"));
-                assertEquals("123 Main St", directionField.getDomProperty("value"));
-                assertEquals("12345678A", nifField.getDomProperty("value"));
+                assertEquals("Tienda Artesanal de Riaza", nameField.getDomProperty("value"));
+                assertEquals("riaza@ejemplo.com", gmailField.getDomProperty("value"));
+                assertEquals("Plaza Mayor, Riaza", directionField.getDomProperty("value"));
+                assertEquals("70000001A", nifField.getDomProperty("value"));
 
                 // Validate avatar image
                 WebElement avatarImg = profileContainer.findElement(By.cssSelector(".avatar-box img"));
@@ -126,7 +126,7 @@ public class UserUITests {
         @Test
         public void testAdminSeesClients() {
                 // Login as ADMIN
-                login("German", "password123");
+                login("Admin", "password123");
 
                 // Go directly to the users page
                 driver.get("http://localhost:4200/users");
@@ -137,36 +137,34 @@ public class UserUITests {
 
                 assertFalse(userRows.isEmpty(), "Users list should not be empty");
 
-                // Check that Victor appears
-                boolean foundVictor = userRows.stream()
-                                .anyMatch(row -> row.getText().contains("Victor"));
-                assertTrue(foundVictor, "The users table should include Victor");
+                boolean foundUser = userRows.stream()
+                                .anyMatch(row -> row.getText().contains("Tienda Artesanal de Riaza"));
+                assertTrue(foundUser, "The users table should include Tienda Artesanal de Riaza");
 
-                // Validate Victor's fields
-                WebElement victorRow = userRows.stream()
-                                .filter(row -> row.getText().contains("Victor"))
+                WebElement tiendaRow = userRows.stream()
+                                .filter(row -> row.getText().contains("Tienda Artesanal de Riaza"))
                                 .findFirst()
                                 .orElseThrow();
 
-                String name = victorRow.findElement(By.xpath("./span[2]")).getText();
-                String gmail = victorRow.findElement(By.xpath("./span[3]")).getText();
-                String direction = victorRow.findElement(By.xpath("./span[4]")).getText();
-                String nif = victorRow.findElement(By.xpath("./span[5]")).getText();
+                String name = tiendaRow.findElement(By.xpath("./span[2]")).getText();
+                String gmail = tiendaRow.findElement(By.xpath("./span[3]")).getText();
+                String direction = tiendaRow.findElement(By.xpath("./span[4]")).getText();
+                String nif = tiendaRow.findElement(By.xpath("./span[5]")).getText();
 
-                assertEquals("Victor", name);
-                assertEquals("victor@example.com", gmail);
-                assertEquals("123 Main St", direction);
-                assertEquals("12345678A", nif);
+                assertEquals("Tienda Artesanal de Riaza", name);
+                assertEquals("riaza@ejemplo.com", gmail);
+                assertEquals("Plaza Mayor, Riaza", direction);
+                assertEquals("70000001A", nif);
 
                 // Validate avatar
-                WebElement avatarImg = victorRow.findElement(By.cssSelector("img.avatar"));
+                WebElement avatarImg = tiendaRow.findElement(By.cssSelector("img.avatar"));
                 String src = avatarImg.getDomProperty("src");
                 assertNotNull(src);
                 assertTrue(src.contains("assets/avatar-default") || src.startsWith("blob:"),
                                 "Avatar should be default or a generated blob");
 
                 // Validate ban button
-                WebElement banButton = victorRow.findElement(By.cssSelector("button.btn-ban"));
+                WebElement banButton = tiendaRow.findElement(By.cssSelector("button.btn-ban"));
                 assertNotNull(banButton);
                 assertEquals("Banear", banButton.getText());
         }
@@ -174,7 +172,7 @@ public class UserUITests {
         @Order(3)
         @Test
         public void testEditProfileSuccess() {
-                login("Victor", "password123");
+                login("Tienda Artesanal de Riaza", "password123");
                 WebElement profileContainer = openOwnProfile();
 
                 String oldDirection = inputByLabel(profileContainer, "Dirección").getDomProperty("value");
@@ -205,7 +203,7 @@ public class UserUITests {
         @Order(4)
         @Test
         public void testEditProfileCancelKeepsOriginalData() {
-                login("Victor", "password123");
+                login("Tienda Artesanal de Riaza", "password123");
                 WebElement profileContainer = openOwnProfile();
 
                 String originalDirection = inputByLabel(profileContainer, "Dirección").getDomProperty("value");
@@ -224,7 +222,7 @@ public class UserUITests {
         @Order(5)
         @Test
         public void testChangePasswordMismatchShowsValidationError() {
-                login("Victor", "password123");
+                login("Tienda Artesanal de Riaza", "password123");
                 WebElement profileContainer = openOwnProfile();
 
                 forceClick(profileContainer.findElement(By.xpath(".//button[contains(text(),'Cambiar Contraseña')]")));
@@ -243,7 +241,7 @@ public class UserUITests {
         @Order(6)
         @Test
         public void testChangePasswordSuccessThenLoginWithNewPassword() {
-                login("Victor", "password123");
+                login("Tienda Artesanal de Riaza", "password123");
                 WebElement profileContainer = openOwnProfile();
 
                 forceClick(profileContainer.findElement(By.xpath(".//button[contains(text(),'Cambiar Contraseña')]")));
@@ -274,12 +272,12 @@ public class UserUITests {
         @Order(7)
         @Test
         public void testAdminBansUserAndProfileShowsBannedMessage() {
-                login("German", "password123");
+                login("Admin", "password123");
 
                 driver.get("http://localhost:4200/users");
 
                 WebElement userRow = wait.until(ExpectedConditions.visibilityOfElementLocated(
-                                By.xpath("//div[contains(@class,'users-row')][.//span[normalize-space()='User']]")));
+                                By.xpath("//div[contains(@class,'users-row')][.//span[normalize-space()='Colmado Sepulveda']]")));
 
                 WebElement banButton = userRow.findElement(By.cssSelector("button.btn-ban"));
 
@@ -295,10 +293,10 @@ public class UserUITests {
                 banConfirm.accept();
 
                 wait.until(ExpectedConditions.visibilityOfElementLocated(
-                                By.xpath("//div[contains(@class,'users-row')][.//span[normalize-space()='User']]//span[contains(@class,'status-pill') and normalize-space()='BANEADO']")));
+                                By.xpath("//div[contains(@class,'users-row')][.//span[normalize-space()='Colmado Sepulveda']]//span[contains(@class,'status-pill') and normalize-space()='BANEADO']")));
 
                 WebElement bannedUserRow = wait.until(ExpectedConditions.elementToBeClickable(
-                                By.xpath("//div[contains(@class,'users-row')][.//span[normalize-space()='User']]")));
+                                By.xpath("//div[contains(@class,'users-row')][.//span[normalize-space()='Colmado Sepulveda']]")));
                 forceClick(bannedUserRow);
 
                 WebElement bannedMessage = wait.until(ExpectedConditions.visibilityOfElementLocated(

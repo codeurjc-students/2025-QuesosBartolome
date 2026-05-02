@@ -161,26 +161,6 @@ public class UserRestController {
         }
     }
 
-    @GetMapping("/{id}/invoices/{invoiceId}")
-    public ResponseEntity<InvoiceDTO> getMyInvoiceById(
-            @PathVariable Long id,
-            @PathVariable Long invoiceId,
-            HttpServletRequest request) {
-        Principal principal = request.getUserPrincipal();
-        if (principal == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
-
-        Optional<UserDTO> callerOpt = userService.findByName(principal.getName());
-        if (callerOpt.isEmpty() || !callerOpt.get().id().equals(id)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-        }
-
-        return invoiceService.getInvoiceByIdForUser(invoiceId, principal.getName())
-                .map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).build());
-    }
-
     @GetMapping("/{id}/invoices/{invoiceId}/download-pdf")
     public ResponseEntity<byte[]> downloadMyInvoicePdf(
             @PathVariable Long id,

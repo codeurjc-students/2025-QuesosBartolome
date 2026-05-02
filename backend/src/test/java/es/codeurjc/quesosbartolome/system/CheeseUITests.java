@@ -186,12 +186,12 @@ public class CheeseUITests {
                         ((JavascriptExecutor) driver).executeScript("arguments[0].click();", loginBtn);
                 }
 
-                // Login as USER (Victor)
+                // Login as USER
                 WebElement usernameInput = wait.until(ExpectedConditions
                                 .visibilityOfElementLocated(By.cssSelector("input[name='username']")));
                 WebElement passwordInput = driver.findElement(By.cssSelector("input[name='password']"));
 
-                usernameInput.sendKeys("Victor");
+                usernameInput.sendKeys("Tienda Artesanal de Riaza");
                 passwordInput.sendKeys("password123");
 
                 WebElement submitButton = wait.until(ExpectedConditions.elementToBeClickable(
@@ -250,12 +250,12 @@ public class CheeseUITests {
                         ((JavascriptExecutor) driver).executeScript("arguments[0].click();", loginBtn);
                 }
 
-                // Login as ADMIN (German)
+                // Login as ADMIN
                 WebElement usernameInput = wait.until(ExpectedConditions
                                 .visibilityOfElementLocated(By.cssSelector("input[name='username']")));
                 WebElement passwordInput = driver.findElement(By.cssSelector("input[name='password']"));
 
-                usernameInput.sendKeys("German"); // ADMIN USERNAME
+                usernameInput.sendKeys("Admin");
                 passwordInput.sendKeys("password123");
 
                 WebElement submitButton = wait.until(ExpectedConditions.elementToBeClickable(
@@ -333,7 +333,7 @@ public class CheeseUITests {
         public void testCreateCheeseMissingFieldsShowsAlert() throws InterruptedException {
 
                 // 1. Login as ADMIN
-                login("German", "password123");
+                login("Admin", "password123");
 
                 // 2. Go to New Cheese page
                 driver.get("http://localhost:4200/newCheese");
@@ -377,7 +377,7 @@ public class CheeseUITests {
         public void testCreateCheeseWithExpirationDateBeforeManufactureDateShowsAlert() throws InterruptedException {
 
                 // 1. Login as ADMIN
-                login("German", "password123");
+                login("Admin", "password123");
 
                 // 2. Go to New Cheese page
                 driver.get("http://localhost:4200/newCheese");
@@ -434,7 +434,7 @@ public class CheeseUITests {
         public void testEditCheeseSuccessfully() throws InterruptedException {
 
                 // 1. Login as ADMIN
-                login("German", "password123");
+                login("Admin", "password123");
 
                 // 2. Navigate directly to an existing cheese (Curado, id=3) - no need to create
                 driver.get("http://localhost:4200/cheeses/3");
@@ -495,7 +495,7 @@ public class CheeseUITests {
         public void testDeleteCheeseSuccessfully() throws InterruptedException {
 
                 // 1. Login as ADMIN
-                login("German", "password123");
+                login("Admin", "password123");
 
                 // 2. Navigate directly to cheese id=4 (Chevrett)
                 driver.get("http://localhost:4200/cheeses/4");

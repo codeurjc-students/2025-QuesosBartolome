@@ -43,10 +43,6 @@ export class UserService {
     return this.http.get<Page<InvoiceDTO>>(`${this.apiUrl}/${userId}/invoices?page=${page}&size=${size}`, { withCredentials: true });
   }
 
-  getMyInvoiceById(userId: number, id: number): Observable<InvoiceDTO> {
-    return this.http.get<InvoiceDTO>(`${this.apiUrl}/${userId}/invoices/${id}`, { withCredentials: true });
-  }
-
   downloadMyInvoicePdf(userId: number, invoiceId: number): Observable<Blob> {
     return this.http.get(`${this.apiUrl}/${userId}/invoices/${invoiceId}/download-pdf`, {
       responseType: 'blob',

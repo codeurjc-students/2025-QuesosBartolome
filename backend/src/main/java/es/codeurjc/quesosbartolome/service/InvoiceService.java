@@ -56,16 +56,6 @@ public class InvoiceService {
                 .map(invoiceMapper::toDTO);
     }
 
-    public Optional<InvoiceDTO> getInvoiceByIdForUser(Long invoiceId, String username) {
-        Optional<Long> userId = userRepository.findByName(username).map(user -> user.getId());
-        if (userId.isEmpty()) {
-            return Optional.empty();
-        }
-
-        return invoiceRepository.findByIdAndUserId(invoiceId, userId.get())
-                .map(invoiceMapper::toDTO);
-    }
-
     public Optional<Invoice> getInvoiceEntity(Long invoiceId) {
         return invoiceRepository.findById(invoiceId);
     }
@@ -99,7 +89,7 @@ public class InvoiceService {
         double taxableBase = round2(order.getTotalPrice() != null ? order.getTotalPrice() : 0.0);
         double totalWithIva = round2(order.getItems().stream()
                 .mapToDouble(item -> (item.getTotalPrice() != null ? item.getTotalPrice() : 0.0) * 1.04)
-            .sum());
+                .sum());
 
         Invoice invoice = new Invoice(order.getUser(), order);
         invoice.setTaxableBase(taxableBase);

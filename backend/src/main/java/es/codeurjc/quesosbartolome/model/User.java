@@ -41,6 +41,7 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Order> orders = new ArrayList<>();
 
+    // Constructor
     public User() {
         this.cart = new Cart(this);
     }
@@ -56,7 +57,7 @@ public class User {
         this.cart = new Cart(this);
     }
 
-    // Getters y Setters
+    // Getters & Setters
     public Long getId() {
         return id;
     }

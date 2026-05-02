@@ -9,7 +9,6 @@ import es.codeurjc.quesosbartolome.model.Review;
 
 @Repository
 public interface ReviewRepository extends JpaRepository<Review, Long> {
-
     Page<Review> findByCheeseId(Long cheeseId, Pageable pageable);
     Page<Review> findByUserId(Long userId, Pageable pageable);
 }

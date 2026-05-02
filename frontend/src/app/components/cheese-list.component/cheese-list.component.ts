@@ -23,16 +23,16 @@ import { DialogService } from '../../service/dialog.service';
 export class CheeseListComponent implements OnInit {
   cheeses: CheeseDTO[] = [];
   filteredCheeses: CheeseDTO[] = [];
-  paginatedCheeses: CheeseDTO[] = [];
   
   // Filtrado
   selectedType: string = 'Todos';
   cheeseTypes: string[] = ['Todos', 'Pasta prensada', 'Cremoso', 'Maduración fúngica'];
   
-  // Paginación
-  currentPage: number = 1;
+  // Paginación (server-side)
+  currentPage: number = 1; // 1-based for the UI
   itemsPerPage: number = 10;
   totalPages: number = 1;
+  totalElements: number = 0;
 
   isLoggedIn: boolean = false;
   currentUser: UserDTO | null = null;
@@ -49,19 +49,8 @@ export class CheeseListComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    // Load cheeses
-    this.cheeseService.getAllCheeses().subscribe({
-      next: (list) => {
-        this.cheeses = list;
-        this.applyFilter();
-      },
-      error: (err) => {
-        console.error('Error loading cheeses', err)
-        if (err.status >= 500) {
-          this.router.navigate(['/error']);
-        }
-      }
-    });
+    // Load first page of cheeses (server-side pagination)
+    this.loadPage(this.currentPage);
 
     // Check login status and get current user
     this.userService.getCurrentUser().subscribe({
@@ -73,6 +62,25 @@ export class CheeseListComponent implements OnInit {
         // If there is no valid token or an error occurs, consider that no user is logged in
         this.currentUser = null;
         this.isLoggedIn = false;
+      }
+    });
+  }
+
+  loadPage(page: number): void {
+    const pageIndex = Math.max(0, page - 1); // backend is 0-based
+    this.cheeseService.getAllCheeses(pageIndex, this.itemsPerPage).subscribe({
+      next: (p) => {
+        this.cheeses = p.content;
+        this.totalPages = p.totalPages;
+        this.totalElements = p.totalElements;
+        this.currentPage = p.number + 1;
+        this.applyFilter();
+      },
+      error: (err) => {
+        console.error('Error loading cheeses', err);
+        if (err.status >= 500) {
+          this.router.navigate(['/error']);
+        }
       }
     });
   }
@@ -148,8 +156,8 @@ export class CheeseListComponent implements OnInit {
   // Filtrado
   selectType(type: string): void {
     this.selectedType = type;
-    this.currentPage = 1; // Reset a la primera página al cambiar filtro
-    this.applyFilter();
+    this.currentPage = 1; // Reset to first page and reload from server
+    this.loadPage(this.currentPage);
   }
 
   applyFilter(): void {
@@ -163,30 +171,29 @@ export class CheeseListComponent implements OnInit {
 
   // Paginación
   updatePagination(): void {
-    this.totalPages = Math.ceil(this.filteredCheeses.length / this.itemsPerPage);
-    const startIndex = (this.currentPage - 1) * this.itemsPerPage;
-    const endIndex = startIndex + this.itemsPerPage;
-    this.paginatedCheeses = this.filteredCheeses.slice(startIndex, endIndex);
+    // With server-side pagination, the server provides pages; here we only filter current page content
+    if (this.selectedType === 'Todos') {
+      this.filteredCheeses = [...this.cheeses];
+    } else {
+      this.filteredCheeses = this.cheeses.filter(cheese => cheese.type === this.selectedType);
+    }
   }
 
   nextPage(): void {
     if (this.currentPage < this.totalPages) {
-      this.currentPage++;
-      this.updatePagination();
+      this.loadPage(this.currentPage + 1);
     }
   }
 
   previousPage(): void {
     if (this.currentPage > 1) {
-      this.currentPage--;
-      this.updatePagination();
+      this.loadPage(this.currentPage - 1);
     }
   }
 
   goToPage(page: number): void {
     if (page >= 1 && page <= this.totalPages) {
-      this.currentPage = page;
-      this.updatePagination();
+      this.loadPage(page);
     }
   }
 

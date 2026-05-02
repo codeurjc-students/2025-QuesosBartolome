@@ -81,7 +81,7 @@
     </div>
 
     <div class="card-grid">
-      <div class="card shadow-sm" *ngFor="let cheese of paginatedCheeses" (click)="goToDetails(cheese.id!)">
+      <div class="card shadow-sm" *ngFor="let cheese of filteredCheeses" (click)="goToDetails(cheese.id!)">
         <div class="image-placeholder">
           <img [src]="'https://localhost:443/api/v1/cheeses/' + cheese.id + '/image'"
             alt="Imagen de {{ cheese.name }}" />
@@ -125,8 +125,8 @@
       </nav>
       <p class="text-center text-muted mt-2">
         Mostrando {{ (currentPage - 1) * itemsPerPage + 1 }} -
-        {{ Math.min(currentPage * itemsPerPage, filteredCheeses.length) }}
-        de {{ filteredCheeses.length }} quesos
+        {{ Math.min(currentPage * itemsPerPage, totalElements) }}
+        de {{ totalElements }} quesos
       </p>
     </div>
 

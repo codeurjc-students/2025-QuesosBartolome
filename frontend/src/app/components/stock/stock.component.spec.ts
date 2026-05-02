@@ -49,7 +49,16 @@ describe('StockComponent (unit)', () => {
         mockRouter = jasmine.createSpyObj('Router', ['navigate']);
 
         mockCheeseService.getAllCheeses.and.returnValue(
-            of(JSON.parse(JSON.stringify(cheesesMock)))
+            of({
+                content: JSON.parse(JSON.stringify(cheesesMock)),
+                totalPages: 1,
+                totalElements: cheesesMock.length,
+                size: 10,
+                number: 0,
+                first: true,
+                last: true,
+                numberOfElements: cheesesMock.length
+            } as any)
         );
 
         mockCheeseService.getCheeseImage.and.returnValue(of(new Blob(['fake'])));

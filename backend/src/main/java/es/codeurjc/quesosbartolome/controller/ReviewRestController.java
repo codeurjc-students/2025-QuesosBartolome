@@ -49,7 +49,7 @@ public class ReviewRestController {
     public ResponseEntity<Page<ReviewDTO>> getReviewsByUserId(
             @PathVariable Long userId,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
+            @RequestParam(defaultValue = "3") int size) {
         
         Page<ReviewDTO> reviews = reviewService.getReviewsByUserId(userId, page, size);
         return ResponseEntity.ok(reviews);
@@ -77,7 +77,6 @@ public class ReviewRestController {
         }
 
         try {
-            // Get current user
             Optional<UserDTO> userOpt = userService.findByName(principal.getName());
             if (userOpt.isEmpty()) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();

@@ -160,49 +160,6 @@ class InvoiceServiceUnitTest {
     }
 
     @Test
-    void getInvoiceByIdForUserReturnsEmptyWhenUserNotFound() {
-        when(userRepository.findByName("unknown")).thenReturn(Optional.empty());
-
-        Optional<InvoiceDTO> result = invoiceService.getInvoiceByIdForUser(2L, "unknown");
-
-        assertThat(result).isEmpty();
-        verify(userRepository).findByName("unknown");
-        verify(invoiceRepository, never()).findByIdAndUserId(anyLong(), anyLong());
-    }
-
-    @Test
-    void getInvoiceByIdForUserReturnsDTOWhenFound() {
-        User user = new User();
-        user.setId(14L);
-        user.setName("pepe");
-
-        Invoice invoice = new Invoice();
-        invoice.setId(77L);
-
-        when(userRepository.findByName("pepe")).thenReturn(Optional.of(user));
-        when(invoiceRepository.findByIdAndUserId(77L, 14L)).thenReturn(Optional.of(invoice));
-
-        Optional<InvoiceDTO> result = invoiceService.getInvoiceByIdForUser(77L, "pepe");
-
-        assertThat(result).isPresent();
-        assertThat(result.get().id()).isEqualTo(77L);
-    }
-
-    @Test
-    void getInvoiceByIdForUserReturnsEmptyWhenInvoiceNotFoundForUser() {
-        User user = new User();
-        user.setId(15L);
-        user.setName("ana");
-
-        when(userRepository.findByName("ana")).thenReturn(Optional.of(user));
-        when(invoiceRepository.findByIdAndUserId(101L, 15L)).thenReturn(Optional.empty());
-
-        Optional<InvoiceDTO> result = invoiceService.getInvoiceByIdForUser(101L, "ana");
-
-        assertThat(result).isEmpty();
-    }
-
-    @Test
     void getInvoiceEntityReturnsEntityWhenFound() {
         Invoice invoice = new Invoice();
         invoice.setId(200L);

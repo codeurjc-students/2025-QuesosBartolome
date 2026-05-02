@@ -24,6 +24,7 @@ public class Review {
     @ManyToOne
     private Cheese cheese;
 
+    // Constructor
     public Review() {
     }
 
@@ -34,7 +35,7 @@ public class Review {
         this.cheese = cheese;
     }
 
-    // Getters y Setters
+    // Getters & Setters
     public Long getId() {
         return id;
     }

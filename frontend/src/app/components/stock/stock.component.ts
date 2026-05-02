@@ -50,12 +50,10 @@ export class StockComponent implements OnInit {
 
   loadCheeses() {
     this.loading = true;
-    this.cheeseService.getAllCheeses().subscribe({
-      next: (data) => {
-        this.totalCheeses = data.length;
-        const startIndex = this.currentCheesePage * this.cheesePageSize;
-        const endIndex = startIndex + this.cheesePageSize;
-        const pageData = data.slice(startIndex, endIndex);
+    this.cheeseService.getAllCheeses(this.currentCheesePage, this.cheesePageSize).subscribe({
+      next: (page) => {
+        this.totalCheeses = page.totalElements;
+        const pageData = page.content;
 
         this.cheeses = pageData.map(cheese => ({
           cheese: cheese,

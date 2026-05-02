@@ -1,4 +1,5 @@
 package es.codeurjc.quesosbartolome.service;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,7 +13,6 @@ import org.springframework.stereotype.Service;
 
 import es.codeurjc.quesosbartolome.model.User;
 import es.codeurjc.quesosbartolome.repository.UserRepository;
-
 
 @Service
 public class RepositoryUserDetailsService implements UserDetailsService {
@@ -31,9 +31,8 @@ public class RepositoryUserDetailsService implements UserDetailsService {
 			roles.add(new SimpleGrantedAuthority("ROLE_" + role));
 		}
 
-		return new org.springframework.security.core.userdetails.User(user.getName(), 
+		return new org.springframework.security.core.userdetails.User(user.getName(),
 				user.getPassword(), !user.isBanned(), true, true, true, roles);
 
 	}
 }
-

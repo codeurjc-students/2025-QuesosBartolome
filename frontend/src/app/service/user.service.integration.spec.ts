@@ -325,38 +325,6 @@ describe('UserService (integration with real login)', () => {
     });
   });
 
-  it('should return my invoice by id after creating an invoice', (done) => {
-    createInvoiceForUser('Victor', 'password123').then((invoice) => {
-
-      return loginAs('Victor', 'password123').then(() => invoice);
-
-    }).then((invoice) => {
-      service.getCurrentUser().subscribe({
-        next: (user) => {
-          service.getMyInvoiceById(user.id, invoice.id).subscribe({
-            next: (fetched: InvoiceDTO) => {
-              expect(fetched).toBeTruthy();
-              expect(fetched.id).toBe(invoice.id);
-              expect(fetched.invNo).toContain('FACT-Q');
-              done();
-            },
-            error: (err) => {
-              fail('Failed to get my invoice by id: ' + err.message);
-              done();
-            }
-          });
-        },
-        error: (err) => {
-          fail('Failed to get current user before getMyInvoiceById: ' + err.message);
-          done();
-        }
-      });
-    }).catch(err => {
-      fail(err);
-      done();
-    });
-  });
-
   it('should download my invoice pdf as Blob', (done) => {
     createInvoiceForUser('Victor', 'password123').then((invoice) => {
 

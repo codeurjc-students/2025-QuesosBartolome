@@ -28,7 +28,7 @@ public class OrderItem {
     private Double weight;
     private Double totalPrice;
 
-    // CONSTRUCTORS
+    // Constructor
     public OrderItem() {
     }
 
@@ -56,7 +56,7 @@ public class OrderItem {
         this.totalPrice = totalPrice;
     }
 
-    // GETTERS & SETTERS
+    // Getters & Setters
     public Long getId() {
         return id;
     }

@@ -51,7 +51,7 @@ public class ReviewService {
     }
 
     public ReviewDTO createReview(Integer rating, String comment, Long userId, Long cheeseId) {
-        
+
         // Validate rating
         if (rating == null || rating < 1 || rating > 5) {
             throw new IllegalArgumentException("Rating must be between 1 and 5");

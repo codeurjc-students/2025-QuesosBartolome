@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { Page } from '../dto/page.dto';
 import { CheeseDTO } from '../dto/cheese.dto';
 
 @Injectable({
@@ -15,8 +16,8 @@ export class CheeseService {
 
   constructor(private http: HttpClient) { }
 
-  getAllCheeses(): Observable<CheeseDTO[]> {
-    return this.http.get<CheeseDTO[]>(this.apiUrl);
+  getAllCheeses(page: number = 0, size: number = 10): Observable<Page<CheeseDTO>> {
+    return this.http.get<Page<CheeseDTO>>(`${this.apiUrl}?page=${page}&size=${size}`, { withCredentials: true });
   }
 
   getCheeseById(id: number): Observable<CheeseDTO> {

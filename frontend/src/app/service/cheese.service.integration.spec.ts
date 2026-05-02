@@ -20,8 +20,9 @@ describe('CheeseService (integration)', () => {
   });
 
   it('should fetch cheeses from real API', (done) => {
-    service.getAllCheeses().subscribe({
-      next: (cheeses: CheeseDTO[]) => {
+    service.getAllCheeses(0, 100).subscribe({
+      next: (page) => {
+        const cheeses: CheeseDTO[] = page.content;
 
         expect(cheeses.length).toBeGreaterThan(0);
 

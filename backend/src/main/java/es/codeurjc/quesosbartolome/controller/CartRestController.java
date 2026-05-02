@@ -44,7 +44,7 @@ public class CartRestController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();// 404
         }
 
-        return ResponseEntity.ok(cartdto); // 200 OK
+        return ResponseEntity.ok(cartdto);
     }
 
     @PutMapping("/addItem")

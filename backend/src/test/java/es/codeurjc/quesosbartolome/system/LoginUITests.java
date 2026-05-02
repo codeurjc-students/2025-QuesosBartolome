@@ -48,7 +48,7 @@ public class LoginUITests {
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("username")));
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("password")));
 
-        driver.findElement(By.id("username")).sendKeys("Victor");
+        driver.findElement(By.id("username")).sendKeys("Tienda Artesanal de Riaza");
         driver.findElement(By.id("password")).sendKeys("password123");
 
         WebElement button = wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("button[type='submit']")));
@@ -69,7 +69,7 @@ public class LoginUITests {
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("username")));
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("password")));
 
-        driver.findElement(By.id("username")).sendKeys("German");
+        driver.findElement(By.id("username")).sendKeys("Admin");
         driver.findElement(By.id("password")).sendKeys("password123");
 
         WebElement loginButton = wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("button[type='submit']")));
@@ -86,17 +86,17 @@ public class LoginUITests {
         wait.until(ExpectedConditions.urlToBe("http://localhost:4200/users"));
 
         WebElement targetRow = wait.until(ExpectedConditions.visibilityOfElementLocated(
-            By.xpath("//div[contains(@class,'users-row')][.//span[normalize-space()='User']]")));
+            By.xpath("//div[contains(@class,'users-row')][.//span[normalize-space()='Supermercado Aldeonte']]")));
 
         WebElement banButton = targetRow.findElement(By.cssSelector("button.btn-ban"));
         ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block:'center'});", banButton);
-        banButton.click();
+        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", banButton);
 
         Alert confirmBanAlert = SeleniumDialogHelper.waitForDialog(wait);
         confirmBanAlert.accept();
 
         wait.until(ExpectedConditions.visibilityOfElementLocated(
-            By.xpath("//div[contains(@class,'users-row')][.//span[normalize-space()='User']]//span[contains(@class,'status-pill') and normalize-space()='BANEADO']")));
+            By.xpath("//div[contains(@class,'users-row')][.//span[normalize-space()='Supermercado Aldeonte']]//span[contains(@class,'status-pill') and normalize-space()='BANEADO']")));
 
         driver.get("http://localhost:4200/cheeses");
         safeClick(By.xpath("//button[normalize-space()='Cerrar Sesión']"));
@@ -106,7 +106,7 @@ public class LoginUITests {
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("username")));
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("password")));
 
-        driver.findElement(By.id("username")).sendKeys("User");
+        driver.findElement(By.id("username")).sendKeys("Supermercado Aldeonte");
         driver.findElement(By.id("password")).sendKeys("password123");
 
         WebElement button = wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("button[type='submit']")));
@@ -118,13 +118,13 @@ public class LoginUITests {
     }
 
     @Test
-    public void testLoginFailsWithWrongPasswordForVictor() {
+    public void testLoginFailsWithWrongPassword() {
         driver.get("http://localhost:4200/auth/login");
 
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("username")));
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("password")));
 
-        driver.findElement(By.id("username")).sendKeys("Victor");
+        driver.findElement(By.id("username")).sendKeys("Tienda Artesanal de Riaza");
         driver.findElement(By.id("password")).sendKeys("password_incorrecta");
 
         WebElement button = wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("button[type='submit']")));
