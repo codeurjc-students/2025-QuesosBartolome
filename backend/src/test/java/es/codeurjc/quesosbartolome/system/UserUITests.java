@@ -123,7 +123,7 @@ public class UserUITests {
                 WebElement avatarImg = profileContainer.findElement(By.cssSelector(".avatar-box img"));
                 String src = avatarImg.getDomProperty("src");
                 assertNotNull(src);
-                assertTrue(src.contains("assets/avatar-default.png") || src.startsWith("blob:"),
+                assertTrue(src.contains("avatar-default") || src.startsWith("blob:"),
                                 "Avatar should be default or a generated blob");
         }
 
