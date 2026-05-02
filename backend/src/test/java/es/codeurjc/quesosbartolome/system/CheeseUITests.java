@@ -213,9 +213,10 @@ public class CheeseUITests {
                 Alert alert = SeleniumDialogHelper.waitForDialog(wait);
                 alert.accept();
 
-                // Sidebar visible
-                WebElement sidebar = wait.until(ExpectedConditions
-                                .visibilityOfElementLocated(By.cssSelector(".menu")));
+                // Wait until isLoggedIn resolves so *ngIf items appear in the sidebar
+                wait.until(ExpectedConditions.visibilityOfElementLocated(
+                                By.xpath("//nav[contains(@class,'menu')]//li[contains(text(),'Mi pedido')]")));
+                WebElement sidebar = driver.findElement(By.cssSelector(".menu"));
 
                 // Regular USER should see:
                 assertTrue(sidebar.getText().contains("Mi pedido"), "USER should see 'Mi pedido'");
