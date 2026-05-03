@@ -8,6 +8,12 @@ import org.junit.jupiter.api.*;
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.OutputType;
+import org.openqa.selenium.TakesScreenshot;
+import org.openqa.selenium.TimeoutException;
+import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.*;
 
@@ -156,10 +162,12 @@ public class CheeseDetailsUITests {
 
                 WebElement boxesInput = wait
                                 .until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".cajas-input")));
-                boxesInput.sendKeys("1");
+                // Use JS to set value and dispatch input event to ensure Angular receives the change
+                ((JavascriptExecutor) driver).executeScript("arguments[0].value = arguments[1]; arguments[0].dispatchEvent(new Event('input'));", boxesInput, "1");
 
                 WebElement addButton = wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(".add-btn")));
-                new Actions(driver).moveToElement(addButton).pause(200).click().perform();
+                // Click via JS to avoid flaky Actions in headless environments
+                ((JavascriptExecutor) driver).executeScript("arguments[0].click();", addButton);
 
                 Alert successAlert = SeleniumDialogHelper.waitForDialog(wait);
                 assertTrue(successAlert.getText().contains("Producto añadido al pedido"));
@@ -180,15 +188,36 @@ public class CheeseDetailsUITests {
 
                 WebElement boxesInput = wait
                                 .until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".cajas-input")));
-                boxesInput.sendKeys("0");
+                // Use JS to set invalid value and dispatch input event
+                ((JavascriptExecutor) driver).executeScript("arguments[0].value = arguments[1]; arguments[0].dispatchEvent(new Event('input'));", boxesInput, "0");
 
-                WebElement addButton = wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(".add-btn")));
-                new Actions(driver).moveToElement(addButton).pause(200).click().perform();
+                                WebElement addButton = wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(".add-btn")));
+                                // Click via JS to avoid flaky Actions in headless environments
+                                ((JavascriptExecutor) driver).executeScript("arguments[0].click();", addButton);
 
-                Alert errorAlert = SeleniumDialogHelper.waitForDialog(wait);
-                assertTrue(errorAlert.getText().contains("Error al añadir el producto")
-                                || errorAlert.getText().contains("Ingrese una cantidad correcta"));
-                errorAlert.accept();
+                                try {
+                                        Alert errorAlert = SeleniumDialogHelper.waitForDialog(wait);
+                                        assertTrue(errorAlert.getText().contains("Error al añadir el producto")
+                                                                        || errorAlert.getText().contains("Ingrese una cantidad correcta"));
+                                        errorAlert.accept();
+                                } catch (TimeoutException te) {
+                                        try {
+                                                if (driver instanceof TakesScreenshot) {
+                                                        File img = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
+                                                        Path dst = Path.of("target", "screenshots", "CheeseDetails_Failure.png");
+                                                        Files.createDirectories(dst.getParent());
+                                                        Files.copy(img.toPath(), dst);
+                                                        System.out.println("Saved screenshot to: " + dst.toAbsolutePath());
+                                                }
+                                                String page = driver.getPageSource();
+                                                Path html = Path.of("target", "screenshots", "CheeseDetails_Failure.html");
+                                                Files.writeString(html, page);
+                                                System.out.println("Saved page source to: " + html.toAbsolutePath());
+                                        } catch (Exception ex) {
+                                                System.out.println("Failed to capture debug artifacts: " + ex.getMessage());
+                                        }
+                                        throw te;
+                                }
         }
 
 }
