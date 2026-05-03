@@ -3,13 +3,14 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Page } from '../dto/page.dto';
 import { OrderDTO } from '../dto/order.dto';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class OrderService {
 
-  private apiUrl = 'https://localhost:443/api/v1/orders';
+  private apiUrl = `${environment.apiBaseUrl}/api/v1/orders`;
 
   constructor(private http: HttpClient) { }
 

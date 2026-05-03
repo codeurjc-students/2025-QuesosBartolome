@@ -5,13 +5,14 @@ import { UserDTO } from '../dto/user.dto';
 import { Page } from '../dto/page.dto';
 import { OrderDTO } from '../dto/order.dto';
 import { InvoiceDTO } from '../dto/invoice.dto';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class UserService {
 
-  private apiUrl = 'https://localhost:443/api/v1/users';
+  private apiUrl = `${environment.apiBaseUrl}/api/v1/users`;
 
   constructor(private http: HttpClient) {}
 

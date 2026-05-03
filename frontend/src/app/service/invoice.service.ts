@@ -4,13 +4,14 @@ import { Observable } from 'rxjs';
 import { InvoiceDTO } from '../dto/invoice.dto';
 import { OrderDTO } from '../dto/order.dto';
 import { Page } from '../dto/page.dto';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class InvoiceService {
 
-  private apiUrl = 'https://localhost:443/api/v1/invoices';
+  private apiUrl = `${environment.apiBaseUrl}/api/v1/invoices`;
 
   constructor(private http: HttpClient) { }
 

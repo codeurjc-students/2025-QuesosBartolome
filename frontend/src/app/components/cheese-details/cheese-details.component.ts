@@ -11,6 +11,7 @@ import { ReviewService } from '../../service/review.service';
 import { ReviewDTO } from '../../dto/review.dto';
 import { Page } from '../../dto/page.dto';
 import { DialogService } from '../../service/dialog.service';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-cheese-details',
@@ -21,6 +22,7 @@ import { DialogService } from '../../service/dialog.service';
 })
 export class CheeseDetailsComponent implements OnInit {
 
+  apiBaseUrl = environment.apiBaseUrl;
   cheese!: CheeseDTO;
   imageUrl: string | null = null;
 
@@ -208,7 +210,7 @@ export class CheeseDetailsComponent implements OnInit {
   }
 
   getUserImageUrl(userId: number): string {
-    return `https://localhost:443/api/v1/users/${userId}/image`;
+    return `${this.apiBaseUrl}/api/v1/users/${userId}/image`;
   }
 
   goToUserProfile(userId: number): void {
