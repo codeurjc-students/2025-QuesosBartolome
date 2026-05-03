@@ -30,7 +30,7 @@ beforeEach(() => {
     loginService.login('Tienda Artesanal de Riaza', 'password123').subscribe({
       next: () => {
 
-        cartService.addCheeseToOrder(1, 1, 1).subscribe({
+        cartService.addCheeseToOrder(1, 1).subscribe({
           next: () => {
 
             service.confirmOrder().subscribe({
@@ -91,7 +91,7 @@ beforeEach(() => {
   it('should retrieve order by id after creating order (admin access)', (done) => {
     loginService.login('Tienda Artesanal de Riaza', 'password123').subscribe({
       next: () => {
-        cartService.addCheeseToOrder(1, 1, 1).subscribe({
+        cartService.addCheeseToOrder(1, 1).subscribe({
           next: () => {
             service.confirmOrder().subscribe({
               next: (createdOrder: OrderDTO) => {
@@ -138,7 +138,7 @@ beforeEach(() => {
   it('should reject order by id after creating order (admin access)', (done) => {
     loginService.login('Tienda Artesanal de Riaza', 'password123').subscribe({
       next: () => {
-        cartService.addCheeseToOrder(1, 1, 1).subscribe({
+        cartService.addCheeseToOrder(1, 1).subscribe({
           next: () => {
             service.confirmOrder().subscribe({
               next: (createdOrder: OrderDTO) => {

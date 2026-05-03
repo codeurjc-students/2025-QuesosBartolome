@@ -73,7 +73,7 @@ describe('UserService (integration with real login)', () => {
   function createOrderAsUser(username: string, password: string): Promise<OrderDTO> {
     return loginAs(username, password).then(() =>
       new Promise<OrderDTO>((resolve, reject) => {
-        cartService.addCheeseToOrder(5, 1, 1).subscribe({
+        cartService.addCheeseToOrder(1, 1).subscribe({
           next: () => {
             orderService.confirmOrder().subscribe({
               next: (order) => resolve(order),

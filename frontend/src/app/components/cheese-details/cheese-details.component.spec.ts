@@ -309,7 +309,7 @@ const mockCheeseBasic: CheeseBasicDTO = {
     component.addToOrder("1");
     tick();
 
-    expect(mockCartService.addCheeseToOrder).toHaveBeenCalledWith(1, 999, 1);
+    expect(mockCartService.addCheeseToOrder).toHaveBeenCalledWith(999, 1);
     expect(mockDialogService.alert).toHaveBeenCalledWith('Producto añadido al pedido');
   }));
 

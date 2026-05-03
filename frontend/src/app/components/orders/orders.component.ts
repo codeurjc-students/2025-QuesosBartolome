@@ -55,7 +55,7 @@ export class OrdersComponent implements OnInit {
         this.loading = false;
       },
       error: (err) => {
-        console.error('Error cargando pedidos', err);
+        // Error handling: avoid console logs in production UI code
         this.loading = false;
         if (err.status >= 500) {
           this.router.navigate(['/error']);

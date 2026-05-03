@@ -45,7 +45,7 @@ describe('CartService (integration with real login)', () => {
   it('should add cheese to cart after real login', (done) => {
     loginService.login('Tienda Artesanal de Riaza', 'password123').subscribe({
       next: () => {
-        service.addCheeseToOrder(1, 1, 1).subscribe({
+        service.addCheeseToOrder(1, 1).subscribe({
           next: (cart: CartDTO) => {
             expect(cart).toBeTruthy();
             expect(cart.items.length).toBeGreaterThan(0);
@@ -67,7 +67,7 @@ describe('CartService (integration with real login)', () => {
   it('should remove item from cart after real login', (done) => {
     loginService.login('Tienda Artesanal de Riaza', 'password123').subscribe({
       next: () => {
-        service.addCheeseToOrder(1, 1, 1).subscribe({
+        service.addCheeseToOrder(1, 1).subscribe({
           next: (cartAfterAdd: CartDTO) => {
             const itemId = cartAfterAdd.items[0].id;
 

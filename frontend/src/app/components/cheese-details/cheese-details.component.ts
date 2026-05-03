@@ -115,10 +115,9 @@ export class CheeseDetailsComponent implements OnInit {
       return;
     }
 
-    const userId = this.currentUser.id;
     const cheeseId = this.cheese.id;
 
-    this.cartService.addCheeseToOrder(userId, cheeseId!, boxes)
+    this.cartService.addCheeseToOrder(cheeseId!, boxes)
       .subscribe({
         next: () => {
           this.dialogService.alert('Producto añadido al pedido');

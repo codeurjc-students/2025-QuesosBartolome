@@ -4,6 +4,7 @@ import { RegisterComponent } from './register.component';
 import { LoginService } from '../../service/login.service';
 import { Router } from '@angular/router';
 import { DialogService } from '../../service/dialog.service';
+import { UserService } from '../../service/user.service';
 
 
 describe('RegisterComponent (unit)', () => {
@@ -13,17 +14,21 @@ describe('RegisterComponent (unit)', () => {
   let mockLoginService: jasmine.SpyObj<LoginService>;
   let mockRouter: jasmine.SpyObj<Router>;
   let mockDialogService: jasmine.SpyObj<DialogService>;
+  let mockUserService: jasmine.SpyObj<UserService>;
 
   beforeEach(async () => {
 
     mockLoginService = jasmine.createSpyObj('LoginService', ['register']);
     mockRouter = jasmine.createSpyObj('Router', ['navigate']);
     mockDialogService = jasmine.createSpyObj('DialogService', ['alert']);
+    mockUserService = jasmine.createSpyObj('UserService', ['getCurrentUser']);
+    mockUserService.getCurrentUser.and.returnValue(throwError(() => ({ status: 401 })));
 
     await TestBed.configureTestingModule({
       imports: [RegisterComponent],
       providers: [
         { provide: LoginService, useValue: mockLoginService },
+        { provide: UserService, useValue: mockUserService },
         { provide: Router, useValue: mockRouter },
         { provide: DialogService, useValue: mockDialogService }
       ]
@@ -54,6 +59,15 @@ describe('RegisterComponent (unit)', () => {
       direction: 'Calle Falsa 123',
       nif: '12345678A'
     });
+    expect(mockRouter.navigate).toHaveBeenCalledWith(['/']);
+  });
+
+  it('should redirect to home if user is already logged in', () => {
+    mockUserService.getCurrentUser.and.returnValue(of({ id: 1, rols: ['USER'] } as any));
+    mockRouter.navigate.calls.reset();
+
+    component.ngOnInit();
+
     expect(mockRouter.navigate).toHaveBeenCalledWith(['/']);
   });
 

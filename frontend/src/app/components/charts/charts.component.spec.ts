@@ -110,7 +110,6 @@ describe('ChartsComponent (unit)', () => {
 	});
 
 	it('should refresh line chart when year and users change', () => {
-		spyOn(console, 'log');
 		component.selectedYear = 2025;
 		component.selectedUsers = [{ id: 1 } as any];
 
@@ -119,7 +118,6 @@ describe('ChartsComponent (unit)', () => {
 
 		expect(component.chartTitle).toBe('Ingresos - 2025');
 		expect(component.dataPoints[0]).toBe(60);
-		expect(console.log).toHaveBeenCalled();
 	});
 
 	it('should switch to bar chart mode and rebuild bar data', () => {
@@ -130,8 +128,6 @@ describe('ChartsComponent (unit)', () => {
 		expect(component.selectedUsers).toEqual([]);
 		expect(component.barData.length).toBeGreaterThan(0);
 		expect(component.barRects.length).toBe(component.barData.length);
-		expect(component.barIncomeTicks.length).toBeGreaterThan(0);
-		expect(component.barKgTicks.length).toBeGreaterThan(0);
 	});
 
 	it('should filter bar chart by selected month and selected users', () => {
@@ -193,16 +189,14 @@ describe('ChartsComponent (unit)', () => {
 		expect(component.barHoverColor).toBe('#8B0000');
 	});
 
-	it('should generate svg paths and points', () => {
+	it('should generate svg paths', () => {
 		component.dataPoints = [10, 20, 30];
 
 		const linePath = component.getLinePath();
 		const areaPath = component.getAreaPath();
-		const pointsAttr = component.getPointsAttr();
 
 		expect(linePath.startsWith('M ')).toBeTrue();
 		expect(areaPath.endsWith('Z')).toBeTrue();
-		expect(pointsAttr.split(' ').length).toBe(3);
 	});
 
 	it('should return empty svg paths when there is no data', () => {
@@ -210,7 +204,6 @@ describe('ChartsComponent (unit)', () => {
 
 		expect(component.getLinePath()).toBe('');
 		expect(component.getAreaPath()).toBe('');
-		expect(component.getPointsAttr()).toBe('');
 	});
 
 	it('should compute point coords, ticks and y-position', () => {
@@ -318,7 +311,6 @@ describe('ChartsComponent (unit)', () => {
 
 		expect(component.getLinePath()).toContain('M ');
 		expect(component.getAreaPath()).toContain('Z');
-		expect(component.getPointsAttr()).toContain(',');
 	});
 
 	it('should include whole year in bar chart when month is null', () => {

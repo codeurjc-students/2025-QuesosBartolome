@@ -21,24 +21,20 @@ import { DialogService } from '../../service/dialog.service';
   styleUrls: ['./cheese-list.component.css']
 })
 export class CheeseListComponent implements OnInit {
-  cheeses: CheeseDTO[] = [];
+  allCheeses: CheeseDTO[] = []; // ALL cheeses from server (all pages combined)
   filteredCheeses: CheeseDTO[] = [];
   
   // Filtrado
   selectedType: string = 'Todos';
   cheeseTypes: string[] = ['Todos', 'Pasta prensada', 'Cremoso', 'Maduración fúngica'];
   
-  // Paginación (server-side)
+  // Paginación (local, client-side)
   currentPage: number = 1; // 1-based for the UI
   itemsPerPage: number = 10;
   totalPages: number = 1;
-  totalElements: number = 0;
 
   isLoggedIn: boolean = false;
   currentUser: UserDTO | null = null;
-
-  // Hacer Math accesible en el template
-  Math = Math;
 
   constructor(
     private cheeseService: CheeseService,
@@ -49,8 +45,8 @@ export class CheeseListComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    // Load first page of cheeses (server-side pagination)
-    this.loadPage(this.currentPage);
+    // Load ALL pages of cheeses (combine all server pages)
+    this.loadAllPages(0);
 
     // Check login status and get current user
     this.userService.getCurrentUser().subscribe({
@@ -59,22 +55,25 @@ export class CheeseListComponent implements OnInit {
         this.isLoggedIn = true;
       },
       error: (err) => {
-        // If there is no valid token or an error occurs, consider that no user is logged in
         this.currentUser = null;
         this.isLoggedIn = false;
       }
     });
   }
 
-  loadPage(page: number): void {
-    const pageIndex = Math.max(0, page - 1); // backend is 0-based
+  loadAllPages(pageIndex: number): void {
     this.cheeseService.getAllCheeses(pageIndex, this.itemsPerPage).subscribe({
       next: (p) => {
-        this.cheeses = p.content;
-        this.totalPages = p.totalPages;
-        this.totalElements = p.totalElements;
-        this.currentPage = p.number + 1;
-        this.applyFilter();
+        // Add current page to allCheeses
+        this.allCheeses.push(...p.content);
+        
+        // If there are more pages, load them recursively
+        if (!p.last) {
+          this.loadAllPages(pageIndex + 1);
+        } else {
+          // All pages loaded, apply filter
+          this.applyFilter();
+        }
       },
       error: (err) => {
         console.error('Error loading cheeses', err);
@@ -129,7 +128,6 @@ export class CheeseListComponent implements OnInit {
       next: () => {
         this.isLoggedIn = false;
         this.currentUser = null;
-        console.log('Logged out successfully');
         this.router.navigate(['/']);
       },
       error: (err) => {
@@ -139,10 +137,6 @@ export class CheeseListComponent implements OnInit {
         }
       }
     });
-  }
-
-  openNewCheeseModal(): void {
-    this.dialogService.alert('Open modal for creating a new cheese (not implemented)');
   }
 
   isAdmin(): boolean {
@@ -156,44 +150,56 @@ export class CheeseListComponent implements OnInit {
   // Filtrado
   selectType(type: string): void {
     this.selectedType = type;
-    this.currentPage = 1; // Reset to first page and reload from server
-    this.loadPage(this.currentPage);
+    this.currentPage = 1; // Reset to first page
+    this.applyFilter();
   }
 
   applyFilter(): void {
+    // Filter based on selected type from ALL cheeses (not just current page)
     if (this.selectedType === 'Todos') {
-      this.filteredCheeses = [...this.cheeses];
+      this.filteredCheeses = [...this.allCheeses];
     } else {
-      this.filteredCheeses = this.cheeses.filter(cheese => cheese.type === this.selectedType);
+      this.filteredCheeses = this.allCheeses.filter(cheese => cheese.type === this.selectedType);
     }
-    this.updatePagination();
+    // Recalculate totalPages based on filtered results
+    this.totalPages = Math.ceil(this.filteredCheeses.length / this.itemsPerPage);
+    // Ensure totalPages is at least 1
+    if (this.totalPages === 0) {
+      this.totalPages = 1;
+    }
   }
 
-  // Paginación
-  updatePagination(): void {
-    // With server-side pagination, the server provides pages; here we only filter current page content
-    if (this.selectedType === 'Todos') {
-      this.filteredCheeses = [...this.cheeses];
-    } else {
-      this.filteredCheeses = this.cheeses.filter(cheese => cheese.type === this.selectedType);
-    }
+  // Get displayed cheeses for current page (local client-side pagination)
+  get displayedCheeses(): CheeseDTO[] {
+    const startIdx = (this.currentPage - 1) * this.itemsPerPage;
+    const endIdx = startIdx + this.itemsPerPage;
+    return this.filteredCheeses.slice(startIdx, endIdx);
+  }
+
+  get firstDisplayedIndex(): number {
+    return this.filteredCheeses.length === 0 ? 0 : (this.currentPage - 1) * this.itemsPerPage + 1;
+  }
+
+  get lastDisplayedIndex(): number {
+    const endIdx = this.currentPage * this.itemsPerPage;
+    return Math.min(endIdx, this.filteredCheeses.length);
   }
 
   nextPage(): void {
     if (this.currentPage < this.totalPages) {
-      this.loadPage(this.currentPage + 1);
+      this.currentPage++;
     }
   }
 
   previousPage(): void {
     if (this.currentPage > 1) {
-      this.loadPage(this.currentPage - 1);
+      this.currentPage--;
     }
   }
 
   goToPage(page: number): void {
     if (page >= 1 && page <= this.totalPages) {
-      this.loadPage(page);
+      this.currentPage = page;
     }
   }
 

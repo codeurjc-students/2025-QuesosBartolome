@@ -8,9 +8,7 @@ import { CheeseDTO } from '../dto/cheese.dto';
   providedIn: 'root'
 })
 export class CheeseService {
-  addCheeseToOrder(userId: number, cheeseId: number, boxes: number) {
-    throw new Error('Method not implemented.');
-  }
+  // Removed unused addCheeseToOrder stub. Use `CartService` for cart operations.
 
   private apiUrl = 'https://localhost:443/api/v1/cheeses';
 

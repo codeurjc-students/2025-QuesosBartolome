@@ -127,19 +127,25 @@ describe('InvoicesComponent', () => {
     expect(empty.nativeElement.textContent).toContain('No hay facturas para mostrar');
   });
 
-  it('should navigate to error page when loadInvoices fails with 500', () => {
+  it('should navigate to error page when loading invoices fails with 500', () => {
+    component.currentPage = 0;
+    component.totalPages = 2;
+    invoiceServiceSpy.getAllInvoices.calls.reset();
     invoiceServiceSpy.getAllInvoices.and.returnValue(throwError(() => ({ status: 500 })));
 
-    component.loadInvoices();
+    component.nextPage();
 
     expect(component.loading).toBeFalse();
     expect(routerSpy.navigate).toHaveBeenCalledWith(['/error']);
   });
 
-  it('should not navigate to error page when loadInvoices fails with 404', () => {
+  it('should not navigate to error page when loading invoices fails with 404', () => {
+    component.currentPage = 0;
+    component.totalPages = 2;
+    invoiceServiceSpy.getAllInvoices.calls.reset();
     invoiceServiceSpy.getAllInvoices.and.returnValue(throwError(() => ({ status: 404 })));
 
-    component.loadInvoices();
+    component.nextPage();
 
     expect(component.loading).toBeFalse();
     expect(routerSpy.navigate).not.toHaveBeenCalled();
@@ -222,11 +228,13 @@ describe('InvoicesComponent', () => {
 
   it('should navigate to login when user has no id and is not admin', () => {
     component.currentUser = { rols: ['USER'] } as any;
+    component.currentPage = 0;
+    component.totalPages = 2;
     routerSpy.navigate.calls.reset();
     invoiceServiceSpy.getAllInvoices.calls.reset();
     userServiceSpy.getMyInvoices.calls.reset();
 
-    component.loadInvoices();
+    component.nextPage();
 
     expect(routerSpy.navigate).toHaveBeenCalledWith(['/auth/login']);
     expect(invoiceServiceSpy.getAllInvoices).not.toHaveBeenCalled();

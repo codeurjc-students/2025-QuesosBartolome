@@ -24,19 +24,13 @@ export class LoginComponent {
   login(): void {
     this.loginService.login(this.username, this.password).subscribe({
       next: (response) => {
-        console.log("Login ok:", response);
         this.dialogService.alert('Inicio de sesión correcto');
         this.router.navigate(['/']);
       },
       error: (err) => {
-        console.error("Error en login:", err);
         const backendMessage = err?.error?.message;
-        if (backendMessage) {
-          this.dialogService.alert(backendMessage);
-        } else {
-          this.dialogService.alert('Credenciales incorrectas.');
-        }
-        if (err.status >= 500) {
+        this.dialogService.alert(backendMessage ?? 'Credenciales incorrectas.');
+        if (err?.status >= 500) {
           this.router.navigate(['/error']);
         }
       }
