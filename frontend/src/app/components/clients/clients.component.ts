@@ -37,8 +37,12 @@ export class ClientsComponent implements OnInit {
                 this.users.forEach(user => this.loadUserImage(user));
             },
             error: (err) => {
-                console.error('Error cargando usuarios', err);
-                if (err.status >= 500) {
+                if (err.status === 401) {
+                    this.router.navigate(['/auth/login']);
+                    return;
+                }
+
+                if (err.status === 403 || err.status >= 500) {
                     this.router.navigate(['/error']);
                 }
             }

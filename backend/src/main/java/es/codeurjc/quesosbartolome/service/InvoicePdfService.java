@@ -22,6 +22,7 @@ public class InvoicePdfService {
 
     /**
      * Generates a PDF from an invoice using Thymeleaf and iText7
+     * 
      * @param invoice The invoice to generate PDF from
      * @return PDF as byte array
      * @throws IOException if PDF generation fails
@@ -81,6 +82,7 @@ public class InvoicePdfService {
 
     /**
      * Converts HTML string to PDF bytes using iText7
+     * 
      * @param htmlContent HTML content as string
      * @return PDF as byte array
      * @throws IOException if conversion fails

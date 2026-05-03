@@ -50,6 +50,31 @@ public class ApiUserTests {
                                 .detailedCookies();
         }
 
+        private io.restassured.http.Cookies registerAndLoginTestUser(String name, String password) throws JSONException {
+                String uniqueNif = String.format("%08d", Math.abs(name.hashCode() % 100000000)) + "Z";
+
+                JSONObject registerBody = new JSONObject();
+                registerBody.put("name", name);
+                registerBody.put("password", password);
+                registerBody.put("gmail", name.toLowerCase() + "@example.com");
+                registerBody.put("direction", "Street of " + name);
+                registerBody.put("nif", uniqueNif);
+                registerBody.put("image", JSONObject.NULL);
+
+                given()
+                                .contentType("application/json")
+                                .body(registerBody.toString())
+                                .post("/api/v1/auth/register")
+                                .then()
+                                .statusCode(anyOf(is(201)));
+
+                return login(name, password);
+        }
+
+        private io.restassured.http.Cookies loginAsAdmin() throws JSONException {
+                return login("Admin", "password123");
+        }
+
         private Long getCurrentUserId(io.restassured.http.Cookies cookies) {
                 Number id = given()
                                 .cookies(cookies)
@@ -62,17 +87,9 @@ public class ApiUserTests {
                 return id.longValue();
         }
 
-        private io.restassured.http.Cookies loginAsAdminGerman() throws JSONException {
-                return login("German", "password123");
-        }
-
-        private io.restassured.http.Cookies loginAsUserVictor() throws JSONException {
-                return login("Victor", "password123");
-        }
-
-        private Long createOrderAsVictor(io.restassured.http.Cookies victorCookies) {
+        private Long createOrderAsUser(io.restassured.http.Cookies userCookies) {
                 given()
-                                .cookies(victorCookies)
+                                .cookies(userCookies)
                                 .queryParam("cheeseId", 5)
                                 .queryParam("boxes", 1)
                                 .when()
@@ -81,7 +98,7 @@ public class ApiUserTests {
                                 .statusCode(200);
 
                 Integer confirmedOrderId = given()
-                                .cookies(victorCookies)
+                                .cookies(userCookies)
                                 .when()
                                 .post("/api/v1/orders/confirm")
                                 .then()
@@ -121,7 +138,6 @@ public class ApiUserTests {
         @Test
         @Order(1)
         void testGetCurrentUserUnauthorized() {
-                // Without login, should return 401 Unauthorized
                 given()
                                 .when()
                                 .get("/api/v1/users")
@@ -132,36 +148,7 @@ public class ApiUserTests {
         @Test
         @Order(2)
         void testGetCurrentUserAfterLogin() throws JSONException {
-                // Register test user
-                JSONObject registerBody = new JSONObject();
-                registerBody.put("name", "JorgeTestUser");
-                registerBody.put("password", "password123");
-                registerBody.put("gmail", "jorge.test@example.com");
-                registerBody.put("direction", "Calle Victoria 1");
-                registerBody.put("nif", "87654321B");
-                registerBody.put("image", JSONObject.NULL);
-
-                given()
-                                .contentType("application/json")
-                                .body(registerBody.toString())
-                                .post("/api/v1/auth/register")
-                                .then()
-                                .statusCode(201);
-
-                JSONObject loginBody = new JSONObject();
-                loginBody.put("username", "JorgeTestUser");
-                loginBody.put("password", "password123");
-
-                var loginResponse = given()
-                                .contentType("application/json")
-                                .body(loginBody.toString())
-                                .post("/api/v1/auth/login")
-                                .then()
-                                .statusCode(200)
-                                .extract()
-                                .response();
-
-                var cookies = loginResponse.detailedCookies();
+                var cookies = registerAndLoginTestUser("UserTest1", "password123");
 
                 given()
                                 .cookies(cookies)
@@ -169,10 +156,9 @@ public class ApiUserTests {
                                 .get("/api/v1/users")
                                 .then()
                                 .statusCode(200)
-                                .body("name", equalTo("JorgeTestUser"))
-                                .body("gmail", equalTo("jorge.test@example.com"))
-                                .body("direction", equalTo("Calle Victoria 1"))
-                                .body("nif", equalTo("87654321B"))
+                                .body("name", equalTo("UserTest1"))
+                                .body("gmail", equalTo("usertest1@example.com"))
+                                .body("direction", equalTo("Street of UserTest1"))
                                 .body("id", notNullValue())
                                 .body("password", notNullValue());
         }
@@ -180,25 +166,8 @@ public class ApiUserTests {
         @Test
         @Order(3)
         void testGetUserImageById() throws JSONException {
-                JSONObject registerBody = new JSONObject();
-                registerBody.put("name", "AnaTestUser");
-                registerBody.put("password", "clave456");
-                registerBody.put("gmail", "ana.test@example.com");
-                registerBody.put("direction", "Calle Luna 2");
-                registerBody.put("nif", "12345678C");
-                registerBody.put("image", JSONObject.NULL);
-
-                var registerResponse = given()
-                                .contentType("application/json")
-                                .body(registerBody.toString())
-                                .post("/api/v1/auth/register")
-                                .then()
-                                .statusCode(201)
-                                .extract()
-                                .response();
-
-                Integer idInt = registerResponse.path("id");
-                Long userId = idInt.longValue();
+                var cookies = registerAndLoginTestUser("UserTest2", "password123");
+                Long userId = getCurrentUserId(cookies);
 
                 given()
                                 .when()
@@ -210,7 +179,7 @@ public class ApiUserTests {
         @Test
         @Order(4)
         void testGetUserImageByIdNotFound() throws JSONException {
-                Long userId = 99999L; // Assuming this ID does not exist
+                Long userId = 99999L;
 
                 given()
                                 .when()
@@ -222,36 +191,17 @@ public class ApiUserTests {
         @Test
         @Order(4)
         void testGetUserById() throws JSONException {
-                // Registrar un usuario
-                JSONObject registerBody = new JSONObject();
-                registerBody.put("name", "LuisTestUser");
-                registerBody.put("password", "password789");
-                registerBody.put("gmail", "luis.test@example.com");
-                registerBody.put("direction", "Calle Mayor 3");
-                registerBody.put("nif", "11223344D");
-                registerBody.put("image", JSONObject.NULL);
-
-                var registerResponse = given()
-                                .contentType("application/json")
-                                .body(registerBody.toString())
-                                .post("/api/v1/auth/register")
-                                .then()
-                                .statusCode(201)
-                                .extract()
-                                .response();
-
-                Integer idInt = registerResponse.path("id");
-                Long userId = idInt.longValue();
+                var cookies = registerAndLoginTestUser("UserTest3", "password123");
+                Long userId = getCurrentUserId(cookies);
 
                 given()
                                 .when()
                                 .get("/api/v1/users/" + userId)
                                 .then()
                                 .statusCode(200)
-                                .body("name", equalTo("LuisTestUser"))
-                                .body("gmail", equalTo("luis.test@example.com"))
-                                .body("direction", equalTo("Calle Mayor 3"))
-                                .body("nif", equalTo("11223344D"))
+                                .body("name", equalTo("UserTest3"))
+                                .body("gmail", equalTo("usertest3@example.com"))
+                                .body("direction", equalTo("Street of UserTest3"))
                                 .body("id", equalTo(userId.intValue()));
         }
 
@@ -268,7 +218,6 @@ public class ApiUserTests {
         @Test
         @Order(7)
         void testGetAllUsersUnauthorized() {
-
                 given()
                                 .when()
                                 .get("/api/v1/users/all")
@@ -279,37 +228,8 @@ public class ApiUserTests {
         @Test
         @Order(8)
         void testGetAllUsersForbiddenForUser() throws JSONException {
-                // Register USER
-                JSONObject registerBody = new JSONObject();
-                registerBody.put("name", "NormalTestUser");
-                registerBody.put("password", "password");
-                registerBody.put("gmail", "normal.test@example.com");
-                registerBody.put("direction", "Calle Normal");
-                registerBody.put("nif", "11111111A");
-                registerBody.put("image", JSONObject.NULL);
+                var cookies = registerAndLoginTestUser("UserTest4", "password123");
 
-                given()
-                                .contentType("application/json")
-                                .body(registerBody.toString())
-                                .post("/api/v1/auth/register")
-                                .then()
-                                .statusCode(201);
-
-                // Login USER
-                JSONObject loginBody = new JSONObject();
-                loginBody.put("username", "NormalTestUser");
-                loginBody.put("password", "password");
-
-                var cookies = given()
-                                .contentType("application/json")
-                                .body(loginBody.toString())
-                                .post("/api/v1/auth/login")
-                                .then()
-                                .statusCode(200)
-                                .extract()
-                                .detailedCookies();
-
-                // USER tries to access ADMIN endpoint
                 given()
                                 .cookies(cookies)
                                 .when()
@@ -321,20 +241,7 @@ public class ApiUserTests {
         @Test
         @Order(9)
         void testGetAllUsersAsAdmin() throws JSONException {
-
-                // Login as ADMIN (German is admin by default)
-                JSONObject loginBody = new JSONObject();
-                loginBody.put("username", "German");
-                loginBody.put("password", "password123");
-
-                var cookies = given()
-                                .contentType("application/json")
-                                .body(loginBody.toString())
-                                .post("/api/v1/auth/login")
-                                .then()
-                                .statusCode(200)
-                                .extract()
-                                .detailedCookies();
+                var cookies = loginAsAdmin();
 
                 given()
                                 .cookies(cookies)
@@ -349,20 +256,7 @@ public class ApiUserTests {
         @Test
         @Order(10)
         void testGetAllUsersWithPaginationAsAdmin() throws JSONException {
-
-                // Login as ADMIN
-                JSONObject loginBody = new JSONObject();
-                loginBody.put("username", "German");
-                loginBody.put("password", "password123");
-
-                var cookies = given()
-                                .contentType("application/json")
-                                .body(loginBody.toString())
-                                .post("/api/v1/auth/login")
-                                .then()
-                                .statusCode(200)
-                                .extract()
-                                .detailedCookies();
+                var cookies = loginAsAdmin();
 
                 given()
                                 .cookies(cookies)
@@ -379,7 +273,6 @@ public class ApiUserTests {
         @Test
         @Order(11)
         void testUpdateUserUnauthorized() throws JSONException {
-
                 JSONObject body = new JSONObject();
                 body.put("name", "NewName");
 
@@ -395,59 +288,11 @@ public class ApiUserTests {
         @Test
         @Order(12)
         void testUpdateUserForbidden() throws JSONException {
+                var cookiesA = registerAndLoginTestUser("UserTest5", "password123");
+                Long idA = getCurrentUserId(cookiesA);
 
-                // Register A
-                JSONObject regA = new JSONObject();
-                regA.put("name", "UserA");
-                regA.put("password", "passwordA");
-                regA.put("gmail", "a@test.com");
-                regA.put("direction", "Street A");
-                regA.put("nif", "11111111A");
-                regA.put("image", JSONObject.NULL);
+                var cookiesB = registerAndLoginTestUser("UserTest6", "password123");
 
-                var resA = given()
-                                .contentType("application/json")
-                                .body(regA.toString())
-                                .post("/api/v1/auth/register")
-                                .then()
-                                .statusCode(201)
-                                .extract()
-                                .response();
-
-                Number idANum = resA.path("id");
-                Long idA = idANum.longValue();
-
-                // Register B
-                JSONObject regB = new JSONObject();
-                regB.put("name", "UserB");
-                regB.put("password", "passwordB");
-                regB.put("gmail", "b@test.com");
-                regB.put("direction", "Street B");
-                regB.put("nif", "22222222B");
-                regB.put("image", JSONObject.NULL);
-
-                given()
-                                .contentType("application/json")
-                                .body(regB.toString())
-                                .post("/api/v1/auth/register")
-                                .then()
-                                .statusCode(201);
-
-                // Login B
-                JSONObject loginB = new JSONObject();
-                loginB.put("username", "UserB");
-                loginB.put("password", "passwordB");
-
-                var cookiesB = given()
-                                .contentType("application/json")
-                                .body(loginB.toString())
-                                .post("/api/v1/auth/login")
-                                .then()
-                                .statusCode(200)
-                                .extract()
-                                .detailedCookies();
-
-                // B tries to update A → forbidden
                 JSONObject update = new JSONObject();
                 update.put("name", "HackedName");
 
@@ -464,41 +309,9 @@ public class ApiUserTests {
         @Test
         @Order(13)
         void testUpdateUserSuccess() throws JSONException {
+                var cookies = registerAndLoginTestUser("UserTest7", "password123");
+                Long id = getCurrentUserId(cookies);
 
-                JSONObject reg = new JSONObject();
-                reg.put("name", "UpdateUser");
-                reg.put("password", "password123");
-                reg.put("gmail", "update@test.com");
-                reg.put("direction", "Old Street");
-                reg.put("nif", "33333333C");
-                reg.put("image", JSONObject.NULL);
-
-                var res = given()
-                                .contentType("application/json")
-                                .body(reg.toString())
-                                .post("/api/v1/auth/register")
-                                .then()
-                                .statusCode(201)
-                                .extract()
-                                .response();
-
-                Number idNum = res.path("id");
-                Long id = idNum.longValue();
-
-                JSONObject login = new JSONObject();
-                login.put("username", "UpdateUser");
-                login.put("password", "password123");
-
-                var cookies = given()
-                                .contentType("application/json")
-                                .body(login.toString())
-                                .post("/api/v1/auth/login")
-                                .then()
-                                .statusCode(200)
-                                .extract()
-                                .detailedCookies();
-
-                // Update
                 JSONObject update = new JSONObject();
                 update.put("name", "UpdatedName");
                 update.put("gmail", "newmail@test.com");
@@ -522,43 +335,12 @@ public class ApiUserTests {
         @Test
         @Order(14)
         void testUpdateUserNameChangeRefreshesCookies() throws JSONException {
-
-                JSONObject reg = new JSONObject();
-                reg.put("name", "RenameUser");
-                reg.put("password", "password123");
-                reg.put("gmail", "rename@test.com");
-                reg.put("direction", "Old Street");
-                reg.put("nif", "55555555B");
-                reg.put("image", JSONObject.NULL);
-
-                var res = given()
-                                .contentType("application/json")
-                                .body(reg.toString())
-                                .post("/api/v1/auth/register")
-                                .then()
-                                .statusCode(201)
-                                .extract()
-                                .response();
-
-                Number idNumber = res.path("id");
-                Long id = idNumber.longValue();
-
-                JSONObject login = new JSONObject();
-                login.put("username", "RenameUser");
-                login.put("password", "password123");
-
-                var cookies = given()
-                                .contentType("application/json")
-                                .body(login.toString())
-                                .post("/api/v1/auth/login")
-                                .then()
-                                .statusCode(200)
-                                .extract()
-                                .detailedCookies();
+                var cookies = registerAndLoginTestUser("UserTest8", "password123");
+                Long id = getCurrentUserId(cookies);
 
                 JSONObject update = new JSONObject();
-                update.put("name", "RenameUserUpdated");
-                update.put("gmail", "rename.updated@test.com");
+                update.put("name", "UserTest8Updated");
+                update.put("gmail", "usertest8updated@example.com");
                 update.put("direction", "New Street");
                 update.put("nif", "55555555B");
 
@@ -588,7 +370,6 @@ public class ApiUserTests {
         @Test
         @Order(14)
         void testUpdateUserImageUnauthorized() {
-
                 given()
                                 .multiPart("file", "photo.png", "fake".getBytes())
                                 .when()
@@ -600,56 +381,11 @@ public class ApiUserTests {
         @Test
         @Order(15)
         void testUpdateUserImageForbidden() throws JSONException {
+                var cookiesA = registerAndLoginTestUser("UserTest9", "password123");
+                Long idA = getCurrentUserId(cookiesA);
 
-                JSONObject regA = new JSONObject();
-                regA.put("name", "ImgA");
-                regA.put("password", "pwdA1234");
-                regA.put("gmail", "a@img.com");
-                regA.put("direction", "Street A");
-                regA.put("nif", "11111111A");
-                regA.put("image", JSONObject.NULL);
+                var cookiesB = registerAndLoginTestUser("UserTest10", "password123");
 
-                var resA = given()
-                                .contentType("application/json")
-                                .body(regA.toString())
-                                .post("/api/v1/auth/register")
-                                .then()
-                                .statusCode(201)
-                                .extract()
-                                .response();
-
-                Number idANum = resA.path("id");
-                Long idA = idANum.longValue();
-
-                JSONObject regB = new JSONObject();
-                regB.put("name", "ImgB");
-                regB.put("password", "pwdB1234");
-                regB.put("gmail", "b@img.com");
-                regB.put("direction", "Street B");
-                regB.put("nif", "22222222B");
-                regB.put("image", JSONObject.NULL);
-
-                given()
-                                .contentType("application/json")
-                                .body(regB.toString())
-                                .post("/api/v1/auth/register")
-                                .then()
-                                .statusCode(201);
-
-                JSONObject loginB = new JSONObject();
-                loginB.put("username", "ImgB");
-                loginB.put("password", "pwdB1234");
-
-                var cookiesB = given()
-                                .contentType("application/json")
-                                .body(loginB.toString())
-                                .post("/api/v1/auth/login")
-                                .then()
-                                .statusCode(200)
-                                .extract()
-                                .detailedCookies();
-
-                // B tries to upload image for A → forbidden
                 given()
                                 .cookies(cookiesB)
                                 .multiPart("file", "photo.png", "fake".getBytes())
@@ -662,41 +398,9 @@ public class ApiUserTests {
         @Test
         @Order(16)
         void testUpdateUserImageSuccess() throws JSONException {
+                var cookies = registerAndLoginTestUser("UserTest11", "password123");
+                Long id = getCurrentUserId(cookies);
 
-                JSONObject reg = new JSONObject();
-                reg.put("name", "ImgUser");
-                reg.put("password", "pwd12345");
-                reg.put("gmail", "img@test.com");
-                reg.put("direction", "Street Img");
-                reg.put("nif", "55555555A");
-                reg.put("image", JSONObject.NULL);
-
-                var res = given()
-                                .contentType("application/json")
-                                .body(reg.toString())
-                                .post("/api/v1/auth/register")
-                                .then()
-                                .statusCode(201)
-                                .extract()
-                                .response();
-
-                Number idNum = res.path("id");
-                Long id = idNum.longValue();
-
-                JSONObject login = new JSONObject();
-                login.put("username", "ImgUser");
-                login.put("password", "pwd12345");
-
-                var cookies = given()
-                                .contentType("application/json")
-                                .body(login.toString())
-                                .post("/api/v1/auth/login")
-                                .then()
-                                .statusCode(200)
-                                .extract()
-                                .detailedCookies();
-
-                // Upload image
                 given()
                                 .cookies(cookies)
                                 .multiPart("file", "photo.png", "fakeImageData".getBytes())
@@ -709,7 +413,6 @@ public class ApiUserTests {
         @Test
         @Order(17)
         void testChangePasswordUnauthorized() throws JSONException {
-
                 JSONObject body = new JSONObject();
                 body.put("currentPassword", "old");
                 body.put("newPassword", "newPassword123");
@@ -727,61 +430,13 @@ public class ApiUserTests {
         @Test
         @Order(18)
         void testChangePasswordForbidden() throws JSONException {
+                var cookiesA = registerAndLoginTestUser("UserTest12", "password123");
+                Long idA = getCurrentUserId(cookiesA);
 
-                // Register A
-                JSONObject regA = new JSONObject();
-                regA.put("name", "PassA");
-                regA.put("password", "pwdA1234");
-                regA.put("gmail", "a@pass.com");
-                regA.put("direction", "Street A");
-                regA.put("nif", "11111111A");
-                regA.put("image", JSONObject.NULL);
+                var cookiesB = registerAndLoginTestUser("UserTest13", "password123");
 
-                var resA = given()
-                                .contentType("application/json")
-                                .body(regA.toString())
-                                .post("/api/v1/auth/register")
-                                .then()
-                                .statusCode(201)
-                                .extract()
-                                .response();
-
-                Number idANum = resA.path("id");
-                Long idA = idANum.longValue();
-
-                // Register B
-                JSONObject regB = new JSONObject();
-                regB.put("name", "PassB");
-                regB.put("password", "pwdB1234");
-                regB.put("gmail", "b@pass.com");
-                regB.put("direction", "Street B");
-                regB.put("nif", "22222222B");
-                regB.put("image", JSONObject.NULL);
-
-                given()
-                                .contentType("application/json")
-                                .body(regB.toString())
-                                .post("/api/v1/auth/register")
-                                .then()
-                                .statusCode(201);
-
-                // Login B
-                JSONObject loginB = new JSONObject();
-                loginB.put("username", "PassB");
-                loginB.put("password", "pwdB1234");
-
-                var cookiesB = given()
-                                .contentType("application/json")
-                                .body(loginB.toString())
-                                .post("/api/v1/auth/login")
-                                .then()
-                                .statusCode(200)
-                                .extract()
-                                .detailedCookies();
-
-                // B tries to change password of A → forbidden
                 JSONObject body = new JSONObject();
-                body.put("currentPassword", "pwdA1234");
+                body.put("currentPassword", "password123");
                 body.put("newPassword", "newPass123");
                 body.put("confirmPassword", "newPass123");
 
@@ -798,41 +453,9 @@ public class ApiUserTests {
         @Test
         @Order(19)
         void testChangePasswordWrongCurrentPassword() throws JSONException {
+                var cookies = registerAndLoginTestUser("UserTest14", "correctPwd");
+                Long id = getCurrentUserId(cookies);
 
-                JSONObject reg = new JSONObject();
-                reg.put("name", "WrongPassUser");
-                reg.put("password", "correctPwd");
-                reg.put("gmail", "wrongpass@test.com");
-                reg.put("direction", "Street");
-                reg.put("nif", "99999999X");
-                reg.put("image", JSONObject.NULL);
-
-                var res = given()
-                                .contentType("application/json")
-                                .body(reg.toString())
-                                .post("/api/v1/auth/register")
-                                .then()
-                                .statusCode(201)
-                                .extract()
-                                .response();
-
-                Number idNum = res.path("id");
-                Long id = idNum.longValue();
-
-                JSONObject login = new JSONObject();
-                login.put("username", "WrongPassUser");
-                login.put("password", "correctPwd");
-
-                var cookies = given()
-                                .contentType("application/json")
-                                .body(login.toString())
-                                .post("/api/v1/auth/login")
-                                .then()
-                                .statusCode(200)
-                                .extract()
-                                .detailedCookies();
-
-                // Wrong current password
                 JSONObject body = new JSONObject();
                 body.put("currentPassword", "wrongPwd");
                 body.put("newPassword", "newPassword123");
@@ -851,41 +474,9 @@ public class ApiUserTests {
         @Test
         @Order(20)
         void testChangePasswordSuccess() throws JSONException {
+                var cookies = registerAndLoginTestUser("UserTest15", "oldPassword");
+                Long id = getCurrentUserId(cookies);
 
-                JSONObject reg = new JSONObject();
-                reg.put("name", "PassSuccess");
-                reg.put("password", "oldPassword");
-                reg.put("gmail", "passsuccess@test.com");
-                reg.put("direction", "Street");
-                reg.put("nif", "12312312Z");
-                reg.put("image", JSONObject.NULL);
-
-                var res = given()
-                                .contentType("application/json")
-                                .body(reg.toString())
-                                .post("/api/v1/auth/register")
-                                .then()
-                                .statusCode(201)
-                                .extract()
-                                .response();
-
-                Number idNum = res.path("id");
-                Long id = idNum.longValue();
-
-                JSONObject login = new JSONObject();
-                login.put("username", "PassSuccess");
-                login.put("password", "oldPassword");
-
-                var cookies = given()
-                                .contentType("application/json")
-                                .body(login.toString())
-                                .post("/api/v1/auth/login")
-                                .then()
-                                .statusCode(200)
-                                .extract()
-                                .detailedCookies();
-
-                // Change password
                 JSONObject body = new JSONObject();
                 body.put("currentPassword", "oldPassword");
                 body.put("newPassword", "newPassword123");
@@ -914,34 +505,7 @@ public class ApiUserTests {
         @Test
         @Order(22)
         void testBanUserForbiddenForNonAdmin() throws JSONException {
-
-                JSONObject reg = new JSONObject();
-                reg.put("name", "NonAdminUser");
-                reg.put("password", "password123");
-                reg.put("gmail", "nonadmin@test.com");
-                reg.put("direction", "Street");
-                reg.put("nif", "12345678Z");
-                reg.put("image", JSONObject.NULL);
-
-                given()
-                                .contentType("application/json")
-                                .body(reg.toString())
-                                .post("/api/v1/auth/register")
-                                .then()
-                                .statusCode(201);
-
-                JSONObject login = new JSONObject();
-                login.put("username", "NonAdminUser");
-                login.put("password", "password123");
-
-                var cookies = given()
-                                .contentType("application/json")
-                                .body(login.toString())
-                                .post("/api/v1/auth/login")
-                                .then()
-                                .statusCode(200)
-                                .extract()
-                                .detailedCookies();
+                var cookies = registerAndLoginTestUser("UserTest16", "password123");
 
                 given()
                                 .cookies(cookies)
@@ -954,19 +518,7 @@ public class ApiUserTests {
         @Test
         @Order(23)
         void testBanUserNotFound() throws JSONException {
-
-                JSONObject login = new JSONObject();
-                login.put("username", "German");
-                login.put("password", "password123");
-
-                var cookies = given()
-                                .contentType("application/json")
-                                .body(login.toString())
-                                .post("/api/v1/auth/login")
-                                .then()
-                                .statusCode(200)
-                                .extract()
-                                .detailedCookies();
+                var cookies = loginAsAdmin();
 
                 given()
                                 .cookies(cookies)
@@ -979,41 +531,12 @@ public class ApiUserTests {
         @Test
         @Order(24)
         void testBanUserSuccess() throws JSONException {
-
-                JSONObject login = new JSONObject();
-                login.put("username", "German");
-                login.put("password", "password123");
-
-                var cookies = given()
-                                .contentType("application/json")
-                                .body(login.toString())
-                                .post("/api/v1/auth/login")
-                                .then()
-                                .statusCode(200)
-                                .extract()
-                                .detailedCookies();
-
-                JSONObject reg = new JSONObject();
-                reg.put("name", "BanTarget");
-                reg.put("password", "password123");
-                reg.put("gmail", "ban@test.com");
-                reg.put("direction", "Street");
-                reg.put("nif", "87654321Z");
-                reg.put("image", JSONObject.NULL);
-
-                var res = given()
-                                .contentType("application/json")
-                                .body(reg.toString())
-                                .post("/api/v1/auth/register")
-                                .then()
-                                .statusCode(201)
-                                .extract()
-                                .response();
-
-                Long id = res.jsonPath().getLong("id");
+                var adminCookies = loginAsAdmin();
+                var userCookies = registerAndLoginTestUser("UserTest17", "password123");
+                Long id = getCurrentUserId(userCookies);
 
                 given()
-                                .cookies(cookies)
+                                .cookies(adminCookies)
                                 .when()
                                 .put("/api/v1/users/" + id + "/ban")
                                 .then()
@@ -1024,41 +547,12 @@ public class ApiUserTests {
         @Test
         @Order(25)
         void testUnbanUserSuccess() throws JSONException {
-
-                JSONObject login = new JSONObject();
-                login.put("username", "German");
-                login.put("password", "password123");
-
-                var cookies = given()
-                                .contentType("application/json")
-                                .body(login.toString())
-                                .post("/api/v1/auth/login")
-                                .then()
-                                .statusCode(200)
-                                .extract()
-                                .detailedCookies();
-
-                JSONObject reg = new JSONObject();
-                reg.put("name", "UnbanTarget");
-                reg.put("password", "password123");
-                reg.put("gmail", "unban@test.com");
-                reg.put("direction", "Street");
-                reg.put("nif", "11223344Z");
-                reg.put("image", JSONObject.NULL);
-
-                var res = given()
-                                .contentType("application/json")
-                                .body(reg.toString())
-                                .post("/api/v1/auth/register")
-                                .then()
-                                .statusCode(201)
-                                .extract()
-                                .response();
-
-                Long id = res.jsonPath().getLong("id");
+                var adminCookies = loginAsAdmin();
+                var userCookies = registerAndLoginTestUser("UserTest18", "password123");
+                Long id = getCurrentUserId(userCookies);
 
                 given()
-                                .cookies(cookies)
+                                .cookies(adminCookies)
                                 .when()
                                 .put("/api/v1/users/" + id + "/ban")
                                 .then()
@@ -1066,7 +560,7 @@ public class ApiUserTests {
                                 .body("banned", equalTo(true));
 
                 given()
-                                .cookies(cookies)
+                                .cookies(adminCookies)
                                 .when()
                                 .put("/api/v1/users/" + id + "/ban")
                                 .then()
@@ -1086,16 +580,16 @@ public class ApiUserTests {
 
         @Test
         @Order(27)
-        void testGetMyOrdersAsVictorSuccess() throws JSONException {
-                var victorCookies = loginAsUserVictor();
-                Long victorId = getCurrentUserId(victorCookies);
+        void testGetMyOrdersAsUserSuccess() throws JSONException {
+                var userCookies = registerAndLoginTestUser("UserTest19", "password123");
+                Long userId = getCurrentUserId(userCookies);
 
                 given()
-                                .cookies(victorCookies)
+                                .cookies(userCookies)
                                 .queryParam("page", 0)
                                 .queryParam("size", 10)
                                 .when()
-                                .get("/api/v1/users/" + victorId + "/orders")
+                                .get("/api/v1/users/" + userId + "/orders")
                                 .then()
                                 .statusCode(200)
                                 .body("content", notNullValue());
@@ -1103,32 +597,30 @@ public class ApiUserTests {
 
         @Test
         @Order(28)
-        void testGetMyOrdersForbiddenWhenVictorUsesGermanId() throws JSONException {
-                var victorCookies = loginAsUserVictor();
-                var germanCookies = loginAsAdminGerman();
-
-                Long germanId = getCurrentUserId(germanCookies);
+        void testGetMyOrdersForbiddenWhenUserUsesAdminId() throws JSONException {
+                var userCookies = registerAndLoginTestUser("UserTest20", "password123");
+                var adminCookies = loginAsAdmin();
+                Long adminId = getCurrentUserId(adminCookies);
 
                 given()
-                                .cookies(victorCookies)
+                                .cookies(userCookies)
                                 .when()
-                                .get("/api/v1/users/" + germanId + "/orders")
+                                .get("/api/v1/users/" + adminId + "/orders")
                                 .then()
                                 .statusCode(403);
         }
 
         @Test
         @Order(29)
-        void testGetMyOrdersForbiddenWhenGermanUsesVictorId() throws JSONException {
-                var victorCookies = loginAsUserVictor();
-                var germanCookies = loginAsAdminGerman();
-
-                Long victorId = getCurrentUserId(victorCookies);
+        void testGetMyOrdersForbiddenWhenAdminUsesUserId() throws JSONException {
+                var userCookies = registerAndLoginTestUser("UserTest21", "password123");
+                var adminCookies = loginAsAdmin();
+                Long userId = getCurrentUserId(userCookies);
 
                 given()
-                                .cookies(germanCookies)
+                                .cookies(adminCookies)
                                 .when()
-                                .get("/api/v1/users/" + victorId + "/orders")
+                                .get("/api/v1/users/" + userId + "/orders")
                                 .then()
                                 .statusCode(403);
         }
@@ -1145,14 +637,14 @@ public class ApiUserTests {
 
         @Test
         @Order(31)
-        void testGetMyOrderByIdNotFoundForVictor() throws JSONException {
-                var victorCookies = loginAsUserVictor();
-                Long victorId = getCurrentUserId(victorCookies);
+        void testGetMyOrderByIdNotFoundForUser() throws JSONException {
+                var userCookies = registerAndLoginTestUser("UserTest22", "password123");
+                Long userId = getCurrentUserId(userCookies);
 
                 given()
-                                .cookies(victorCookies)
+                                .cookies(userCookies)
                                 .when()
-                                .get("/api/v1/users/" + victorId + "/orders/999999")
+                                .get("/api/v1/users/" + userId + "/orders/999999")
                                 .then()
                                 .statusCode(404);
         }
@@ -1169,16 +661,16 @@ public class ApiUserTests {
 
         @Test
         @Order(33)
-        void testGetMyInvoicesAsVictorSuccess() throws JSONException {
-                var victorCookies = loginAsUserVictor();
-                Long victorId = getCurrentUserId(victorCookies);
+        void testGetMyInvoicesAsUserSuccess() throws JSONException {
+                var userCookies = registerAndLoginTestUser("UserTest23", "password123");
+                Long userId = getCurrentUserId(userCookies);
 
                 given()
-                                .cookies(victorCookies)
+                                .cookies(userCookies)
                                 .queryParam("page", 0)
                                 .queryParam("size", 10)
                                 .when()
-                                .get("/api/v1/users/" + victorId + "/invoices")
+                                .get("/api/v1/users/" + userId + "/invoices")
                                 .then()
                                 .statusCode(200)
                                 .body("content", notNullValue());
@@ -1186,42 +678,17 @@ public class ApiUserTests {
 
         @Test
         @Order(34)
-        void testGetMyInvoicesForbiddenWhenVictorUsesGermanId() throws JSONException {
-                var victorCookies = loginAsUserVictor();
-                var germanCookies = loginAsAdminGerman();
-
-                Long germanId = getCurrentUserId(germanCookies);
+        void testGetMyInvoicesForbiddenWhenUserUsesAdminId() throws JSONException {
+                var userCookies = registerAndLoginTestUser("UserTest24", "password123");
+                var adminCookies = loginAsAdmin();
+                Long adminId = getCurrentUserId(adminCookies);
 
                 given()
-                                .cookies(victorCookies)
+                                .cookies(userCookies)
                                 .when()
-                                .get("/api/v1/users/" + germanId + "/invoices")
+                                .get("/api/v1/users/" + adminId + "/invoices")
                                 .then()
                                 .statusCode(403);
-        }
-
-        @Test
-        @Order(35)
-        void testGetMyInvoiceByIdUnauthorized() {
-                given()
-                                .when()
-                                .get("/api/v1/users/1/invoices/1")
-                                .then()
-                                .statusCode(401);
-        }
-
-        @Test
-        @Order(36)
-        void testGetMyInvoiceByIdNotFoundForVictor() throws JSONException {
-                var victorCookies = loginAsUserVictor();
-                Long victorId = getCurrentUserId(victorCookies);
-
-                given()
-                                .cookies(victorCookies)
-                                .when()
-                                .get("/api/v1/users/" + victorId + "/invoices/999999")
-                                .then()
-                                .statusCode(404);
         }
 
         @Test
@@ -1236,85 +703,64 @@ public class ApiUserTests {
 
         @Test
         @Order(38)
-        void testDownloadMyInvoicePdfForbiddenWhenVictorUsesGermanId() throws JSONException {
-                var victorCookies = loginAsUserVictor();
-                var germanCookies = loginAsAdminGerman();
-
-                Long germanId = getCurrentUserId(germanCookies);
+        void testDownloadMyInvoicePdfForbiddenWhenUserUsesAdminId() throws JSONException {
+                var userCookies = registerAndLoginTestUser("UserTest25", "password123");
+                var adminCookies = loginAsAdmin();
+                Long adminId = getCurrentUserId(adminCookies);
 
                 given()
-                                .cookies(victorCookies)
+                                .cookies(userCookies)
                                 .when()
-                                .get("/api/v1/users/" + germanId + "/invoices/1/download-pdf")
+                                .get("/api/v1/users/" + adminId + "/invoices/1/download-pdf")
                                 .then()
                                 .statusCode(403);
         }
 
         @Test
         @Order(39)
-        void testDownloadMyInvoicePdfNotFoundForVictor() throws JSONException {
-                var victorCookies = loginAsUserVictor();
-                Long victorId = getCurrentUserId(victorCookies);
+        void testDownloadMyInvoicePdfNotFoundForUser() throws JSONException {
+                var userCookies = registerAndLoginTestUser("UserTest26", "password123");
+                Long userId = getCurrentUserId(userCookies);
 
                 given()
-                                .cookies(victorCookies)
+                                .cookies(userCookies)
                                 .when()
-                                .get("/api/v1/users/" + victorId + "/invoices/999999/download-pdf")
+                                .get("/api/v1/users/" + userId + "/invoices/999999/download-pdf")
                                 .then()
                                 .statusCode(404);
         }
 
         @Test
         @Order(40)
-        void testGetMyOrderByIdSuccessForVictor() throws JSONException {
-                var victorCookies = loginAsUserVictor();
-                Long victorId = getCurrentUserId(victorCookies);
-                Long orderId = createOrderAsVictor(victorCookies);
+        void testGetMyOrderByIdSuccessForUser() throws JSONException {
+                var userCookies = registerAndLoginTestUser("UserTest27", "password123");
+                Long userId = getCurrentUserId(userCookies);
+                Long orderId = createOrderAsUser(userCookies);
 
                 given()
-                                .cookies(victorCookies)
+                                .cookies(userCookies)
                                 .when()
-                                .get("/api/v1/users/" + victorId + "/orders/" + orderId)
+                                .get("/api/v1/users/" + userId + "/orders/" + orderId)
                                 .then()
                                 .statusCode(200)
                                 .body("id", equalTo(orderId.intValue()))
-                                .body("user.name", equalTo("Victor"));
-        }
-
-        @Test
-        @Order(41)
-        void testGetMyInvoiceByIdSuccessForVictor() throws JSONException {
-                var victorCookies = loginAsUserVictor();
-                var germanCookies = loginAsAdminGerman();
-
-                Long victorId = getCurrentUserId(victorCookies);
-                Long orderId = createOrderAsVictor(victorCookies);
-                Long invoiceId = createInvoiceAsAdmin(germanCookies, orderId);
-
-                given()
-                                .cookies(victorCookies)
-                                .when()
-                                .get("/api/v1/users/" + victorId + "/invoices/" + invoiceId)
-                                .then()
-                                .statusCode(200)
-                                .body("id", equalTo(invoiceId.intValue()))
-                                .body("user.name", equalTo("Victor"));
+                                .body("user.name", equalTo("UserTest27"));
         }
 
         @Test
         @Order(42)
-        void testDownloadMyInvoicePdfSuccessForVictor() throws JSONException {
-                var victorCookies = loginAsUserVictor();
-                var germanCookies = loginAsAdminGerman();
+        void testDownloadMyInvoicePdfSuccessForUser() throws JSONException {
+                var userCookies = registerAndLoginTestUser("UserTest28", "password123");
+                var adminCookies = loginAsAdmin();
 
-                Long victorId = getCurrentUserId(victorCookies);
-                Long orderId = createOrderAsVictor(victorCookies);
-                Long invoiceId = createInvoiceAsAdmin(germanCookies, orderId);
+                Long userId = getCurrentUserId(userCookies);
+                Long orderId = createOrderAsUser(userCookies);
+                Long invoiceId = createInvoiceAsAdmin(adminCookies, orderId);
 
                 given()
-                                .cookies(victorCookies)
+                                .cookies(userCookies)
                                 .when()
-                                .get("/api/v1/users/" + victorId + "/invoices/" + invoiceId + "/download-pdf")
+                                .get("/api/v1/users/" + userId + "/invoices/" + invoiceId + "/download-pdf")
                                 .then()
                                 .statusCode(200)
                                 .header("Content-Type", containsString("application/pdf"));
@@ -1323,7 +769,6 @@ public class ApiUserTests {
         @Test
         @Order(43)
         void testAllUsers_Unauthorized() {
-                // Sin login → 401
                 given()
                                 .when()
                                 .get("/api/v1/users/allUsers")
@@ -1334,19 +779,7 @@ public class ApiUserTests {
         @Test
         @Order(44)
         void testAllUsers_Forbidden_ForNormalUser() throws JSONException {
-
-                JSONObject login = new JSONObject();
-                login.put("username", "Tienda Artesanal de Riaza");
-                login.put("password", "password123");
-
-                var cookies = given()
-                                .contentType("application/json")
-                                .body(login.toString())
-                                .post("/api/v1/auth/login")
-                                .then()
-                                .statusCode(200)
-                                .extract()
-                                .detailedCookies();
+                var cookies = registerAndLoginTestUser("UserTest29", "password123");
 
                 given()
                                 .cookies(cookies)
@@ -1359,18 +792,7 @@ public class ApiUserTests {
         @Test
         @Order(45)
         void testAllUsers_AsAdmin() throws JSONException {
-                JSONObject login = new JSONObject();
-                login.put("username", "Admin");
-                login.put("password", "password123");
-
-                var cookies = given()
-                                .contentType("application/json")
-                                .body(login.toString())
-                                .post("/api/v1/auth/login")
-                                .then()
-                                .statusCode(200)
-                                .extract()
-                                .detailedCookies();
+                var cookies = loginAsAdmin();
 
                 given()
                                 .cookies(cookies)
@@ -1384,18 +806,7 @@ public class ApiUserTests {
         @Test
         @Order(46)
         void testAllUsers_AsAdmin_ListContainsUsers() throws JSONException {
-                JSONObject login = new JSONObject();
-                login.put("username", "Admin");
-                login.put("password", "password123");
-
-                var cookies = given()
-                                .contentType("application/json")
-                                .body(login.toString())
-                                .post("/api/v1/auth/login")
-                                .then()
-                                .statusCode(200)
-                                .extract()
-                                .detailedCookies();
+                var cookies = loginAsAdmin();
 
                 given()
                                 .cookies(cookies)

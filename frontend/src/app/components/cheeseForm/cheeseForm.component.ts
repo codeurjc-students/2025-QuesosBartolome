@@ -4,7 +4,6 @@ import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { CheeseService } from '../../service/cheese.service';
 import { CheeseDTO } from '../../dto/cheese.dto';
-import { UserDTO } from '../../dto/user.dto';
 import { UserService } from '../../service/user.service';
 import { DialogService } from '../../service/dialog.service';
 
@@ -25,9 +24,6 @@ export class CheeseFormComponent implements OnInit {
   expirationDate: string = '';
 
   selectedFile: File | null = null;
-
-  isLoggedIn: boolean = false;
-  currentUser: UserDTO | null = null;
 
   isEditMode: boolean = false;
   cheeseId: number | null = null;

@@ -3,7 +3,9 @@ package es.codeurjc.quesosbartolome.controller;
 import java.net.URI;
 import java.security.Principal;
 import java.sql.Blob;
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,8 +38,9 @@ public class CheeseRestController {
     private UserService userService;
 
     @GetMapping
-    public List<CheeseDTO> getAllCheeses() {
-        return cheeseService.findAll();
+    public ResponseEntity<Page<CheeseDTO>> getAllCheeses(@PageableDefault(size = 10) Pageable pageable) {
+        Page<CheeseDTO> page = cheeseService.findAll(pageable);
+        return ResponseEntity.ok(page);
     }
 
     @GetMapping("/{id}")

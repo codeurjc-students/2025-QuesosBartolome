@@ -44,10 +44,6 @@ export class InvoicesComponent implements OnInit {
     });
   }
 
-  loadInvoices(): void {
-    this.loadInvoicesPage(this.currentPage);
-  }
-
   private loadLastInvoices(): void {
     this.loading = true;
 

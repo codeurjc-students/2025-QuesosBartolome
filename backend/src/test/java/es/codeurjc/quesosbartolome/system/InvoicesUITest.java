@@ -176,14 +176,13 @@ public class InvoicesUITest {
 
 	@Test
 	public void testAdminSeesInvoiceAfterProcessingOrder() {
-		String username = "Victor";
 
-		login(username, "password123");
+		login("Tienda Artesanal de Riaza", "password123");
 		createOrderAsUser();
 		logout();
 
 		login("Admin", "password123");
-		processFirstPendingOrderForUserAsAdmin(username);
+		processFirstPendingOrderForUserAsAdmin("Tienda Artesanal de Riaza");
 
 		driver.get("http://localhost:4200/invoices");
 
@@ -193,7 +192,7 @@ public class InvoicesUITest {
 
 		boolean foundUserInvoice = invoiceRows.stream().anyMatch(row -> {
 			String rowText = row.getText();
-			return rowText.contains(username) && rowText.contains("FACT-Q");
+			return rowText.contains("Tienda Artesanal de Riaza") && rowText.contains("FACT-Q");
 		});
 
 		assertTrue(foundUserInvoice, "Invoice for processed order should appear in invoices section");
@@ -201,22 +200,21 @@ public class InvoicesUITest {
 
 	@Test
 	public void testUserCanSeeOnlyOwnInvoices() {
-		String username = "Victor";
 
-		login(username, "password123");
+		login("Tienda Artesanal de Riaza", "password123");
 		createOrderAsUser();
 		logout();
 
 		login("Admin", "password123");
-		processFirstPendingOrderForUserAsAdmin(username);
+		processFirstPendingOrderForUserAsAdmin("Tienda Artesanal de Riaza");
 		logout();
 
-		login(username, "password123");
+		login("Tienda Artesanal de Riaza", "password123");
 		openInvoicesPageAsUser();
 
 		List<WebElement> invoiceRows = waitForInvoiceRowsWithRetry();
 		assertFalse(invoiceRows.isEmpty(), "User should see at least one own invoice");
-		assertTrue(invoiceRows.stream().allMatch(row -> row.getText().contains(username)),
+		assertTrue(invoiceRows.stream().allMatch(row -> row.getText().contains("Tienda Artesanal de Riaza")),
 				"User invoices list should only contain own invoices");
 		assertTrue(invoiceRows.stream().allMatch(row -> !row.findElements(By.cssSelector(".btn-download")).isEmpty()),
 				"Each invoice row should include download button");
@@ -224,23 +222,23 @@ public class InvoicesUITest {
 
 	@Test
 	public void testUserCanDownloadOwnInvoiceFromInvoicesPage() {
-		String username = "Victor";
 
-		login(username, "password123");
+
+		login("Tienda Artesanal de Riaza", "password123");
 		createOrderAsUser();
 		logout();
 
 		login("Admin", "password123");
-		processFirstPendingOrderForUserAsAdmin(username);
+		processFirstPendingOrderForUserAsAdmin("Tienda Artesanal de Riaza");
 		logout();
 
-		login(username, "password123");
+		login("Tienda Artesanal de Riaza", "password123");
 		openInvoicesPageAsUser();
 
 		WebElement invoiceRow = waitForInvoiceRowsWithRetry().stream()
-				.filter(row -> row.getText().contains(username) && row.getText().contains("FACT-Q"))
+				.filter(row -> row.getText().contains("Tienda Artesanal de Riaza") && row.getText().contains("FACT-Q"))
 				.findFirst()
-				.orElseThrow(() -> new AssertionError("No invoice row found for user " + username));
+				.orElseThrow(() -> new AssertionError("No invoice row found for user " + "Tienda Artesanal de Riaza"));
 
 		WebElement downloadBtn = invoiceRow.findElement(By.cssSelector(".btn-download"));
 		wait.until(ExpectedConditions.elementToBeClickable(downloadBtn)).click();

@@ -16,7 +16,7 @@ export class CartService {
         return this.http.get<CartDTO>(`${this.apiUrl}`, { withCredentials: true });
     }
     
-    addCheeseToOrder(userId: number, cheeseId: number, boxes: number): Observable<CartDTO> {
+    addCheeseToOrder(cheeseId: number, boxes: number): Observable<CartDTO> {
         return this.http.put<CartDTO>(`${this.apiUrl}/addItem`,
             null,
             { params: { cheeseId, boxes }, withCredentials: true });

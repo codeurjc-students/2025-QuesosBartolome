@@ -30,7 +30,7 @@ describe('CheeseFormComponent (unit)', () => {
         mockUserService = jasmine.createSpyObj('UserService', ['getCurrentUser']);
 
         mockRouter = jasmine.createSpyObj('Router', ['navigate']);
-    mockDialogService = jasmine.createSpyObj('DialogService', ['alert']);
+        mockDialogService = jasmine.createSpyObj('DialogService', ['alert']);
 
         mockActivatedRoute = {
             snapshot: { paramMap: new Map() }
@@ -63,22 +63,22 @@ describe('CheeseFormComponent (unit)', () => {
         fixture.detectChanges();
     });
 
-it('should redirect to /error if user is not admin', () => {
-    mockUserService.getCurrentUser.and.returnValue(of({
-        id: 2,
-        name: 'User',
-        password: '1234',
-        gmail: 'user@gmail.com',
-        direction: 'Fake Street 123',
-        nif: '12345678Z',
-        rols: ['USER'],
-        banned: false
-    }));
+    it('should redirect to /error if user is not admin', () => {
+        mockUserService.getCurrentUser.and.returnValue(of({
+            id: 2,
+            name: 'User',
+            password: '1234',
+            gmail: 'user@gmail.com',
+            direction: 'Fake Street 123',
+            nif: '12345678Z',
+            rols: ['USER'],
+            banned: false
+        }));
 
-    component.ngOnInit();
+        component.ngOnInit();
 
-    expect(mockRouter.navigate).toHaveBeenCalledWith(['/error']);
-});
+        expect(mockRouter.navigate).toHaveBeenCalledWith(['/error']);
+    });
 
 
     it('should redirect to /error if getCurrentUser fails', () => {
@@ -87,6 +87,26 @@ it('should redirect to /error if user is not admin', () => {
         component.ngOnInit();
 
         expect(mockRouter.navigate).toHaveBeenCalledWith(['/error']);
+    });
+
+    it('should enter edit mode when id param is present in route', () => {
+        mockActivatedRoute.snapshot.paramMap = new Map([['id', '5']]);
+        mockCheeseService.getCheeseById.and.returnValue(of({
+            id: 5,
+            name: 'Curado',
+            price: 15,
+            description: 'desc',
+            type: 'Cremoso',
+            manufactureDate: '2024-01-01',
+            expirationDate: '2025-01-01',
+            boxes: []
+        }));
+
+        component.ngOnInit();
+
+        expect(component.isEditMode).toBeTrue();
+        expect(component.cheeseId).toBe(5);
+        expect(mockCheeseService.getCheeseById).toHaveBeenCalledWith(5);
     });
 
     it('should load cheese data correctly', () => {
@@ -128,7 +148,7 @@ it('should redirect to /error if user is not admin', () => {
         component.createCheese();
 
         expect(mockDialogService.alert).toHaveBeenCalledWith(
-            "La fecha de fabricación debe estar en formato YYYY-MM-DD"
+            'La fecha de fabricación debe estar en formato YYYY-MM-DD'
         );
     });
 
@@ -143,8 +163,52 @@ it('should redirect to /error if user is not admin', () => {
         component.createCheese();
 
         expect(mockDialogService.alert).toHaveBeenCalledWith(
-            "La fecha de caducidad debe estar en formato YYYY-MM-DD"
+            'La fecha de caducidad debe estar en formato YYYY-MM-DD'
         );
+    });
+
+    it('should alert when any required field is empty', () => {
+        component.name = '';
+        component.description = 'desc';
+        component.type = 'Cremoso';
+        component.price = 10;
+        component.manufactureDate = '2024-01-01';
+        component.expirationDate = '2025-01-01';
+
+        component.createCheese();
+
+        expect(mockDialogService.alert).toHaveBeenCalledWith('Todos los campos son obligatorios');
+        expect(mockCheeseService.createCheese).not.toHaveBeenCalled();
+    });
+
+    it('should alert when price is zero or negative', () => {
+        component.name = 'Queso';
+        component.description = 'desc';
+        component.type = 'Cremoso';
+        component.price = 0;
+        component.manufactureDate = '2024-01-01';
+        component.expirationDate = '2025-01-01';
+
+        component.createCheese();
+
+        expect(mockDialogService.alert).toHaveBeenCalledWith('El precio debe ser mayor que 0');
+        expect(mockCheeseService.createCheese).not.toHaveBeenCalled();
+    });
+
+    it('should alert when expiration date is before manufacture date', () => {
+        component.name = 'Queso';
+        component.description = 'desc';
+        component.type = 'Cremoso';
+        component.price = 10;
+        component.manufactureDate = '2025-01-01';
+        component.expirationDate = '2024-01-01';
+
+        component.createCheese();
+
+        expect(mockDialogService.alert).toHaveBeenCalledWith(
+            'La fecha de caducidad debe ser posterior a la de fabricación'
+        );
+        expect(mockCheeseService.createCheese).not.toHaveBeenCalled();
     });
 
     it('should store selected file', () => {
@@ -157,6 +221,21 @@ it('should redirect to /error if user is not admin', () => {
         component.onFileSelected(event);
 
         expect(component.selectedFile).toBe(fakeFile);
+    });
+
+    it('should reject file larger than 10MB and clear selectedFile', () => {
+        const largeFile = new File(['x'.repeat(11 * 1024 * 1024)], 'big.png', { type: 'image/png' });
+
+        const event = {
+            target: { files: [largeFile] }
+        };
+
+        component.onFileSelected(event);
+
+        expect(mockDialogService.alert).toHaveBeenCalledWith(
+            'La imagen es demasiado grande. Tamaño máximo: 10MB.'
+        );
+        expect(component.selectedFile).toBeNull();
     });
 
     it('should build cheese data correctly', () => {
@@ -176,98 +255,238 @@ it('should redirect to /error if user is not admin', () => {
     });
 
     it('should call createCheese() and upload image', () => {
-    component.name = 'Queso';
-    component.description = 'desc';
-    component.type = 'Cremoso';
-    component.price = 10;
-    component.manufactureDate = '2024-01-01';
-    component.expirationDate = '2025-01-01';
+        component.name = 'Queso';
+        component.description = 'desc';
+        component.type = 'Cremoso';
+        component.price = 10;
+        component.manufactureDate = '2024-01-01';
+        component.expirationDate = '2025-01-01';
 
-    const fakeFile = new File(['abc'], 'img.png');
-    component.selectedFile = fakeFile;
+        const fakeFile = new File(['abc'], 'img.png');
+        component.selectedFile = fakeFile;
 
-    mockCheeseService.createCheese.and.returnValue(of({
-        id: 50,
-        name: 'Queso',
-        price: 10,
-        description: 'desc',
-        manufactureDate: '2024-01-01',
-        expirationDate: '2025-01-01',
-        type: 'Cremoso',
-        boxes: []
-    }));
+        mockCheeseService.createCheese.and.returnValue(of({
+            id: 50,
+            name: 'Queso',
+            price: 10,
+            description: 'desc',
+            manufactureDate: '2024-01-01',
+            expirationDate: '2025-01-01',
+            type: 'Cremoso',
+            boxes: []
+        }));
 
-    mockCheeseService.uploadCheeseImage.and.returnValue(of(true));
+        mockCheeseService.uploadCheeseImage.and.returnValue(of(true));
 
-    component.createCheese();
+        component.createCheese();
 
-    expect(mockCheeseService.createCheese).toHaveBeenCalled();
-    expect(mockCheeseService.uploadCheeseImage).toHaveBeenCalledWith(50, fakeFile);
-    expect(mockRouter.navigate).toHaveBeenCalledWith(['/']);
-});
+        expect(mockCheeseService.createCheese).toHaveBeenCalled();
+        expect(mockCheeseService.uploadCheeseImage).toHaveBeenCalledWith(50, fakeFile);
+        expect(mockRouter.navigate).toHaveBeenCalledWith(['/']);
+    });
+
+    it('should navigate to / when createCheese succeeds with no file selected', () => {
+        component.name = 'Queso';
+        component.description = 'desc';
+        component.type = 'Cremoso';
+        component.price = 10;
+        component.manufactureDate = '2024-01-01';
+        component.expirationDate = '2025-01-01';
+        component.selectedFile = null;
+
+        mockCheeseService.createCheese.and.returnValue(of({
+            id: 50,
+            name: 'Queso',
+            price: 10,
+            description: 'desc',
+            manufactureDate: '2024-01-01',
+            expirationDate: '2025-01-01',
+            type: 'Cremoso',
+            boxes: []
+        }));
+
+        component.createCheese();
+
+        expect(mockCheeseService.uploadCheeseImage).not.toHaveBeenCalled();
+        expect(mockRouter.navigate).toHaveBeenCalledWith(['/']);
+    });
+
+    it('should navigate to / even when image upload fails after createCheese', () => {
+        component.name = 'Queso';
+        component.description = 'desc';
+        component.type = 'Cremoso';
+        component.price = 10;
+        component.manufactureDate = '2024-01-01';
+        component.expirationDate = '2025-01-01';
+        component.selectedFile = new File(['abc'], 'img.png');
+
+        mockCheeseService.createCheese.and.returnValue(of({
+            id: 50,
+            name: 'Queso',
+            price: 10,
+            description: 'desc',
+            manufactureDate: '2024-01-01',
+            expirationDate: '2025-01-01',
+            type: 'Cremoso',
+            boxes: []
+        }));
+
+        mockCheeseService.uploadCheeseImage.and.returnValue(throwError(() => new Error('upload failed')));
+
+        component.createCheese();
+
+        expect(mockRouter.navigate).toHaveBeenCalledWith(['/']);
+    });
+
+    it('should show specific alert when createCheese fails with status 400', () => {
+        component.name = 'Queso';
+        component.description = 'desc';
+        component.type = 'Cremoso';
+        component.price = 10;
+        component.manufactureDate = '2024-01-01';
+        component.expirationDate = '2025-01-01';
+
+        mockCheeseService.createCheese.and.returnValue(
+            throwError(() => ({ status: 400 }))
+        );
+
+        component.createCheese();
+
+        expect(mockDialogService.alert).toHaveBeenCalledWith(
+            'Error al crear queso. Verifica que no exista otro queso con el mismo nombre.'
+        );
+    });
+
+    it('should show generic alert when createCheese fails with non-400 error', () => {
+        component.name = 'Queso';
+        component.description = 'desc';
+        component.type = 'Cremoso';
+        component.price = 10;
+        component.manufactureDate = '2024-01-01';
+        component.expirationDate = '2025-01-01';
+
+        mockCheeseService.createCheese.and.returnValue(
+            throwError(() => ({ status: 500 }))
+        );
+
+        component.createCheese();
+
+        expect(mockDialogService.alert).toHaveBeenCalledWith('Error al crear queso');
+    });
 
     it('should update cheese successfully without image', () => {
-    component.isEditMode = true;
-    component.cheeseId = 10;
+        component.isEditMode = true;
+        component.cheeseId = 10;
 
-    component.name = 'Queso';
-    component.description = 'desc';
-    component.type = 'Cremoso';
-    component.price = 10;
-    component.manufactureDate = '2024-01-01';
-    component.expirationDate = '2025-01-01';
+        component.name = 'Queso';
+        component.description = 'desc';
+        component.type = 'Cremoso';
+        component.price = 10;
+        component.manufactureDate = '2024-01-01';
+        component.expirationDate = '2025-01-01';
 
-    mockCheeseService.updateCheese.and.returnValue(of({
-        id: 10,
-        name: 'Queso',
-        price: 10,
-        description: 'desc',
-        manufactureDate: '2024-01-01',
-        expirationDate: '2025-01-01',
-        type: 'Cremoso',
-        boxes: []
-    }));
+        mockCheeseService.updateCheese.and.returnValue(of({
+            id: 10,
+            name: 'Queso',
+            price: 10,
+            description: 'desc',
+            manufactureDate: '2024-01-01',
+            expirationDate: '2025-01-01',
+            type: 'Cremoso',
+            boxes: []
+        }));
 
-    component.editCheese();
+        component.editCheese();
 
-    expect(mockCheeseService.updateCheese).toHaveBeenCalled();
-    expect(mockRouter.navigate).toHaveBeenCalledWith(['/cheeses', 10]);
-});
+        expect(mockCheeseService.updateCheese).toHaveBeenCalled();
+        expect(mockRouter.navigate).toHaveBeenCalledWith(['/cheeses', 10]);
+    });
 
 
     it('should update cheese and upload image', () => {
-    component.isEditMode = true;
-    component.cheeseId = 10;
+        component.isEditMode = true;
+        component.cheeseId = 10;
 
-    component.name = 'Queso';
-    component.description = 'desc';
-    component.type = 'Cremoso';
-    component.price = 10;
-    component.manufactureDate = '2024-01-01';
-    component.expirationDate = '2025-01-01';
+        component.name = 'Queso';
+        component.description = 'desc';
+        component.type = 'Cremoso';
+        component.price = 10;
+        component.manufactureDate = '2024-01-01';
+        component.expirationDate = '2025-01-01';
 
-    const fakeFile = new File(['abc'], 'img.png');
-    component.selectedFile = fakeFile;
+        const fakeFile = new File(['abc'], 'img.png');
+        component.selectedFile = fakeFile;
 
-    mockCheeseService.updateCheese.and.returnValue(of({
-        id: 10,
-        name: 'Queso',
-        price: 10,
-        description: 'desc',
-        manufactureDate: '2024-01-01',
-        expirationDate: '2025-01-01',
-        type: 'Cremoso',
-        boxes: []
-    }));
+        mockCheeseService.updateCheese.and.returnValue(of({
+            id: 10,
+            name: 'Queso',
+            price: 10,
+            description: 'desc',
+            manufactureDate: '2024-01-01',
+            expirationDate: '2025-01-01',
+            type: 'Cremoso',
+            boxes: []
+        }));
 
-    mockCheeseService.updateCheeseImage.and.returnValue(of(true));
+        mockCheeseService.updateCheeseImage.and.returnValue(of(true));
 
-    component.editCheese();
+        component.editCheese();
 
-    expect(mockCheeseService.updateCheeseImage).toHaveBeenCalledWith(10, fakeFile);
-    expect(mockRouter.navigate).toHaveBeenCalledWith(['/cheeses', 10]);
-});
+        expect(mockCheeseService.updateCheeseImage).toHaveBeenCalledWith(10, fakeFile);
+        expect(mockRouter.navigate).toHaveBeenCalledWith(['/cheeses', 10]);
+    });
 
+    it('should navigate to cheese detail even when image update fails after editCheese', () => {
+        component.isEditMode = true;
+        component.cheeseId = 10;
+
+        component.name = 'Queso';
+        component.description = 'desc';
+        component.type = 'Cremoso';
+        component.price = 10;
+        component.manufactureDate = '2024-01-01';
+        component.expirationDate = '2025-01-01';
+        component.selectedFile = new File(['abc'], 'img.png');
+
+        mockCheeseService.updateCheese.and.returnValue(of({
+            id: 10,
+            name: 'Queso',
+            price: 10,
+            description: 'desc',
+            manufactureDate: '2024-01-01',
+            expirationDate: '2025-01-01',
+            type: 'Cremoso',
+            boxes: []
+        }));
+
+        mockCheeseService.updateCheeseImage.and.returnValue(throwError(() => new Error('upload failed')));
+
+        component.editCheese();
+
+        expect(mockRouter.navigate).toHaveBeenCalledWith(['/cheeses', 10]);
+    });
+
+    it('should show specific alert when editCheese fails with status 400', () => {
+        component.isEditMode = true;
+        component.cheeseId = 10;
+
+        component.name = 'Queso';
+        component.description = 'desc';
+        component.type = 'Cremoso';
+        component.price = 10;
+        component.manufactureDate = '2024-01-01';
+        component.expirationDate = '2025-01-01';
+
+        mockCheeseService.updateCheese.and.returnValue(
+            throwError(() => ({ status: 400 }))
+        );
+
+        component.editCheese();
+
+        expect(mockDialogService.alert).toHaveBeenCalledWith(
+            'Error al actualizar queso. Verifica que no exista otro queso con el mismo nombre.'
+        );
+    });
 
     it('should alert error when updateCheese fails', () => {
         component.isEditMode = true;
@@ -286,7 +505,7 @@ it('should redirect to /error if user is not admin', () => {
 
         component.editCheese();
 
-        expect(mockDialogService.alert).toHaveBeenCalledWith("Error al actualizar queso");
+        expect(mockDialogService.alert).toHaveBeenCalledWith('Error al actualizar queso');
     });
 
 });

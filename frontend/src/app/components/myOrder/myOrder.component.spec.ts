@@ -7,6 +7,7 @@ import { CartDTO } from '../../dto/cart.dto';
 import { By } from '@angular/platform-browser';
 import { DebugElement } from '@angular/core';
 import { DialogService } from '../../service/dialog.service';
+import { Router } from '@angular/router';
 
 describe('MyOrderComponent (unit)', () => {
 
@@ -16,6 +17,7 @@ describe('MyOrderComponent (unit)', () => {
     let mockCartService: jasmine.SpyObj<CartService>;
     let mockOrderService: jasmine.SpyObj<OrderService>;
     let mockDialogService: jasmine.SpyObj<DialogService>;
+    let mockRouter: jasmine.SpyObj<Router>;
 
     beforeEach(async () => {
 
@@ -28,10 +30,11 @@ describe('MyOrderComponent (unit)', () => {
             'confirmOrder'
         ]);
         mockDialogService = jasmine.createSpyObj('DialogService', ['alert']);
+        mockRouter = jasmine.createSpyObj('Router', ['navigate']);
 
         const mockCart: CartDTO = {
             id: 1,
-            user: { id: 1, name: 'Victor' },
+            user: { id: 1, name: 'User1' },
             totalWeight: 2.5,
             totalPrice: 30,
             items: [
@@ -54,7 +57,8 @@ describe('MyOrderComponent (unit)', () => {
             providers: [
                 { provide: CartService, useValue: mockCartService },
                 { provide: OrderService, useValue: mockOrderService },
-                { provide: DialogService, useValue: mockDialogService }
+                { provide: DialogService, useValue: mockDialogService },
+                { provide: Router, useValue: mockRouter }
             ]
         }).compileComponents();
 
@@ -79,7 +83,7 @@ describe('MyOrderComponent (unit)', () => {
     it('should remove an item when removeItem is called', () => {
         const updatedCart: CartDTO = {
             id: 1,
-            user: { id: 1, name: 'Victor' },
+            user: { id: 1, name: 'User1' },
             totalWeight: 0,
             totalPrice: 0,
             items: []
@@ -110,6 +114,82 @@ describe('MyOrderComponent (unit)', () => {
 
         expect(mockOrderService.confirmOrder).toHaveBeenCalled();
         expect(mockDialogService.alert).toHaveBeenCalledWith('Error al hacer el pedido');
+    });
+
+    // --- ngOnInit error branches ---
+
+    it('should navigate to /auth/login when getMyCart returns 401', () => {
+        mockCartService.getMyCart.and.returnValue(throwError(() => ({ status: 401 })));
+        component.ngOnInit();
+        expect(mockRouter.navigate).toHaveBeenCalledWith(['/auth/login']);
+    });
+
+    it('should navigate to /error when getMyCart returns 403', () => {
+        mockCartService.getMyCart.and.returnValue(throwError(() => ({ status: 403 })));
+        component.ngOnInit();
+        expect(mockRouter.navigate).toHaveBeenCalledWith(['/error']);
+    });
+
+    it('should navigate to /error when getMyCart returns 500', () => {
+        mockCartService.getMyCart.and.returnValue(throwError(() => ({ status: 500 })));
+        component.ngOnInit();
+        expect(mockRouter.navigate).toHaveBeenCalledWith(['/error']);
+    });
+
+    it('should set loading=false and not navigate when getMyCart returns 404', () => {
+        mockCartService.getMyCart.and.returnValue(throwError(() => ({ status: 404 })));
+        component.ngOnInit();
+        expect(component.loading).toBeFalse();
+        expect(mockRouter.navigate).not.toHaveBeenCalled();
+    });
+
+    // --- removeItem error branches ---
+
+    it('should navigate to /auth/login when removeItem returns 401', () => {
+        mockCartService.removeItemFromCart.and.returnValue(throwError(() => ({ status: 401 })));
+        component.removeItem(10);
+        expect(mockRouter.navigate).toHaveBeenCalledWith(['/auth/login']);
+    });
+
+    it('should navigate to /error when removeItem returns 403', () => {
+        mockCartService.removeItemFromCart.and.returnValue(throwError(() => ({ status: 403 })));
+        component.removeItem(10);
+        expect(mockRouter.navigate).toHaveBeenCalledWith(['/error']);
+    });
+
+    it('should navigate to /error when removeItem returns 500', () => {
+        mockCartService.removeItemFromCart.and.returnValue(throwError(() => ({ status: 500 })));
+        component.removeItem(10);
+        expect(mockRouter.navigate).toHaveBeenCalledWith(['/error']);
+    });
+
+    it('should not navigate when removeItem returns 404', () => {
+        mockCartService.removeItemFromCart.and.returnValue(throwError(() => ({ status: 404 })));
+        component.removeItem(10);
+        expect(mockRouter.navigate).not.toHaveBeenCalled();
+    });
+
+    // --- makeOrder error branches ---
+
+    it('should navigate to /auth/login when makeOrder returns 401', () => {
+        mockOrderService.confirmOrder.and.returnValue(throwError(() => ({ status: 401 })));
+        component.makeOrder();
+        expect(mockRouter.navigate).toHaveBeenCalledWith(['/auth/login']);
+        expect(mockDialogService.alert).not.toHaveBeenCalled();
+    });
+
+    it('should navigate to /error when makeOrder returns 403', () => {
+        mockOrderService.confirmOrder.and.returnValue(throwError(() => ({ status: 403 })));
+        component.makeOrder();
+        expect(mockRouter.navigate).toHaveBeenCalledWith(['/error']);
+        expect(mockDialogService.alert).not.toHaveBeenCalled();
+    });
+
+    it('should alert and navigate to /error when makeOrder returns 500', () => {
+        mockOrderService.confirmOrder.and.returnValue(throwError(() => ({ status: 500 })));
+        component.makeOrder();
+        expect(mockDialogService.alert).toHaveBeenCalledWith('Error al hacer el pedido');
+        expect(mockRouter.navigate).toHaveBeenCalledWith(['/error']);
     });
 
 });

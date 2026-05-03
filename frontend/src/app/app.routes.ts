@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router';
-import { CheeseListComponent } from './components/cheese-list.component/cheese-list.component';
+import { CheeseListComponent } from './components/cheese-list/cheese-list.component';
 import { LoginComponent } from './components/log-in/login.component';
 import { RegisterComponent } from './components/register/register.component';
 import { UserPageComponent } from './components/userPage/userPage.component';

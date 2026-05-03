@@ -13,6 +13,8 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.InputStream;
 import java.sql.Blob;
 import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -30,6 +32,10 @@ public class CheeseService {
                 .stream()
                 .map(cheeseMapper::toDTO)
                 .collect(Collectors.toList());
+    }
+
+    public Page<CheeseDTO> findAll(Pageable pageable) {
+        return cheeseRepository.findAll(pageable).map(cheeseMapper::toDTO);
     }
 
     public Optional<CheeseDTO> findById(Long id) {

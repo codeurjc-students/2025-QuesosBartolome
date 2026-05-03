@@ -1,9 +1,10 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { LoginService } from '../../service/login.service';
 import { Router } from '@angular/router';
 import { DialogService } from '../../service/dialog.service';
+import { UserService } from '../../service/user.service';
 
 @Component({
   selector: 'app-register',
@@ -15,7 +16,7 @@ import { DialogService } from '../../service/dialog.service';
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.css']
 })
-export class RegisterComponent {
+export class RegisterComponent implements OnInit {
   nombre: string = '';
   password: string = '';
   confirmPassword: string = '';
@@ -23,7 +24,26 @@ export class RegisterComponent {
   direccion: string = '';
   nif: string = '';
 
-  constructor(private loginService: LoginService, private router: Router, private dialogService: DialogService) { }
+  constructor(
+    private loginService: LoginService,
+    private userService: UserService,
+    private router: Router,
+    private dialogService: DialogService
+  ) { }
+
+  ngOnInit(): void {
+    this.userService.getCurrentUser().subscribe({
+      next: () => {
+        this.router.navigate(['/']);
+      },
+      error: (err) => {
+        // Unauthenticated users are allowed to stay on the register page.
+        if (err.status >= 500) {
+          this.router.navigate(['/error']);
+        }
+      }
+    });
+  }
 
   register(): void {
     if (!this.nombre || !this.password || !this.confirmPassword || !this.email || !this.direccion || !this.nif) {
@@ -55,7 +75,7 @@ export class RegisterComponent {
         this.router.navigate(['/']);
       },
       error: (err) => {
-        console.error('Error en registro', err);
+        // Avoid console logging in UI code; show user-friendly message
         this.dialogService.alert(err.error?.error || 'Error desconocido');
         if (err.status >= 500) {
           this.router.navigate(['/error']);

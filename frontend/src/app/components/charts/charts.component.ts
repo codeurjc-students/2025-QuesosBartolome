@@ -49,8 +49,6 @@ export class ChartsComponent implements OnInit {
     incomeLabel: string;
     kgLabel: string;
   }> = [];
-  barIncomeTicks: number[] = [];
-  barKgTicks: number[] = [];
 
   readonly monthOptions = [
     { value: 1, label: 'Enero' },
@@ -80,7 +78,6 @@ export class ChartsComponent implements OnInit {
   tooltipX = 0;
   tooltipY = 0;
   tooltipText = '';
-  barHoverVisible = true;
   barHoverCheese = '';
   barHoverValue = '';
   barHoverColor = '#8B0000';
@@ -110,7 +107,17 @@ export class ChartsComponent implements OnInit {
 
         this.loadChartData();
       },
-      error: () => {
+      error: (err) => {
+        if (err.status === 401) {
+          this.router.navigate(['/auth/login']);
+          return;
+        }
+
+        if (err.status === 403 || err.status >= 500) {
+          this.router.navigate(['/error']);
+          return;
+        }
+
         this.router.navigate(['/auth/login']);
       }
     });
@@ -151,14 +158,12 @@ export class ChartsComponent implements OnInit {
   }
 
   onUsersChange(): void {
-  console.log("Usuarios seleccionados:", this.selectedUsers);
   this.refreshActiveChart();
 }
 
   onChartModeChange(mode: 'line' | 'bar'): void {
     this.chartMode = mode;
     this.resetSelectorsToDefault();
-    this.barHoverVisible = true;
     this.barHoverCheese = '';
     this.barHoverValue = '';
     this.barHoverColor = '#8B0000';
@@ -187,8 +192,6 @@ export class ChartsComponent implements OnInit {
   private updateBarChart(): void {
     this.barData = [];
     this.barRects = [];
-    this.barIncomeTicks = [];
-    this.barKgTicks = [];
     if (!this.selectedYear) return;
 
     const invoices = this.allInvoices.filter(inv => {
@@ -228,9 +231,6 @@ export class ChartsComponent implements OnInit {
     const maxIncome = Math.max(...this.barData.map(d => d.income), 1);
     const maxKg = Math.max(...this.barData.map(d => d.kg), 1);
     const chartH = this.svgHeight - 120; // leave space for labels
-
-    this.barIncomeTicks = this.buildNiceTicks(maxIncome);
-    this.barKgTicks = this.buildNiceTicks(maxKg);
 
     for (let i = 0; i < this.barData.length; i++) {
       const d = this.barData[i];
@@ -405,23 +405,6 @@ export class ChartsComponent implements OnInit {
     return pathParts.join(' ');
   }
 
-  getPointsAttr(): string {
-    if (!this.dataPoints || this.dataPoints.length === 0) return '';
-    const w = this.svgWidth - this.padding.left - this.padding.right;
-    const h = this.svgHeight - this.padding.top - this.padding.bottom;
-    const max = Math.max(...this.dataPoints, 0);
-    const min = 0;
-    const len = this.dataPoints.length;
-    const stepX = len > 1 ? w / (len - 1) : w;
-    const coords: string[] = [];
-    for (let i = 0; i < len; i++) {
-      const x = this.padding.left + i * stepX;
-      const v = this.dataPoints[i];
-      const y = this.padding.top + (max - v) * (h / (max - min || 1));
-      coords.push(`${x},${y}`);
-    }
-    return coords.join(' ');
-  }
 
   getPointCoords(index: number): [number, number] {
     const w = this.svgWidth - this.padding.left - this.padding.right;

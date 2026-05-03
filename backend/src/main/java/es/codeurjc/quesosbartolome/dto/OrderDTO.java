@@ -4,11 +4,11 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public record OrderDTO(
-    Long id,
-    UserBasicDTO user,
-    Double totalWeight,
-    Double totalPrice,
-    LocalDateTime orderDate,
-    boolean processed,
-    List<OrderItemDTO> items
-) {}
+        Long id,
+        UserBasicDTO user,
+        Double totalWeight,
+        Double totalPrice,
+        LocalDateTime orderDate,
+        boolean processed,
+        List<OrderItemDTO> items) {
+}

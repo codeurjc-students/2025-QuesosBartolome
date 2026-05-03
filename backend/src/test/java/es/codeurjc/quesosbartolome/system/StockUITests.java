@@ -41,26 +41,22 @@ public class StockUITests {
             driver.quit();
     }
 
-    /** LOGIN AS ADMIN */
-    private void loginAsAdmin() {
+    private void login(String username, String password) {
         driver.get("http://localhost:4200/");
-
         WebElement loginBtn = wait.until(ExpectedConditions.elementToBeClickable(
                 By.xpath("//button[contains(text(),'Iniciar Sesión')]")));
         loginBtn.click();
 
         WebElement usernameInput = wait.until(ExpectedConditions.visibilityOfElementLocated(
                 By.cssSelector("input[name='username']")));
-        WebElement passwordInput = driver.findElement(By.cssSelector("input[name='password']"));
+        usernameInput.sendKeys(username);
+        driver.findElement(By.cssSelector("input[name='password']")).sendKeys(password);
+        driver.findElement(By.cssSelector("button[type='submit']")).click();
+        SeleniumDialogHelper.waitForDialog(wait).accept();
+    }
 
-        usernameInput.sendKeys("German");
-        passwordInput.sendKeys("password123");
-
-        WebElement submitButton = driver.findElement(By.cssSelector("button[type='submit']"));
-        submitButton.click();
-
-        Alert alert = SeleniumDialogHelper.waitForDialog(wait);
-        alert.accept();
+    private void loginAsAdmin() {
+        login("Admin", "password123");
     }
 
     /** Gets the first cheese stock card */

@@ -284,7 +284,7 @@ const mockCheeseBasic: CheeseBasicDTO = {
 
     const mockCart: CartDTO = {
       id: 1,
-      user: { id: 1, name: "Victor" },
+      user: { id: 1, name: "User1" },
       totalWeight: 12.38,
       totalPrice: 216.65,
       items: [
@@ -309,7 +309,7 @@ const mockCheeseBasic: CheeseBasicDTO = {
     component.addToOrder("1");
     tick();
 
-    expect(mockCartService.addCheeseToOrder).toHaveBeenCalledWith(1, 999, 1);
+    expect(mockCartService.addCheeseToOrder).toHaveBeenCalledWith(999, 1);
     expect(mockDialogService.alert).toHaveBeenCalledWith('Producto añadido al pedido');
   }));
 

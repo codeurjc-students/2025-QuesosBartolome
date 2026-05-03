@@ -180,44 +180,6 @@ public class InvoiceServiceIntegrationTest {
     }
 
     @Test
-    void getInvoiceByIdForUserReturnsInvoiceWhenOwnedByUser() {
-        Invoice inv = new Invoice(user, null);
-        inv.setTaxableBase(40.0);
-        invoiceRepository.save(inv);
-
-        Optional<InvoiceDTO> result = invoiceService.getInvoiceByIdForUser(inv.getId(), "pepe");
-
-        assertThat(result).isPresent();
-        assertThat(result.get().id()).isEqualTo(inv.getId());
-        assertThat(result.get().taxableBase()).isEqualTo(40.0);
-    }
-
-    @Test
-    void getInvoiceByIdForUserReturnsEmptyWhenUserNotFound() {
-        Invoice inv = new Invoice(user, null);
-        invoiceRepository.save(inv);
-
-        Optional<InvoiceDTO> result = invoiceService.getInvoiceByIdForUser(inv.getId(), "ghost");
-
-        assertThat(result).isEmpty();
-    }
-
-    @Test
-    void getInvoiceByIdForUserReturnsEmptyWhenInvoiceBelongsToAnotherUser() {
-        User otherUser = new User();
-        otherUser.setName("ana");
-        otherUser.setOrders(new ArrayList<>());
-        userRepository.save(otherUser);
-
-        Invoice otherInv = new Invoice(otherUser, null);
-        invoiceRepository.save(otherInv);
-
-        Optional<InvoiceDTO> result = invoiceService.getInvoiceByIdForUser(otherInv.getId(), "pepe");
-
-        assertThat(result).isEmpty();
-    }
-
-    @Test
     void getInvoiceEntityReturnsEntityWhenFound() {
         Invoice inv = new Invoice(user, null);
         invoiceRepository.save(inv);

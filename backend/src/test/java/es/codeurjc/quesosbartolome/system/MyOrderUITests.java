@@ -14,7 +14,7 @@ import org.openqa.selenium.support.ui.*;
 
 import org.springframework.boot.test.context.SpringBootTest;
 
-@Disabled
+
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @SpringBootTest(classes = es.codeurjc.quesosbartolome.QuesosbartolomeApplication.class)
 public class MyOrderUITests {
@@ -44,55 +44,22 @@ public class MyOrderUITests {
             driver.quit();
     }
 
-    /**
-     * Helper to login as a normal user.
-     */
-    private void loginAsUser() {
+    private void login(String username, String password) {
         driver.get("http://localhost:4200/");
         WebElement loginBtn = wait.until(ExpectedConditions.elementToBeClickable(
                 By.xpath("//button[contains(text(),'Iniciar Sesión')]")));
-        
-        ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block: 'center'});", loginBtn);
-        try {
-            Thread.sleep(200);
-            new Actions(driver)
-                    .moveToElement(loginBtn)
-                    .pause(Duration.ofMillis(200))
-                    .click()
-                    .perform();
-        } catch (Exception e) {
-            ((JavascriptExecutor) driver).executeScript("arguments[0].click();", loginBtn);
-        }
-
+        loginBtn.click();
         WebElement usernameInput = wait.until(ExpectedConditions.visibilityOfElementLocated(
                 By.cssSelector("input[name='username']")));
-        WebElement passwordInput = driver.findElement(By.cssSelector("input[name='password']"));
+        usernameInput.sendKeys(username);
+        driver.findElement(By.cssSelector("input[name='password']")).sendKeys(password);
+        driver.findElement(By.cssSelector("button[type='submit']")).click();
+        SeleniumDialogHelper.waitForDialog(wait).accept();
+        wait.until(ExpectedConditions.urlContains("/cheeses"));
+    }
 
-        usernameInput.sendKeys("User");
-        passwordInput.sendKeys("password123");
-
-        WebElement submitButton = wait.until(ExpectedConditions.elementToBeClickable(
-                By.cssSelector("button[type='submit']")));
-        ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block: 'center'});", submitButton);
-        try {
-            Thread.sleep(200);
-            new Actions(driver)
-                    .moveToElement(submitButton)
-                    .pause(Duration.ofMillis(200))
-                    .click()
-                    .perform();
-        } catch (Exception e) {
-            ((JavascriptExecutor) driver).executeScript("arguments[0].click();", submitButton);
-        }
-
-        Alert alert = SeleniumDialogHelper.waitForDialog(wait);
-        alert.accept();
-        
-        try {
-            Thread.sleep(500); // Wait for login to complete
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
+    private void loginAsUser() {
+        login("Tienda Artesanal de Riaza", "password123");
     }
 
     @Test
@@ -168,28 +135,19 @@ public class MyOrderUITests {
         wait.until(ExpectedConditions.urlContains("/myorder"));
         Thread.sleep(500);
 
-        // Verify item appears
-        List<WebElement> items = driver.findElements(By.cssSelector(".order-item"));
+        // Verify item appears (exclude the always-present total row)
+        List<WebElement> items = driver.findElements(By.cssSelector(".order-item:not(.order-total)"));
         assertFalse(items.isEmpty(), "Order should contain at least one item");
 
-        // Remove item with safe click
+        // Remove item with JS click
         WebElement deleteBtn = items.get(0).findElement(By.cssSelector(".btn-delete"));
         ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block: 'center'});", deleteBtn);
         Thread.sleep(500);
-        
-        try {
-            new Actions(driver)
-                    .moveToElement(deleteBtn)
-                    .pause(Duration.ofMillis(500))
-                    .click()
-                    .perform();
-        } catch (Exception e) {
-            ((JavascriptExecutor) driver).executeScript("arguments[0].click();", deleteBtn);
-        }
+        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", deleteBtn);
         Thread.sleep(500);
 
         // Verify item disappears
-        wait.until(ExpectedConditions.numberOfElementsToBe(By.cssSelector(".order-item"), 0));
+        wait.until(ExpectedConditions.numberOfElementsToBe(By.cssSelector(".order-item:not(.order-total)"), 0));
     }
 
     @Test
@@ -255,8 +213,8 @@ public class MyOrderUITests {
                 "Order success alert should appear");
         orderAlert.accept();
 
-        // Verify cart is reset (no items)
-        wait.until(ExpectedConditions.numberOfElementsToBe(By.cssSelector(".order-item"), 0));
+        // Verify cart is reset (no items, excluding the always-present total row)
+        wait.until(ExpectedConditions.numberOfElementsToBe(By.cssSelector(".order-item:not(.order-total)"), 0));
     }
 
     @Test
@@ -269,23 +227,15 @@ public class MyOrderUITests {
         wait.until(ExpectedConditions.urlContains("/myorder"));
         Thread.sleep(500);
         
-        // Remove all items if any exist
-        List<WebElement> existingItems = driver.findElements(By.cssSelector(".order-item"));
+        // Remove all items if any exist (exclude the always-present total row)
+        List<WebElement> existingItems = driver.findElements(By.cssSelector(".order-item:not(.order-total)"));
         while (!existingItems.isEmpty()) {
             WebElement deleteBtn = existingItems.get(0).findElement(By.cssSelector(".btn-delete"));
             ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block: 'center'});", deleteBtn);
             Thread.sleep(500);
-            try {
-                new Actions(driver)
-                        .moveToElement(deleteBtn)
-                        .pause(Duration.ofMillis(500))
-                        .click()
-                        .perform();
-            } catch (Exception e) {
-                ((JavascriptExecutor) driver).executeScript("arguments[0].click();", deleteBtn);
-            }
+            ((JavascriptExecutor) driver).executeScript("arguments[0].click();", deleteBtn);
             Thread.sleep(500);
-            existingItems = driver.findElements(By.cssSelector(".order-item"));
+            existingItems = driver.findElements(By.cssSelector(".order-item:not(.order-total)"));
         }
 
         // Click "Hacer Pedido" with safe pattern

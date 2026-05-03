@@ -235,39 +235,7 @@ public class DataBaseInitializer {
                 tierno.setBoxes(inventoryA);
                 tierno.setImage(saveImage("images/image-Tierno.JPG"));
 
-                // Create user 1
-                User user1 = new User();
-                user1.setName("Victor");
-                user1.setPassword(passwordEncoder.encode("password123"));
-                user1.setGmail("victor@example.com");
-                user1.setDirection("123 Main St");
-                user1.setNif("12345678A");
-                user1.setRols("USER");
-                user1.setCart(new Cart(user1));
-                user1.setImage(saveImage("images/default-profile.jpg"));
-
-                // Create user 2
-                User user2 = new User();
-                user2.setName("User");
-                user2.setPassword(passwordEncoder.encode("password123"));
-                user2.setGmail("user@example.com");
-                user2.setDirection("123 Main St");
-                user2.setNif("12345678A");
-                user2.setRols("USER");
-                user2.setCart(new Cart(user2));
-                user2.setImage(saveImage("images/default-profile.jpg"));
-
-                // Create Admin 1
-                User userAdmin = new User();
-                userAdmin.setName("German");
-                userAdmin.setPassword(passwordEncoder.encode("password123"));
-                userAdmin.setGmail("german@example.com");
-                userAdmin.setDirection("123 Main St");
-                userAdmin.setNif("12345678A");
-                userAdmin.setRols("ADMIN");
-                userAdmin.setImage(saveImage("images/default-profile.jpg"));
-
-                // Create Admin 2
+                // Create Admin
                 User userAdmin2 = new User();
                 userAdmin2.setName("Admin");
                 userAdmin2.setPassword(passwordEncoder.encode("password123"));
@@ -306,10 +274,6 @@ public class DataBaseInitializer {
                 cheeseRepository.save(chevrett);
                 cheeseRepository.save(tierno);
 
-                // Save users in DB
-                userRepository.save(user1);
-                userRepository.save(user2);
-                userRepository.save(userAdmin);
                 userRepository.save(userAdmin2);
                 userRepository.save(tiendaRiaza);
                 userRepository.save(supermercadoAldeonte);
@@ -322,14 +286,6 @@ public class DataBaseInitializer {
                 userRepository.save(gourmetPedraza);
                 userRepository.save(charcuteriaBoceguillas);
 
-                // Seed reviews across all cheeses so the site opens with visible activity.
-                addReview(user1, semicurado, 5,
-                                "¡Excelente queso! Sabor equilibrado y textura perfecta. Ideal para tapas.");
-                addReview(user2, semicurado, 4,
-                                "Muy bueno, aunque esperaba un sabor un poco más intenso. Aún así lo recomiendo.");
-                addReview(user1, semicurado, 5,
-                                "Cremoso y aromático. Perfecto para acompañar con vino tinto. ¡Volveré a comprarlo!");
-                addReview(user2, semicurado, 1, "Muy malo");
 
                 addReview(tiendaRiaza, semicurado, 5, "Muy equilibrado, entra perfecto en una cesta gourmet de la sierra.");
                 addReview(supermercadoAldeonte, azul, 4, "Para venta al público funciona muy bien, sabor potente pero comercial.");
@@ -462,9 +418,6 @@ public class DataBaseInitializer {
                                 new Cheese[] { azul, chevrett }, new int[] { 4, 2 });
 
                 // Save updates
-                userRepository.save(user1);
-                userRepository.save(user2);
-                userRepository.save(userAdmin);
                 userRepository.save(userAdmin2);
                 userRepository.save(tiendaRiaza);
                 userRepository.save(supermercadoAldeonte);

@@ -93,8 +93,5 @@ public class LoginController {
                 .body(createdUser);
     }
 
-    
-
-
 }
     

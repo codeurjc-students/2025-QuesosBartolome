@@ -25,24 +25,6 @@ public class ApiReviewTests {
         RestAssured.useRelaxedHTTPSValidation();
     }
 
-    private Cookies registerAndLoginTestUser(String name, String password) throws JSONException {
-        JSONObject registerBody = new JSONObject();
-        registerBody.put("name", name);
-        registerBody.put("password", password);
-        registerBody.put("gmail", name.toLowerCase() + "@example.com");
-        registerBody.put("direction", "Street of " + name);
-        registerBody.put("nif", "12345678Z");
-        registerBody.put("image", JSONObject.NULL);
-
-        given()
-                .contentType("application/json")
-                .body(registerBody.toString())
-                .post("/api/v1/auth/register")
-                .then()
-                .statusCode(anyOf(is(200), is(201)));
-
-        return login(name, password);
-    }
 
     private Cookies login(String username, String password) throws JSONException {
         JSONObject loginBody = new JSONObject();
@@ -61,7 +43,7 @@ public class ApiReviewTests {
 
     @Test
     void testGetReviewsByCheese_EmptyList() throws JSONException {
-        var cookies = registerAndLoginTestUser("ReviewUser1", "password123");
+        var cookies = login("Tienda Artesanal de Riaza", "password123");
 
         given()
                 .cookies(cookies)
@@ -89,7 +71,7 @@ public class ApiReviewTests {
 
     @Test
     void testCreateReview_BadRequest_InvalidRating() throws JSONException {
-        var cookies = registerAndLoginTestUser("ReviewUser2", "password123");
+        var cookies = login("Tienda Artesanal de Riaza", "password123");
 
         JSONObject body = new JSONObject();
         body.put("rating", 10);
@@ -107,7 +89,7 @@ public class ApiReviewTests {
 
     @Test
     void testCreateReview_Ok() throws JSONException {
-        var cookies = registerAndLoginTestUser("ReviewUser3", "password123");
+        var cookies = login("Tienda Artesanal de Riaza", "password123");
 
         JSONObject body = new JSONObject();
         body.put("rating", 5);
@@ -128,7 +110,7 @@ public class ApiReviewTests {
 
     @Test
     void testGetReviewById_NotFound() throws JSONException {
-        var cookies = registerAndLoginTestUser("ReviewUser4", "password123");
+        var cookies = login("Tienda Artesanal de Riaza", "password123");
 
         given()
                 .cookies(cookies)
@@ -140,8 +122,8 @@ public class ApiReviewTests {
 
     @Test
     void testDeleteReview_Forbidden_WhenNotOwner() throws JSONException {
-        var ownerCookies = registerAndLoginTestUser("OwnerUser", "password123");
-        var otherCookies = registerAndLoginTestUser("OtherUser", "password123");
+        var ownerCookies = login("Tienda Artesanal de Riaza", "password123");
+        var otherCookies = login("Supermercado Aldeonte", "password123");
 
         JSONObject body = new JSONObject();
         body.put("rating", 4);
@@ -170,7 +152,7 @@ public class ApiReviewTests {
 
     @Test
     void testDeleteReview_Ok() throws JSONException {
-        var cookies = registerAndLoginTestUser("DeleteUser", "password123");
+        var cookies = login("Tienda Artesanal de Riaza", "password123");
 
         JSONObject body = new JSONObject();
         body.put("rating", 5);
@@ -199,7 +181,7 @@ public class ApiReviewTests {
 
     @Test
     void testDeleteReview_NotFound() throws JSONException {
-        var cookies = registerAndLoginTestUser("ReviewUser5", "password123");
+        var cookies = login("Tienda Artesanal de Riaza", "password123");
 
         given()
                 .cookies(cookies)

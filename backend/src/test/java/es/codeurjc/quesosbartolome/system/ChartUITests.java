@@ -44,6 +44,20 @@ public class ChartUITests {
 			driver.quit();
 		}
 	}
+
+	private void login(String username, String password) {
+		driver.get("http://localhost:4200/auth/login");
+		wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("username")));
+		driver.findElement(By.id("username")).sendKeys(username);
+		driver.findElement(By.id("password")).sendKeys(password);
+		wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("button[type='submit']"))).click();
+		SeleniumDialogHelper.waitForDialog(wait).accept();
+		wait.until(ExpectedConditions.urlContains("/cheeses"));
+	}
+
+	private void loginAsAdmin() {
+		login("Admin", "password123");
+	}
  
 	@Test
 	public void chartsPageShowsGrafico1AndGrafico2Switches() {
@@ -82,19 +96,4 @@ public class ChartUITests {
 		assertFalse(driver.findElements(By.cssSelector("svg.line-chart")).isEmpty());
 	}
 
-	private void loginAsAdmin() {
-		driver.get("http://localhost:4200/auth/login");
-
-		wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("username")));
-		wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("password")));
-
-		driver.findElement(By.id("username")).sendKeys("Admin");
-		driver.findElement(By.id("password")).sendKeys("password123");
-
-		WebElement submitButton = wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("button[type='submit']")));
-		submitButton.click();
-
-		SeleniumDialogHelper.waitForDialog(wait).accept();
-		wait.until(ExpectedConditions.urlContains("/cheeses"));
-	}
 }

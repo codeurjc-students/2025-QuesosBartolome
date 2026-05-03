@@ -50,12 +50,10 @@ export class StockComponent implements OnInit {
 
   loadCheeses() {
     this.loading = true;
-    this.cheeseService.getAllCheeses().subscribe({
-      next: (data) => {
-        this.totalCheeses = data.length;
-        const startIndex = this.currentCheesePage * this.cheesePageSize;
-        const endIndex = startIndex + this.cheesePageSize;
-        const pageData = data.slice(startIndex, endIndex);
+    this.cheeseService.getAllCheeses(this.currentCheesePage, this.cheesePageSize).subscribe({
+      next: (page) => {
+        this.totalCheeses = page.totalElements;
+        const pageData = page.content;
 
         this.cheeses = pageData.map(cheese => ({
           cheese: cheese,
@@ -68,10 +66,15 @@ export class StockComponent implements OnInit {
         this.loading = false;
       },
       error: (err) => {
-        console.error('Error cargando quesos', err);
         this.loading = false;
-        if (err.status >= 500) {
+        if (err.status === 401) {
+          this.router.navigate(['/auth/login']);
+          return;
+        }
+
+        if (err.status === 403 || err.status >= 500) {
           this.router.navigate(['/error']);
+          return;
         }
       }
     });
@@ -166,7 +169,14 @@ export class StockComponent implements OnInit {
         }
       },
       error: (err) => {
-        console.error('Error añadiendo caja', err);
+        if (err.status === 401) {
+          this.router.navigate(['/auth/login']);
+          return;
+        }
+
+        if (err.status === 403 || err.status >= 500) {
+          this.router.navigate(['/error']);
+        }
       }
     });
   }
@@ -185,7 +195,14 @@ export class StockComponent implements OnInit {
         }
       },
       error: (err) => {
-        console.error('Error eliminando caja', err);
+        if (err.status === 401) {
+          this.router.navigate(['/auth/login']);
+          return;
+        }
+
+        if (err.status === 403 || err.status >= 500) {
+          this.router.navigate(['/error']);
+        }
       }
     });
   }

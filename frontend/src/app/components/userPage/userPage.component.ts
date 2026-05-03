@@ -111,7 +111,6 @@ export class UserPageComponent implements OnInit {
         }
       },
       error: (err) => {
-        console.error("No se pudo cargar el usuario");
         if (err.status >= 500) {
           this.router.navigate(['/error']);
         } else {
@@ -144,7 +143,13 @@ export class UserPageComponent implements OnInit {
         this.totalPages = data.totalPages;
         this.totalReviews = data.totalElements;
       },
-      error: err => console.error('Error loading reviews', err)
+      error: err => {
+        if (err.status >= 500) {
+          this.router.navigate(['/error']);
+        } else {
+          this.dialogService.alert('No se han podido cargar las reseñas.');
+        }
+      }
     });
   }
 
@@ -180,8 +185,10 @@ export class UserPageComponent implements OnInit {
           this.loadReviews(this.user.id, this.currentPage);
         },
         error: (err) => {
-          console.error('Error deleting review', err);
           this.dialogService.alert('No se pudo eliminar la reseña');
+          if (err.status >= 500) {
+            this.router.navigate(['/error']);
+          }
         }
       });
     });
@@ -262,7 +269,9 @@ export class UserPageComponent implements OnInit {
           this.userService.updateUserImage(this.user.id, this.selectedImageFile).subscribe({
             next: () => this.reloadAfterEdit(),
             error: (err) => {
-              console.error('Error updating image', err);
+              if (err.status >= 500) {
+                this.router.navigate(['/error']);
+              }
               this.reloadAfterEdit();
             }
           });
@@ -271,8 +280,10 @@ export class UserPageComponent implements OnInit {
         }
       },
       error: (err) => {
-        console.error('Error updating profile', err);
         this.dialogService.alert('No se pudo guardar el perfil. Inténtalo de nuevo.');
+        if (err.status >= 500) {
+          this.router.navigate(['/error']);
+        }
       }
     });
   }
@@ -303,8 +314,11 @@ export class UserPageComponent implements OnInit {
         this.dialogService.alert('Contraseña actualizada correctamente.');
       },
       error: (err) => {
-        console.error('Error updating password', err);
-        this.passwordError = 'No se pudo cambiar la contraseña. Revisa la contraseña actual.';
+        if (err.status >= 500) {
+          this.router.navigate(['/error']);
+        } else {
+          this.passwordError = 'No se pudo cambiar la contraseña. Revisa la contraseña actual.';
+        }
       }
     });
   }

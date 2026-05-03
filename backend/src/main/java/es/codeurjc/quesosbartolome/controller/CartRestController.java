@@ -2,7 +2,7 @@ package es.codeurjc.quesosbartolome.controller;
 
 import java.security.Principal;
 import java.util.Optional;
-
+ 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -44,7 +44,7 @@ public class CartRestController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();// 404
         }
 
-        return ResponseEntity.ok(cartdto); // 200 OK
+        return ResponseEntity.ok(cartdto);
     }
 
     @PutMapping("/addItem")

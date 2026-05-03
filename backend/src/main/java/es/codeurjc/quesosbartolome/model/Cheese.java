@@ -17,7 +17,7 @@ import jakarta.persistence.OneToMany;
 
 @Entity
 public class Cheese {
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
@@ -34,18 +34,17 @@ public class Cheese {
 
     @Lob
     private Blob image;
-    
+
     @OneToMany(mappedBy = "cheese", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Review> reviews = new ArrayList<>();
-    
-
 
     // Constructor
     public Cheese() {
 
     }
-    
-    public Cheese(Long id, String name, double price, String description, String type, String manufactureDate, String expirationDate) {
+
+    public Cheese(Long id, String name, double price, String description, String type, String manufactureDate,
+            String expirationDate) {
         this.id = id;
         this.name = name;
         this.price = price;
@@ -55,7 +54,7 @@ public class Cheese {
         this.expirationDate = Date.valueOf(expirationDate);
     }
 
-    // Getters y Setters
+    // Getters & Setters
     public Long getId() {
         return id;
     }
@@ -111,7 +110,7 @@ public class Cheese {
     public void setType(String type) {
         this.type = type;
     }
-    
+
     public List<Double> getBoxes() {
         return boxes;
     }
@@ -131,7 +130,7 @@ public class Cheese {
     public List<Review> getReviews() {
         return reviews;
     }
-    
+
     public void setReviews(List<Review> reviews) {
         this.reviews = reviews;
     }

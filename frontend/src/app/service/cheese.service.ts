@@ -1,22 +1,21 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { Page } from '../dto/page.dto';
 import { CheeseDTO } from '../dto/cheese.dto';
 
 @Injectable({
   providedIn: 'root'
 })
 export class CheeseService {
-  addCheeseToOrder(userId: number, cheeseId: number, boxes: number) {
-    throw new Error('Method not implemented.');
-  }
+  // Removed unused addCheeseToOrder stub. Use `CartService` for cart operations.
 
   private apiUrl = 'https://localhost:443/api/v1/cheeses';
 
   constructor(private http: HttpClient) { }
 
-  getAllCheeses(): Observable<CheeseDTO[]> {
-    return this.http.get<CheeseDTO[]>(this.apiUrl);
+  getAllCheeses(page: number = 0, size: number = 10): Observable<Page<CheeseDTO>> {
+    return this.http.get<Page<CheeseDTO>>(`${this.apiUrl}?page=${page}&size=${size}`, { withCredentials: true });
   }
 
   getCheeseById(id: number): Observable<CheeseDTO> {

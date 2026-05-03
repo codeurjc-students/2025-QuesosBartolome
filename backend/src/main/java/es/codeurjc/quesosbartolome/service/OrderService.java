@@ -84,7 +84,7 @@ public class OrderService {
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
-        
+
         Cart cart = user.getCart();
 
         if (cart == null) {

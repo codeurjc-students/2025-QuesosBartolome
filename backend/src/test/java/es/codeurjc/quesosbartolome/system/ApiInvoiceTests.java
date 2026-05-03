@@ -4,63 +4,23 @@ import io.restassured.RestAssured;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.password.PasswordEncoder;
-
-import es.codeurjc.quesosbartolome.model.User;
-import es.codeurjc.quesosbartolome.repository.CartRepository;
-import es.codeurjc.quesosbartolome.repository.InvoiceRepository;
-import es.codeurjc.quesosbartolome.repository.OrderRepository;
-import es.codeurjc.quesosbartolome.repository.ReviewRepository;
-import es.codeurjc.quesosbartolome.repository.UserRepository;
+import org.springframework.test.annotation.DirtiesContext;
 
 import static io.restassured.RestAssured.*;
 import static org.hamcrest.Matchers.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, properties = "spring.profiles.active=test")
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_CLASS)
 public class ApiInvoiceTests {
 
         @LocalServerPort
         int port;
 
-        @Autowired
-        private UserRepository userRepository;
-
-        @Autowired
-        private CartRepository cartRepository;
-
-        @Autowired
-        private ReviewRepository reviewRepository;
-
-        @Autowired
-        private OrderRepository orderRepository;
-
-        @Autowired
-        private InvoiceRepository invoiceRepository;
-
-        @Autowired
-        private PasswordEncoder passwordEncoder;
-
         @BeforeEach
         void setup() {
-                invoiceRepository.deleteAll();
-                orderRepository.deleteAll();
-                reviewRepository.deleteAll();
-                cartRepository.deleteAll();
-                userRepository.deleteAll();
-
-                User admin = new User("Admin", passwordEncoder.encode("password123"), "admin@example.com",
-                                "Admin Street", "12345678A", "ADMIN");
-                userRepository.save(admin);
-
-                User testUser = new User("InvoiceUser", passwordEncoder.encode("password123"),
-                                "invoiceuser@example.com", "User Street", "12345678B", "USER");
-                userRepository.save(testUser);
-
                 RestAssured.port = port;
                 RestAssured.baseURI = "https://localhost";
                 RestAssured.useRelaxedHTTPSValidation();
@@ -85,10 +45,6 @@ public class ApiInvoiceTests {
                 return login("Admin", "password123");
         }
 
-        private io.restassured.http.Cookies loginAsTestUser() throws JSONException {
-                return login("InvoiceUser", "password123");
-        }
-
         @Test
         void testGetAllInvoicesList_Unauthorized() {
                 given()
@@ -100,7 +56,7 @@ public class ApiInvoiceTests {
 
         @Test
         void testGetAllInvoicesList_ForbiddenForNonAdmin() throws JSONException {
-                var userCookies = loginAsTestUser();
+                var userCookies = login("Tienda Artesanal de Riaza", "password123");
 
                 given()
                                 .cookies(userCookies)
@@ -150,7 +106,7 @@ public class ApiInvoiceTests {
 
         @Test
         void testGetInvoiceById_Ok() throws Exception {
-                var userCookies = loginAsTestUser();
+                var userCookies = login("Tienda Artesanal de Riaza", "password123");
                 var adminCookies = loginAsAdmin();
 
                 given()
@@ -227,10 +183,9 @@ public class ApiInvoiceTests {
                                 .statusCode(404);
         }
 
-        @Disabled("Failed only CI")
         @Test
         void testCreateInvoice_ReturnsExistingInvoice_WhenOrderAlreadyProcessed() throws Exception {
-                var userCookies = loginAsTestUser();
+                var userCookies = login("Tienda Artesanal de Riaza", "password123");
                 var adminCookies = loginAsAdmin();
 
                 given()
@@ -278,10 +233,9 @@ public class ApiInvoiceTests {
                                 .body("id", equalTo(firstInvoiceId));
         }
 
-        @Disabled("Failed only CI")
         @Test
         void testCreateInvoice_Ok() throws Exception {
-                var userCookies = loginAsTestUser();
+                var userCookies = login("Tienda Artesanal de Riaza", "password123");
                 var adminCookies = loginAsAdmin();
 
                 given()

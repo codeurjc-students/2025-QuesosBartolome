@@ -18,6 +18,6 @@ import { AppDialogComponent } from './components/app-dialog/app-dialog.component
   styleUrls: ['./app.component.css']
 })
 export class AppComponent {
-  title = 'frontend';
+  title = 'Quesos Bartolome';
   constructor(public router: Router) { }
 }

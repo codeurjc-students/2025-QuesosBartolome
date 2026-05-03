@@ -74,47 +74,6 @@ public class OrdersUITests {
                                 .visibilityOfElementLocated(By.xpath("//button[contains(.,'Cerrar Sesión')]")));
         }
 
-        private void registerUser(String username, String password) {
-                driver.get("http://localhost:4200/auth/register");
-
-                String nif = String.format("%08dA", Math.abs((int) (System.nanoTime() % 100000000L)));
-
-                // Wait for all form elements to be present and interactable
-                WebElement nombreField = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("nombre")));
-                WebElement emailField = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("email")));
-                WebElement direccionField = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("direccion")));
-                WebElement nifField = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("nif")));
-                WebElement passwordField = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("password")));
-                WebElement confirmPasswordField = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("confirm-password")));
-
-                // Clear fields before sending keys to ensure clean input
-                nombreField.clear();
-                nombreField.sendKeys(username);
-                
-                emailField.clear();
-                emailField.sendKeys(username + "@example.com");
-                
-                direccionField.clear();
-                direccionField.sendKeys("Calle Falsa 123");
-                
-                nifField.clear();
-                nifField.sendKeys(nif);
-                
-                passwordField.clear();
-                passwordField.sendKeys(password);
-                
-                confirmPasswordField.clear();
-                confirmPasswordField.sendKeys(password);
-
-                WebElement submitButton = wait.until(ExpectedConditions.elementToBeClickable(
-                                By.cssSelector("button[type='submit']")));
-                submitButton.click();
-
-                Alert alert = SeleniumDialogHelper.waitForDialog(wait);
-                assertTrue(alert.getText().contains("Registro exitoso"));
-                alert.accept();
-        }
-
         private void logout() {
                 driver.get("http://localhost:4200/");
                 WebElement logoutBtn = wait.until(ExpectedConditions.elementToBeClickable(
@@ -208,15 +167,12 @@ public class OrdersUITests {
         @Order(1)
         public void testAdminCanSeeCreatedOrder() {
 
-                String username = "Victor" + System.currentTimeMillis();
-
-                registerUser(username, "password123");
-                login(username, "password123");
+                login("Tienda Artesanal de Riaza", "password123");
                 createOrderAsUser();
-                Long orderId = getLatestOrderIdForUser(username);
+                Long orderId = getLatestOrderIdForUser("Tienda Artesanal de Riaza");
                 logout();
 
-                login("German", "password123");
+                login("Admin", "password123");
                 driver.get("http://localhost:4200/orders/" + orderId + "/preview");
 
                 WebElement title = wait.until(ExpectedConditions.visibilityOfElementLocated(
@@ -226,15 +182,13 @@ public class OrdersUITests {
 
         @Test
         public void testProcessOrderPreviewAndConfirmRemovesOrderFromList() {
-                String username = "Victor" + System.currentTimeMillis();
 
-                registerUser(username, "password123");
-                login(username, "password123");
+                login("Tienda Artesanal de Riaza", "password123");
                 createOrderAsUser();
-                Long orderId = getLatestOrderIdForUser(username);
+                Long orderId = getLatestOrderIdForUser("Tienda Artesanal de Riaza");
                 logout();
 
-                login("German", "password123");
+                login("Admin", "password123");
                 driver.get("http://localhost:4200/orders/" + orderId + "/preview");
 
                 WebElement title = wait.until(ExpectedConditions.visibilityOfElementLocated(
@@ -266,15 +220,13 @@ public class OrdersUITests {
 
         @Test
         public void testRejectOrderRemovesOrderFromList() {
-                String username = "Victor" + System.currentTimeMillis();
 
-                registerUser(username, "password123");
-                login(username, "password123");
+                login("Tienda Artesanal de Riaza", "password123");
                 createOrderAsUser();
-                Long orderId = getLatestOrderIdForUser(username);
+                Long orderId = getLatestOrderIdForUser("Tienda Artesanal de Riaza");
                 logout();
 
-                login("German", "password123");
+                login("Admin", "password123");
                 driver.get("http://localhost:4200/orders/" + orderId + "/preview");
 
                 WebElement rejectBtn = wait.until(ExpectedConditions.elementToBeClickable(
@@ -294,10 +246,8 @@ public class OrdersUITests {
 
         @Test
         public void testUserCanSeeOnlyOwnOrdersInOrdersPage() {
-                String username = "Victor" + System.currentTimeMillis();
 
-                registerUser(username, "password123");
-                login(username, "password123");
+                login("Tienda Artesanal de Riaza", "password123");
                 createOrderAsUser();
 
                 openOrdersPageAsUser();
@@ -305,7 +255,7 @@ public class OrdersUITests {
                 List<WebElement> orderRows = waitForOrderRowsWithRetry();
 
                 assertFalse(orderRows.isEmpty(), "User should see at least one own order");
-                assertTrue(orderRows.stream().allMatch(row -> row.getText().contains(username)),
+                assertTrue(orderRows.stream().allMatch(row -> row.getText().contains("Tienda Artesanal de Riaza")),
                                 "User orders list should only contain own orders");
 
                 WebElement firstRow = orderRows.get(0);
@@ -317,18 +267,16 @@ public class OrdersUITests {
 
         @Test
         public void testUserCanOpenOwnOrderPreviewInReadOnlyMode() {
-                String username = "Victor" + System.currentTimeMillis();
 
-                registerUser(username, "password123");
-                login(username, "password123");
+                login("Tienda Artesanal de Riaza", "password123");
                 createOrderAsUser();
 
                 openOrdersPageAsUser();
 
                 WebElement userOrderRow = waitForOrderRowsWithRetry().stream()
-                                .filter(row -> row.getText().contains(username))
+                                .filter(row -> row.getText().contains("Tienda Artesanal de Riaza"))
                                 .findFirst()
-                                .orElseThrow(() -> new AssertionError("No order row found for user " + username));
+                                .orElseThrow(() -> new AssertionError("No order row found for user " + "Tienda Artesanal de Riaza"));
 
                 userOrderRow.click();
 

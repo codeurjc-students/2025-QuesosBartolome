@@ -81,7 +81,7 @@
     </div>
 
     <div class="card-grid">
-      <div class="card shadow-sm" *ngFor="let cheese of paginatedCheeses" (click)="goToDetails(cheese.id!)">
+      <div class="card shadow-sm" *ngFor="let cheese of displayedCheeses" (click)="goToDetails(cheese.id!)">
         <div class="image-placeholder">
           <img [src]="'https://localhost:443/api/v1/cheeses/' + cheese.id + '/image'"
             alt="Imagen de {{ cheese.name }}" />
@@ -101,7 +101,7 @@
     </div>
 
     <!-- Paginación -->
-    <div class="pagination-container" *ngIf="totalPages > 1">
+    <div class="pagination-container" *ngIf="filteredCheeses.length > itemsPerPage">
       <nav aria-label="Paginación de quesos">
         <ul class="pagination justify-content-center">
           <li class="page-item" [class.disabled]="currentPage === 1">
@@ -124,8 +124,8 @@
         </ul>
       </nav>
       <p class="text-center text-muted mt-2">
-        Mostrando {{ (currentPage - 1) * itemsPerPage + 1 }} -
-        {{ Math.min(currentPage * itemsPerPage, filteredCheeses.length) }}
+        Mostrando {{ firstDisplayedIndex }} -
+        {{ lastDisplayedIndex }}
         de {{ filteredCheeses.length }} quesos
       </p>
     </div>

@@ -34,8 +34,18 @@ export class MyOrderComponent implements OnInit {
         this.loading = false;
       },
       error: (err) => {
-        console.error('Error cargando pedido', err);
+        // Error handled below
         this.loading = false;
+        if (err.status === 401) {
+          this.router.navigate(['/auth/login']);
+          return;
+        }
+
+        if (err.status === 403) {
+          this.router.navigate(['/error']);
+          return;
+        }
+
         if (err.status >= 500) {
           this.router.navigate(['/error']);
         }
@@ -43,15 +53,21 @@ export class MyOrderComponent implements OnInit {
     });
   }
 
-  goToEdit() {
-    console.log('Ir a editar');
-  }
-
   removeItem(itemId: number) {
     this.cartService.removeItemFromCart(itemId).subscribe({
       next: (order) => this.order = order,
       error: err => {
-        console.error('Error eliminando item', err)
+        // Error handled below
+        if (err.status === 401) {
+          this.router.navigate(['/auth/login']);
+          return;
+        }
+
+        if (err.status === 403) {
+          this.router.navigate(['/error']);
+          return;
+        }
+
         if (err.status >= 500) {
           this.router.navigate(['/error']);
         }
@@ -66,7 +82,17 @@ export class MyOrderComponent implements OnInit {
         this.ngOnInit();
       },
       error: err => {
-        console.error('Error al hacer pedido', err)
+        // Error handled below
+        if (err.status === 401) {
+          this.router.navigate(['/auth/login']);
+          return;
+        }
+
+        if (err.status === 403) {
+          this.router.navigate(['/error']);
+          return;
+        }
+
         this.dialogService.alert('Error al hacer el pedido');
         if (err.status >= 500) {
           this.router.navigate(['/error']);

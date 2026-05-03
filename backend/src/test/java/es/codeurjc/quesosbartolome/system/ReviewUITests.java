@@ -209,7 +209,7 @@ public class ReviewUITests {
 	public void testUserCanCreateReview() {
 		String uniqueComment = "Review Selenium " + System.currentTimeMillis();
 
-		login("Victor", "password123");
+		login("Tienda Artesanal de Riaza", "password123");
 		openCheeseDetailsByName("Azul");
 
 		int previousTotal = getTotalReviewsFromTitle();

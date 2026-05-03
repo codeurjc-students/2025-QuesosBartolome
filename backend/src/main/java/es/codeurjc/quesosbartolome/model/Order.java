@@ -6,7 +6,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-
 @Entity
 @Table(name = "orders")
 public class Order {
@@ -19,17 +18,17 @@ public class Order {
     @JoinColumn(name = "user_id")
     private User user;
 
-    private Double totalWeight;  
+    private Double totalWeight;
     private Double totalPrice;
-    private LocalDateTime orderDate;   
+    private LocalDateTime orderDate;
     private boolean processed;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OrderItem> items = new ArrayList<>();
 
-    // --- Constructors ---
-    public Order() {}
-
+    // Constructor
+    public Order() {
+    }
 
     public Order(User user) {
         this.user = user;
@@ -40,7 +39,7 @@ public class Order {
         this.items = new ArrayList<>();
     }
 
-    // --- Getters & Setters ---
+    // Getters & Setters
 
     public Long getId() {
         return id;
@@ -65,7 +64,6 @@ public class Order {
     public void setTotalWeight(Double totalWeight) {
         this.totalWeight = totalWeight;
     }
-
 
     public Double getTotalPrice() {
         return totalPrice;
@@ -93,7 +91,7 @@ public class Order {
 
     public List<OrderItem> getItems() {
         return items;
-    }   
+    }
 
     public void setItems(List<OrderItem> items) {
         this.items = items;
