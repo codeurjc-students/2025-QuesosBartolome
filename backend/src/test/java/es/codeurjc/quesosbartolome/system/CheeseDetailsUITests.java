@@ -158,7 +158,7 @@ public class CheeseDetailsUITests {
                                 .until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".cajas-input")));
                 boxesInput.sendKeys("1");
 
-                WebElement addButton = wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(".btn add-btn")));
+                WebElement addButton = wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(".add-btn")));
                 new Actions(driver).moveToElement(addButton).pause(200).click().perform();
 
                 Alert successAlert = SeleniumDialogHelper.waitForDialog(wait);
@@ -182,7 +182,7 @@ public class CheeseDetailsUITests {
                                 .until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".cajas-input")));
                 boxesInput.sendKeys("0");
 
-                WebElement addButton = wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(".btn add-btn")));
+                WebElement addButton = wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(".add-btn")));
                 new Actions(driver).moveToElement(addButton).pause(200).click().perform();
 
                 Alert errorAlert = SeleniumDialogHelper.waitForDialog(wait);
