@@ -8,6 +8,7 @@ import { UserService } from '../../service/user.service';
 import { LoginService } from '../../service/login.service';
 import { UserDTO } from '../../dto/user.dto';
 import { DialogService } from '../../service/dialog.service';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-cheese-list',
@@ -21,6 +22,7 @@ import { DialogService } from '../../service/dialog.service';
   styleUrls: ['./cheese-list.component.css']
 })
 export class CheeseListComponent implements OnInit {
+  apiBaseUrl = environment.apiBaseUrl;
   allCheeses: CheeseDTO[] = []; // ALL cheeses from server (all pages combined)
   filteredCheeses: CheeseDTO[] = [];
   

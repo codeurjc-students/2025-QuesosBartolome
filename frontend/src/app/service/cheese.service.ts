@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Page } from '../dto/page.dto';
 import { CheeseDTO } from '../dto/cheese.dto';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -10,7 +11,7 @@ import { CheeseDTO } from '../dto/cheese.dto';
 export class CheeseService {
   // Removed unused addCheeseToOrder stub. Use `CartService` for cart operations.
 
-  private apiUrl = 'https://localhost:443/api/v1/cheeses';
+  private apiUrl = `${environment.apiBaseUrl}/api/v1/cheeses`;
 
   constructor(private http: HttpClient) { }
 

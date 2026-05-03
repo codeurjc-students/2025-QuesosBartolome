@@ -83,7 +83,7 @@
     <div class="card-grid">
       <div class="card shadow-sm" *ngFor="let cheese of displayedCheeses" (click)="goToDetails(cheese.id!)">
         <div class="image-placeholder">
-          <img [src]="'https://localhost:443/api/v1/cheeses/' + cheese.id + '/image'"
+          <img [src]="apiBaseUrl + '/api/v1/cheeses/' + cheese.id + '/image'"
             alt="Imagen de {{ cheese.name }}" />
         </div>
         <div class="card-body">
