@@ -95,4 +95,20 @@ describe('LoginComponent (unit)', () => {
     expect(mockRouter.navigate).not.toHaveBeenCalled();
   });
 
+  it('should navigate to /error when login fails with status >= 500', () => {
+    mockLoginService.login.and.returnValue(
+      throwError(() => ({
+        status: 500,
+        error: { message: 'Internal Server Error' }
+      }))
+    );
+
+    component.username = 'User';
+    component.password = 'pass';
+
+    component.login();
+
+    expect(mockRouter.navigate).toHaveBeenCalledWith(['/error']);
+  });
+
 });

@@ -294,4 +294,81 @@ describe('InvoicesComponent', () => {
     expect(userServiceSpy.downloadMyInvoicePdf).not.toHaveBeenCalled();
   });
 
+  it('should navigate to /auth/login when getCurrentUser fails (unauthenticated user)', () => {
+    userServiceSpy.getCurrentUser.and.returnValue(throwError(() => ({ status: 401 })));
+    invoiceServiceSpy.getAllInvoices.calls.reset();
+    routerSpy.navigate.calls.reset();
+
+    component.ngOnInit();
+
+    expect(routerSpy.navigate).toHaveBeenCalledWith(['/auth/login']);
+    expect(invoiceServiceSpy.getAllInvoices).not.toHaveBeenCalled();
+  });
+
+  it('should load invoices directly when there is only one page (currentPage === 0)', () => {
+    userServiceSpy.getCurrentUser.and.returnValue(of({ id: 1, rols: ['ADMIN'] } as any));
+    invoiceServiceSpy.getAllInvoices.calls.reset();
+    invoiceServiceSpy.getAllInvoices.and.returnValue(of({
+      content: mockInvoices,
+      totalPages: 1,
+      totalElements: 2,
+      size: 10,
+      number: 0,
+      first: true,
+      last: true,
+      numberOfElements: 2
+    }));
+
+    component.ngOnInit();
+
+    expect(component.invoices).toEqual(mockInvoices);
+    expect(component.loading).toBeFalse();
+    expect(component.currentPage).toBe(0);
+  });
+
+  it('should navigate to /error when loadLastInvoices request fails with status >= 500', () => {
+    userServiceSpy.getCurrentUser.and.returnValue(of({ id: 1, rols: ['ADMIN'] } as any));
+    invoiceServiceSpy.getAllInvoices.calls.reset();
+    invoiceServiceSpy.getAllInvoices.and.returnValue(throwError(() => ({ status: 500 })));
+    routerSpy.navigate.calls.reset();
+
+    component.ngOnInit();
+
+    expect(component.loading).toBeFalse();
+    expect(routerSpy.navigate).toHaveBeenCalledWith(['/error']);
+  });
+
+  it('should not navigate on loadLastInvoices error with status < 500', () => {
+    userServiceSpy.getCurrentUser.and.returnValue(of({ id: 1, rols: ['ADMIN'] } as any));
+    invoiceServiceSpy.getAllInvoices.calls.reset();
+    invoiceServiceSpy.getAllInvoices.and.returnValue(throwError(() => ({ status: 404 })));
+    routerSpy.navigate.calls.reset();
+
+    component.ngOnInit();
+
+    expect(component.loading).toBeFalse();
+    expect(routerSpy.navigate).not.toHaveBeenCalled();
+  });
+
+  it('should use user endpoint in loadInvoicesPage for non-admin user with id', () => {
+    component.currentUser = { id: 7, rols: ['USER'] } as any;
+    component.currentPage = 1;
+    component.totalPages = 3;
+    userServiceSpy.getMyInvoices.calls.reset();
+    userServiceSpy.getMyInvoices.and.returnValue(of({
+      content: [mockInvoices[0]],
+      totalPages: 3,
+      totalElements: 3,
+      size: 10,
+      number: 0,
+      first: true,
+      last: false,
+      numberOfElements: 1
+    }));
+
+    component.prevPage();
+
+    expect(userServiceSpy.getMyInvoices).toHaveBeenCalledWith(7, 0, 10);
+  });
+
 });

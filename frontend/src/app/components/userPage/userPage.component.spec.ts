@@ -435,6 +435,162 @@ describe('UserPageComponent (unit)', () => {
     expect(avatarBox.nativeElement.classList).toContain('avatar-banned');
   });
 
+  it('should navigate to /auth/login when getCurrentUser fails and there is no userId in route', () => {
+    fixture.detectChanges();
+    expect(mockRouter.navigate).toHaveBeenCalledWith(['/auth/login']);
+  });
 
+  it('should navigate to /error when loadUserById fails with status >= 500', () => {
+    mockUserService.getUserById = jasmine.createSpy().and.returnValue(
+      throwError(() => ({ status: 500 }))
+    );
+
+    component.loadUserById(99);
+
+    expect(mockRouter.navigate).toHaveBeenCalledWith(['/error']);
+  });
+
+  it('should navigate to /cheeses when loadUserById fails with status < 500', () => {
+    mockUserService.getUserById = jasmine.createSpy().and.returnValue(
+      throwError(() => ({ status: 404 }))
+    );
+
+    component.loadUserById(99);
+
+    expect(mockRouter.navigate).toHaveBeenCalledWith(['/cheeses']);
+  });
+
+  it('should navigate to /error when loadReviews fails with status >= 500', () => {
+    mockReviewService.getReviewsByUserId.and.returnValue(throwError(() => ({ status: 500 })));
+
+    component.loadReviews(1, 0);
+
+    expect(mockRouter.navigate).toHaveBeenCalledWith(['/error']);
+  });
+
+  it('should show alert when loadReviews fails with status < 500', () => {
+    mockReviewService.getReviewsByUserId.and.returnValue(throwError(() => ({ status: 404 })));
+
+    component.loadReviews(1, 0);
+
+    expect(mockDialogService.alert).toHaveBeenCalledWith('No se han podido cargar las reseñas.');
+    expect(mockRouter.navigate).not.toHaveBeenCalled();
+  });
+
+  it('should not call loadReviews when nextPage is called at last page', () => {
+    component.currentPage = 2;
+    component.totalPages = 3;
+    mockReviewService.getReviewsByUserId.calls.reset();
+
+    component.nextPage();
+
+    expect(mockReviewService.getReviewsByUserId).not.toHaveBeenCalled();
+  });
+
+  it('should call loadReviews with next page when nextPage is valid', () => {
+    component.user = { ...component.user, id: 1 };
+    component.currentPage = 0;
+    component.totalPages = 3;
+    mockReviewService.getReviewsByUserId.and.returnValue(of(mockPage([])));
+
+    component.nextPage();
+
+    expect(mockReviewService.getReviewsByUserId).toHaveBeenCalledWith(1, 1, 3);
+  });
+
+  it('should not call loadReviews when previousPage is called at page 0', () => {
+    component.currentPage = 0;
+    mockReviewService.getReviewsByUserId.calls.reset();
+
+    component.previousPage();
+
+    expect(mockReviewService.getReviewsByUserId).not.toHaveBeenCalled();
+  });
+
+  it('should call loadReviews with previous page when previousPage is valid', () => {
+    component.user = { ...component.user, id: 1 };
+    component.currentPage = 2;
+    component.totalPages = 3;
+    mockReviewService.getReviewsByUserId.and.returnValue(of(mockPage([])));
+
+    component.previousPage();
+
+    expect(mockReviewService.getReviewsByUserId).toHaveBeenCalledWith(1, 1, 3);
+  });
+
+  it('should not navigate when deleteReview fails with status < 500', () => {
+    component.user = { ...component.user, id: 1 };
+    mockReviewService.deleteReview.and.returnValue(throwError(() => ({ status: 404 })));
+
+    component.deleteReview(1);
+
+    expect(mockDialogService.alert).toHaveBeenCalledWith('No se pudo eliminar la reseña');
+    expect(mockRouter.navigate).not.toHaveBeenCalled();
+  });
+
+  it('should only alert and not navigate when confirmEdit fails with status < 500', () => {
+    mockUserService.updateUser = jasmine.createSpy().and.returnValue(
+      throwError(() => ({ status: 400 }))
+    );
+
+    component.user = { id: 1, name: 'Juan', password: '', gmail: 'a@a.com', direction: 'x', nif: 'y', rols: [], banned: false };
+
+    component.confirmEdit();
+
+    expect(mockDialogService.alert).toHaveBeenCalledWith('No se pudo guardar el perfil. Inténtalo de nuevo.');
+    expect(mockRouter.navigate).not.toHaveBeenCalled();
+  });
+
+  it('should navigate to /error when updateUserImage fails with status >= 500', () => {
+    mockUserService.updateUser = jasmine.createSpy().and.returnValue(of(component.user));
+    mockUserService.updateUserImage = jasmine.createSpy().and.returnValue(
+      throwError(() => ({ status: 500 }))
+    );
+    spyOn(component, 'reloadAfterEdit');
+
+    component.user = { id: 1, name: 'Juan', password: '', gmail: 'a@a.com', direction: 'x', nif: 'y', rols: [], banned: false };
+    component.selectedImageFile = new File(['abc'], 'img.png');
+
+    component.confirmEdit();
+
+    expect(mockRouter.navigate).toHaveBeenCalledWith(['/error']);
+    expect(component.reloadAfterEdit).toHaveBeenCalled();
+  });
+
+  it('should navigate to /error when confirmPasswordChange fails with status >= 500', () => {
+    mockUserService.changePassword = jasmine.createSpy().and.returnValue(
+      throwError(() => ({ status: 500 }))
+    );
+
+    component.user.id = 1;
+    component.passwordForm = {
+      currentPassword: 'old',
+      newPassword: 'newPassword123',
+      confirmPassword: 'newPassword123'
+    };
+
+    component.confirmPasswordChange();
+
+    expect(mockRouter.navigate).toHaveBeenCalledWith(['/error']);
+  });
+
+  it('should do nothing when onAvatarClick is called and not in edit mode', () => {
+    component.isEditMode = false;
+    const clickSpy = spyOn(document, 'getElementById').and.callThrough();
+
+    component.onAvatarClick();
+
+    expect(clickSpy).not.toHaveBeenCalled();
+  });
+
+  it('should cancelEdit restoring null snapshot without crashing', () => {
+    component.editSnapshot = null;
+    component.user.name = 'Changed';
+
+    component.cancelEdit();
+
+    expect(component.isEditMode).toBeFalse();
+  });
 
 });
+

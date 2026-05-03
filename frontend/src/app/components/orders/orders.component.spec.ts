@@ -227,4 +227,20 @@ describe('OrdersComponent (unit)', () => {
     expect(component.getOrderStatusClass({ processed: false } as any)).toBe('status-pending');
   });
 
+  it('should navigate to /auth/login when getCurrentUser fails on ngOnInit', () => {
+    mockUserService.getCurrentUser.and.returnValue(throwError(() => ({ status: 401 })));
+    mockRouter.navigate.calls.reset();
+    mockOrderService.getAllOrders.calls.reset();
+
+    component.ngOnInit();
+
+    expect(mockRouter.navigate).toHaveBeenCalledWith(['/auth/login']);
+    expect(mockOrderService.getAllOrders).not.toHaveBeenCalled();
+  });
+
+  it('should return false from isAdmin when currentUser is null', () => {
+    component.currentUser = null;
+    expect(component.isAdmin()).toBeFalse();
+  });
+
 });

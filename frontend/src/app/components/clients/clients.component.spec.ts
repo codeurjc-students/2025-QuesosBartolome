@@ -210,4 +210,62 @@ describe('ClientsComponent (unit)', () => {
 
     expect(mockRouter.navigate).not.toHaveBeenCalled();
   });
+
+  it('should navigate to /auth/login when loadUsers fails with 401', () => {
+    mockUserService.getAllUsers.and.returnValue(throwError(() => ({ status: 401 })));
+
+    component.loadUsers();
+
+    expect(mockRouter.navigate).toHaveBeenCalledWith(['/auth/login']);
+  });
+
+  it('should navigate to /error when loadUsers fails with 403', () => {
+    mockUserService.getAllUsers.and.returnValue(throwError(() => ({ status: 403 })));
+
+    component.loadUsers();
+
+    expect(mockRouter.navigate).toHaveBeenCalledWith(['/error']);
+  });
+
+  it('should navigate to /error when loadUsers fails with 500', () => {
+    mockUserService.getAllUsers.and.returnValue(throwError(() => ({ status: 500 })));
+
+    component.loadUsers();
+
+    expect(mockRouter.navigate).toHaveBeenCalledWith(['/error']);
+  });
+
+  it('should set imageUrl from blob when blob is non-empty', () => {
+    const user = component.users[0];
+    const nonEmptyBlob = new Blob(['data'], { type: 'image/jpeg' });
+    mockUserService.getUserImage.and.returnValue(of(nonEmptyBlob));
+
+    component.loadUserImage(user);
+
+    expect(component.imageUrls[user.id]).toMatch(/^blob:/);
+  });
+
+  it('should set default avatar when image load fails', () => {
+    const user = component.users[0];
+    delete component.imageUrls[user.id];
+    mockUserService.getUserImage.and.returnValue(throwError(() => new Error('fail')));
+
+    component.loadUserImage(user);
+
+    expect(component.imageUrls[user.id]).toBe('assets/avatar-default.jpg');
+  });
+
+  it('should return default avatar when imageUrl is not loaded yet', () => {
+    expect(component.getUserImageUrl(9999)).toBe('assets/avatar-default.jpg');
+  });
+
+  it('should show alert but not navigate when ban error has status < 500', () => {
+    mockUserService.toggleUserBan.and.returnValue(throwError(() => ({ status: 404 })));
+
+    const button = fixture.debugElement.queryAll(By.css('.btn-ban'))[0];
+    button.triggerEventHandler('click', new Event('click'));
+
+    expect(mockDialogService.alert).toHaveBeenCalledWith('No se pudo actualizar el estado de baneo del usuario.');
+    expect(mockRouter.navigate).not.toHaveBeenCalled();
+  });
 });

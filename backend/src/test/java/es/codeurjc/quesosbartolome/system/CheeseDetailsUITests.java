@@ -14,7 +14,6 @@ import org.openqa.selenium.TimeoutException;
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.*;
 
 import org.springframework.boot.test.context.SpringBootTest;

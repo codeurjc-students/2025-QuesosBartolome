@@ -130,4 +130,47 @@ describe('RegisterComponent (unit)', () => {
     expect(mockLoginService.register).not.toHaveBeenCalled();
   });
 
+  it('should navigate to /error when ngOnInit getCurrentUser fails with status >= 500', () => {
+    mockUserService.getCurrentUser.and.returnValue(throwError(() => ({ status: 500 })));
+    mockRouter.navigate.calls.reset();
+
+    component.ngOnInit();
+
+    expect(mockRouter.navigate).toHaveBeenCalledWith(['/error']);
+  });
+
+  it('should navigate to /error when register fails with status >= 500', () => {
+    component.nombre = 'Juan';
+    component.password = 'password123';
+    component.confirmPassword = 'password123';
+    component.email = 'juan@example.com';
+    component.direccion = 'Calle Falsa 123';
+    component.nif = '12345678A';
+
+    mockLoginService.register.and.returnValue(
+      throwError(() => ({ status: 500, error: { error: 'Server error' } }))
+    );
+
+    component.register();
+
+    expect(mockRouter.navigate).toHaveBeenCalledWith(['/error']);
+  });
+
+  it('should show fallback error message when register error has no error.error', () => {
+    component.nombre = 'Juan';
+    component.password = 'password123';
+    component.confirmPassword = 'password123';
+    component.email = 'juan@example.com';
+    component.direccion = 'Calle Falsa 123';
+    component.nif = '12345678A';
+
+    mockLoginService.register.and.returnValue(
+      throwError(() => ({ status: 400, error: {} }))
+    );
+
+    component.register();
+
+    expect(mockDialogService.alert).toHaveBeenCalledWith('Error desconocido');
+  });
+
 });
