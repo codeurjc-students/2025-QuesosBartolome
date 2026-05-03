@@ -8,7 +8,7 @@ on:
 
 jobs:
   backend:
-    name: Backend - Build, Test & Run
+    name: Backend - Build & Unit Tests
     runs-on: ubuntu-latest
 
     steps:
@@ -21,22 +21,24 @@ jobs:
           distribution: temurin
           java-version: '21'
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
+      - name: Cache Maven packages
+        uses: actions/cache@v4
         with:
-          node-version: '22'
+          path: ~/.m2
+          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-m2
 
       - name: Build backend
-        working-directory: ./backend/
-        run: mvn clean install -DskipTests
+        working-directory: ./backend
+        run: mvn clean install -DskipTests -B
 
       - name: Run unit tests
         working-directory: ./backend
-        run: mvn -B clean test -Dtest=**/unit/**/*Test.java
+        run: mvn -B test -Dtest=**/unit/**/*Test.java
 
 
   frontend:
-    name: Frontend - Build & Test 
+    name: Frontend - Build & Test
     runs-on: ubuntu-latest
 
     steps:
@@ -47,24 +49,18 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '22'
-
-      - name: Clean npm cache
-        run: npm cache clean --force
-
-      - name: Remove old dependencies
-        working-directory: ./frontend
-        run: |
-          rm -rf node_modules package-lock.json
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
 
       - name: Install dependencies
         working-directory: ./frontend
-        run: npm install
+        run: npm ci
 
       - name: Build frontend
         working-directory: ./frontend
         run: npm run build
 
-      - name: Run frontend tests 
+      - name: Run frontend tests
         working-directory: ./frontend
         env:
           CI: true

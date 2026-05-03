@@ -60,6 +60,8 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
 
       - name: Set up Chrome for headless tests
         uses: browser-actions/setup-chrome@v1
@@ -84,17 +86,9 @@ jobs:
           done
 
       # --- FRONTEND BUILD ---
-      - name: Clean npm cache
+      - name: Install dependencies (clean & deterministic)
         working-directory: ./frontend
-        run: npm cache clean --force
-
-      - name: Remove old dependencies
-        working-directory: ./frontend
-        run: rm -rf node_modules package-lock.json
-
-      - name: Install dependencies fresh
-        working-directory: ./frontend
-        run: npm install
+        run: npm ci
 
       - name: Build frontend
         working-directory: ./frontend
@@ -107,7 +101,7 @@ jobs:
           sleep 8
 
       # --- FRONTEND TESTS ---
-      - name: Run all frontend tests (headless)
+      - name: Run frontend tests (headless)
         working-directory: ./frontend
         env:
           CI: true
@@ -115,15 +109,17 @@ jobs:
           npm run test -- --karma-config=karma.conf.js --browsers=ChromeHeadlessNoSandbox --no-watch --source-map=false
 
       # --- BACKEND TESTS ---
-      - name: Run all backend tests
+      - name: Run backend tests
         working-directory: ./backend
         run: mvn test -B
 
-      # --- SONARQUBE ---
+      # --- SONAR ---
       - name: Build and analyze
         working-directory: ./backend
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar
-                 -Dsonar.projectKey=codeurjc-students_2025-QuesosBartolome
-                 -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml
+        run: |
+          mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
+            -Dsonar.projectKey=codeurjc-students_2025-QuesosBartolome \
+            -Dsonar.organization=codeurjc-students \
+            -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml
