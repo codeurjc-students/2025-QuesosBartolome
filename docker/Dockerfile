@@ -3,8 +3,7 @@ FROM node:22 AS frontend-build
 WORKDIR /app
 
 # copiamos solo archivos necesarios para instalar dependencias
-COPY frontend/package.json ./
-COPY frontend/package-lock.json ./
+COPY frontend/package*.json ./
 COPY frontend/angular.json ./
 COPY frontend/tsconfig*.json ./
 COPY frontend/src ./src
