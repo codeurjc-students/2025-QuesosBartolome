@@ -32,7 +32,7 @@ export class CheeseListComponent implements OnInit {
   
   // Paginación (local, client-side)
   currentPage: number = 1; // 1-based for the UI
-  itemsPerPage: number = 10;
+  itemsPerPage: number = 5;
   totalPages: number = 1;
 
   isLoggedIn: boolean = false;

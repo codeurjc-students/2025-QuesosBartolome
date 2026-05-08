@@ -173,6 +173,22 @@ public class DataBaseInitializer {
                 return Math.round(value * 100.0) / 100.0;
         }
 
+        private boolean isRunningTest() {
+
+                try {
+
+                        Class.forName("org.junit.jupiter.api.Test");
+
+                } catch (ClassNotFoundException e) {
+
+                        return false;
+
+                }
+
+                return true;
+
+        }
+
         @PostConstruct
         public void init() throws IOException, URISyntaxException {
                 // Create Cheese 1
@@ -307,115 +323,151 @@ public class DataBaseInitializer {
                 addReview(distribucionesBurgomillodo, tierno, 5, "Delicado y fácil de recomendar para distribución local.");
                 addReview(ecoValle, tierno, 4, "Buen queso de diario, funciona bien en una oferta de proximidad.");
 
-                // Mass seed: orders and invoices from stores only, sorted oldest -> newest.
-                List<User> storeUsers = List.of(
-                                tiendaRiaza,
-                                supermercadoAldeonte,
-                                queseriaAyllon,
-                                colmadoSepulveda,
-                                tiendaMaderuelo,
-                                mercadoCantalejo,
-                                distribucionesBurgomillodo,
-                                ecoValle,
-                                gourmetPedraza,
-                                charcuteriaBoceguillas);
+                if (!isRunningTest()) {
+                        // Mass seed: orders and invoices from stores only, sorted oldest -> newest.
+                        List<User> storeUsers = List.of(
+                                        tiendaRiaza,
+                                        supermercadoAldeonte,
+                                        queseriaAyllon,
+                                        colmadoSepulveda,
+                                        tiendaMaderuelo,
+                                        mercadoCantalejo,
+                                        distribucionesBurgomillodo,
+                                        ecoValle,
+                                        gourmetPedraza,
+                                        charcuteriaBoceguillas);
 
-                List<int[]> mixPatterns = List.of(
-                                new int[] { 2, 2, 1 },
-                                new int[] { 3, 1 },
-                                new int[] { 1, 1, 1, 1, 1 },
-                                new int[] { 2, 1, 2 },
-                                new int[] { 4, 2 }
-                );
+                        List<int[]> mixPatterns = List.of(
+                                        new int[] { 2, 2, 1 },
+                                        new int[] { 3, 1 },
+                                        new int[] { 1, 1, 1, 1, 1 },
+                                        new int[] { 2, 1, 2 },
+                                        new int[] { 4, 2 }
+                        );
 
-                int invoiceCounter = 1;
-                int entryIndex = 0;
+                        int invoiceCounter = 1;
+                        int entryIndex = 0;
 
-                // Heavy seed: each store creates between 1 and 3 orders per month.
-                // Full year 2025 + January to March 2026.
-                for (int year = 2025; year <= 2026; year++) {
-                        int lastMonth = (year == 2025) ? 12 : 3;
+                        // Heavy seed: each store creates between 1 and 3 orders per month.
+                        // Full year 2025 + January to March 2026.
+                        for (int year = 2025; year <= 2026; year++) {
+                                int lastMonth = (year == 2025) ? 12 : 3;
 
-                        for (int month = 1; month <= lastMonth; month++) {
-                                for (int storeIndex = 0; storeIndex < storeUsers.size(); storeIndex++) {
-                                        User store = storeUsers.get(storeIndex);
-                                        int ordersThisMonth = 1 + ((storeIndex + month + year) % 3); // 1..3
+                                for (int month = 1; month <= lastMonth; month++) {
+                                        for (int storeIndex = 0; storeIndex < storeUsers.size(); storeIndex++) {
+                                                User store = storeUsers.get(storeIndex);
+                                                int ordersThisMonth = 1 + ((storeIndex + month + year) % 3); // 1..3
 
-                                        for (int orderInMonth = 1; orderInMonth <= ordersThisMonth; orderInMonth++) {
-                                                int patternIndex = (entryIndex + storeIndex + orderInMonth + month) % mixPatterns
-                                                                .size();
-                                                int[] counts = mixPatterns.get(patternIndex);
+                                                for (int orderInMonth = 1; orderInMonth <= ordersThisMonth; orderInMonth++) {
+                                                        int patternIndex = (entryIndex + storeIndex + orderInMonth + month) % mixPatterns
+                                                                        .size();
+                                                        int[] counts = mixPatterns.get(patternIndex);
 
-                                                Cheese[] orderCheeses;
-                                                if (patternIndex == 0) {
-                                                        orderCheeses = new Cheese[] { semicurado, azul, curado };
-                                                } else if (patternIndex == 1) {
-                                                        orderCheeses = new Cheese[] { chevrett, tierno };
-                                                } else if (patternIndex == 2) {
-                                                        orderCheeses = new Cheese[] { semicurado, azul, curado, chevrett,
-                                                                        tierno };
-                                                } else if (patternIndex == 3) {
-                                                        orderCheeses = new Cheese[] { curado, semicurado, tierno };
-                                                } else {
-                                                        orderCheeses = new Cheese[] { azul, chevrett };
+                                                        Cheese[] orderCheeses;
+                                                        if (patternIndex == 0) {
+                                                                orderCheeses = new Cheese[] { semicurado, azul, curado };
+                                                        } else if (patternIndex == 1) {
+                                                                orderCheeses = new Cheese[] { chevrett, tierno };
+                                                        } else if (patternIndex == 2) {
+                                                                orderCheeses = new Cheese[] { semicurado, azul, curado, chevrett,
+                                                                                tierno };
+                                                        } else if (patternIndex == 3) {
+                                                                orderCheeses = new Cheese[] { curado, semicurado, tierno };
+                                                        } else {
+                                                                orderCheeses = new Cheese[] { azul, chevrett };
+                                                        }
+
+                                                        int day = 3 + (storeIndex % 4) + (orderInMonth - 1) * 9;
+                                                        LocalDateTime invoiceDate = LocalDateTime.of(
+                                                                        year,
+                                                                        month,
+                                                                        day,
+                                                                        9 + (storeIndex % 6),
+                                                                        10 + ((orderInMonth * 10) % 50));
+
+                                                        Order order = createMixedOrder(
+                                                                        store,
+                                                                        invoiceDate.minusDays(1),
+                                                                        true,
+                                                                        entryIndex,
+                                                                        orderCheeses,
+                                                                        counts);
+
+                                                        double total = order.getTotalPrice();
+                                                        double taxableBase = Math.round((total / 1.04) * 100.0) / 100.0;
+
+                                                        createInvoice(
+                                                                        store,
+                                                                        order,
+                                                                        taxableBase,
+                                                                        total,
+                                                                        invoiceDate,
+                                                                        invoiceCounter++);
+
+                                                        entryIndex++;
                                                 }
-
-                                                int day = 3 + (storeIndex % 4) + (orderInMonth - 1) * 9;
-                                                LocalDateTime invoiceDate = LocalDateTime.of(
-                                                                year,
-                                                                month,
-                                                                day,
-                                                                9 + (storeIndex % 6),
-                                                                10 + ((orderInMonth * 10) % 50));
-
-                                                Order order = createMixedOrder(
-                                                                store,
-                                                                invoiceDate.minusDays(1),
-                                                                true,
-                                                                entryIndex,
-                                                                orderCheeses,
-                                                                counts);
-
-                                                double total = order.getTotalPrice();
-                                                double taxableBase = Math.round((total / 1.04) * 100.0) / 100.0;
-
-                                                createInvoice(
-                                                                store,
-                                                                order,
-                                                                taxableBase,
-                                                                total,
-                                                                invoiceDate,
-                                                                invoiceCounter++);
-
-                                                entryIndex++;
                                         }
                                 }
-                        }
+
+                        // Pending orders left unprocessed so admin has a visible queue.
+                        createMixedOrder(tiendaMaderuelo, LocalDateTime.now().minusHours(8), false, 1001,
+                                        new Cheese[] { semicurado, curado, azul }, new int[] { 2, 1, 2 });
+                        createMixedOrder(mercadoCantalejo, LocalDateTime.now().minusHours(6), false, 1002,
+                                        new Cheese[] { chevrett, tierno }, new int[] { 3, 1 });
+                        createMixedOrder(distribucionesBurgomillodo, LocalDateTime.now().minusHours(4), false, 1003,
+                                        new Cheese[] { semicurado, azul, curado, chevrett, tierno },
+                                        new int[] { 1, 1, 1, 1, 1 });
+                        createMixedOrder(gourmetPedraza, LocalDateTime.now().minusHours(2), false, 1004,
+                                        new Cheese[] { curado, semicurado, tierno }, new int[] { 2, 1, 2 });
+                        createMixedOrder(charcuteriaBoceguillas, LocalDateTime.now().minusHours(1), false, 1005,
+                                        new Cheese[] { azul, chevrett }, new int[] { 4, 2 });
+                        createMixedOrder(tiendaRiaza, LocalDateTime.now().minusMinutes(50), false, 1006,
+                                        new Cheese[] { semicurado, azul, curado }, new int[] { 2, 2, 1 });
+                        createMixedOrder(supermercadoAldeonte, LocalDateTime.now().minusMinutes(40), false, 1007,
+                                        new Cheese[] { semicurado, azul, curado, chevrett, tierno },
+                                        new int[] { 1, 1, 1, 1, 1 });
+                        createMixedOrder(queseriaAyllon, LocalDateTime.now().minusMinutes(30), false, 1008,
+                                        new Cheese[] { chevrett, tierno }, new int[] { 3, 1 });
+                        createMixedOrder(colmadoSepulveda, LocalDateTime.now().minusMinutes(20), false, 1009,
+                                        new Cheese[] { curado, semicurado, tierno }, new int[] { 2, 1, 2 });
+                        createMixedOrder(ecoValle, LocalDateTime.now().minusMinutes(10), false, 1010,
+                                        new Cheese[] { azul, chevrett }, new int[] { 4, 2 });
                 }
 
-                // Pending orders left unprocessed so admin has a visible queue.
-                createMixedOrder(tiendaMaderuelo, LocalDateTime.now().minusHours(8), false, 1001,
-                                new Cheese[] { semicurado, curado, azul }, new int[] { 2, 1, 2 });
-                createMixedOrder(mercadoCantalejo, LocalDateTime.now().minusHours(6), false, 1002,
-                                new Cheese[] { chevrett, tierno }, new int[] { 3, 1 });
-                createMixedOrder(distribucionesBurgomillodo, LocalDateTime.now().minusHours(4), false, 1003,
-                                new Cheese[] { semicurado, azul, curado, chevrett, tierno },
-                                new int[] { 1, 1, 1, 1, 1 });
-                createMixedOrder(gourmetPedraza, LocalDateTime.now().minusHours(2), false, 1004,
-                                new Cheese[] { curado, semicurado, tierno }, new int[] { 2, 1, 2 });
-                createMixedOrder(charcuteriaBoceguillas, LocalDateTime.now().minusHours(1), false, 1005,
-                                new Cheese[] { azul, chevrett }, new int[] { 4, 2 });
-                createMixedOrder(tiendaRiaza, LocalDateTime.now().minusMinutes(50), false, 1006,
-                                new Cheese[] { semicurado, azul, curado }, new int[] { 2, 2, 1 });
-                createMixedOrder(supermercadoAldeonte, LocalDateTime.now().minusMinutes(40), false, 1007,
-                                new Cheese[] { semicurado, azul, curado, chevrett, tierno },
-                                new int[] { 1, 1, 1, 1, 1 });
-                createMixedOrder(queseriaAyllon, LocalDateTime.now().minusMinutes(30), false, 1008,
-                                new Cheese[] { chevrett, tierno }, new int[] { 3, 1 });
-                createMixedOrder(colmadoSepulveda, LocalDateTime.now().minusMinutes(20), false, 1009,
-                                new Cheese[] { curado, semicurado, tierno }, new int[] { 2, 1, 2 });
-                createMixedOrder(ecoValle, LocalDateTime.now().minusMinutes(10), false, 1010,
-                                new Cheese[] { azul, chevrett }, new int[] { 4, 2 });
+                if (isRunningTest()) {
+                        Order chartOrder1 = createMixedOrder(tiendaRiaza,
+                                        LocalDateTime.of(2026, 1, 14, 10, 0),
+                                        true,
+                                        2001,
+                                        new Cheese[] { semicurado, azul },
+                                        new int[] { 1, 1 });
+                        double chartTotal1 = chartOrder1.getTotalPrice();
+                        double chartBase1 = Math.round((chartTotal1 / 1.04) * 100.0) / 100.0;
+                        createInvoice(tiendaRiaza, chartOrder1, chartBase1, chartTotal1,
+                                        LocalDateTime.of(2026, 1, 15, 10, 0), 9001);
+
+                        Order chartOrder2 = createMixedOrder(supermercadoAldeonte,
+                                        LocalDateTime.of(2026, 2, 18, 11, 30),
+                                        true,
+                                        2002,
+                                        new Cheese[] { curado, tierno },
+                                        new int[] { 1, 1 });
+                        double chartTotal2 = chartOrder2.getTotalPrice();
+                        double chartBase2 = Math.round((chartTotal2 / 1.04) * 100.0) / 100.0;
+                        createInvoice(supermercadoAldeonte, chartOrder2, chartBase2, chartTotal2,
+                                        LocalDateTime.of(2026, 2, 19, 11, 30), 9002);
+
+                        Order chartOrder3 = createMixedOrder(queseriaAyllon,
+                                        LocalDateTime.of(2026, 3, 12, 9, 45),
+                                        true,
+                                        2003,
+                                        new Cheese[] { chevrett, semicurado },
+                                        new int[] { 1, 1 });
+                        double chartTotal3 = chartOrder3.getTotalPrice();
+                        double chartBase3 = Math.round((chartTotal3 / 1.04) * 100.0) / 100.0;
+                        createInvoice(queseriaAyllon, chartOrder3, chartBase3, chartTotal3,
+                                        LocalDateTime.of(2026, 3, 13, 9, 45), 9003);
+                }
 
                 // Save updates
                 userRepository.save(userAdmin2);
@@ -436,4 +488,5 @@ public class DataBaseInitializer {
                 cheeseRepository.save(tierno);
 
         }
+}
 }

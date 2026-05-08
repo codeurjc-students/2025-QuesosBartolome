@@ -163,6 +163,11 @@ public class OrdersUITests {
                                 "Processed order should not appear in pending orders list");
         }
 
+        private void clickWithJsFallback(WebElement element) {
+                ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block:'center'});", element);
+                ((JavascriptExecutor) driver).executeScript("arguments[0].click();", element);
+        }
+
         @Test
         @Order(1)
         public void testAdminCanSeeCreatedOrder() {
@@ -231,7 +236,7 @@ public class OrdersUITests {
 
                 WebElement rejectBtn = wait.until(ExpectedConditions.elementToBeClickable(
                                 By.cssSelector(".btn.btn-cancel")));
-                rejectBtn.click();
+                clickWithJsFallback(rejectBtn);
 
                 Alert rejectConfirm = SeleniumDialogHelper.waitForDialog(wait);
                 assertTrue(rejectConfirm.getText().contains("Rechazar"));

@@ -22,7 +22,7 @@ describe('CheeseListComponent (unit)', () => {
     content,
     totalPages: 1,
     totalElements: content.length,
-    size: 10,
+    size: 5,
     number: 0,
     first: true,
     last: true,
@@ -216,20 +216,20 @@ describe('CheeseListComponent (unit)', () => {
       if (page === 0) {
         return of({
           content: [{ id: 1, name: 'A', price: 1, description: '', type: '', manufactureDate: '', expirationDate: '', boxes: [] }],
-          last: false, totalPages: 2, totalElements: 2, size: 10, number: 0, first: true, numberOfElements: 1
+          last: false, totalPages: 2, totalElements: 2, size: 5, number: 0, first: true, numberOfElements: 1
         } as any);
       }
       return of({
         content: [{ id: 2, name: 'B', price: 2, description: '', type: '', manufactureDate: '', expirationDate: '', boxes: [] }],
-        last: true, totalPages: 2, totalElements: 2, size: 10, number: 1, first: false, numberOfElements: 1
+        last: true, totalPages: 2, totalElements: 2, size: 5, number: 1, first: false, numberOfElements: 1
       } as any);
     });
 
     component.loadAllPages(0);
 
     expect(component.allCheeses.length).toBe(2);
-    expect(mockCheeseService.getAllCheeses).toHaveBeenCalledWith(0, 10);
-    expect(mockCheeseService.getAllCheeses).toHaveBeenCalledWith(1, 10);
+    expect(mockCheeseService.getAllCheeses).toHaveBeenCalledWith(0, 5);
+    expect(mockCheeseService.getAllCheeses).toHaveBeenCalledWith(1, 5);
   });
 
   it('should navigate to /error when loadAllPages fails with status >= 500', () => {
