@@ -375,6 +375,12 @@ public class DataBaseInitializer {
                                                 int ordersThisMonth = 1 + ((storeIndex + month + year) % 3); // 1..3
 
                                                 for (int orderInMonth = 1; orderInMonth <= ordersThisMonth; orderInMonth++) {
+                                                        // Keep the same generation criteria but persist only half of
+                                                        // the candidate orders/invoices to reduce seed volume.
+                                                        if (((storeIndex + orderInMonth + month + year) % 2) != 0) {
+                                                                continue;
+                                                        }
+
                                                         int patternIndex = (entryIndex
                                                                         + storeIndex + orderInMonth + month)
                                                                         % mixPatterns
@@ -431,6 +437,7 @@ public class DataBaseInitializer {
                                 }
 
                                 // Pending orders left unprocessed so admin has a visible queue.
+                                // Keep the same style but reduce volume to roughly half.
                                 createMixedOrder(tiendaMaderuelo, LocalDateTime.now().minusHours(8), false, 1001,
                                                 new Cheese[] { semicurado, curado, azul }, new int[] { 2, 1, 2 });
                                 createMixedOrder(mercadoCantalejo, LocalDateTime.now().minusHours(6), false, 1002,
@@ -442,18 +449,6 @@ public class DataBaseInitializer {
                                 createMixedOrder(gourmetPedraza, LocalDateTime.now().minusHours(2), false, 1004,
                                                 new Cheese[] { curado, semicurado, tierno }, new int[] { 2, 1, 2 });
                                 createMixedOrder(charcuteriaBoceguillas, LocalDateTime.now().minusHours(1), false, 1005,
-                                                new Cheese[] { azul, chevrett }, new int[] { 4, 2 });
-                                createMixedOrder(tiendaRiaza, LocalDateTime.now().minusMinutes(50), false, 1006,
-                                                new Cheese[] { semicurado, azul, curado }, new int[] { 2, 2, 1 });
-                                createMixedOrder(supermercadoAldeonte, LocalDateTime.now().minusMinutes(40), false,
-                                                1007,
-                                                new Cheese[] { semicurado, azul, curado, chevrett, tierno },
-                                                new int[] { 1, 1, 1, 1, 1 });
-                                createMixedOrder(queseriaAyllon, LocalDateTime.now().minusMinutes(30), false, 1008,
-                                                new Cheese[] { chevrett, tierno }, new int[] { 3, 1 });
-                                createMixedOrder(colmadoSepulveda, LocalDateTime.now().minusMinutes(20), false, 1009,
-                                                new Cheese[] { curado, semicurado, tierno }, new int[] { 2, 1, 2 });
-                                createMixedOrder(ecoValle, LocalDateTime.now().minusMinutes(10), false, 1010,
                                                 new Cheese[] { azul, chevrett }, new int[] { 4, 2 });
                         }
 
