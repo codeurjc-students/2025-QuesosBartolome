@@ -10,18 +10,10 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_DATABASE: ${MYSQL_DATABASE}
-      MYSQL_USER: ${MYSQL_USER}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
     volumes:
       - db_data:/var/lib/mysql
     networks:
       - quesos-network
-    healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD}"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 30s
 
   app:
     image: victorbartolome/quesosbartolome:latest
@@ -30,30 +22,29 @@ services:
     env_file:
       - .env
     depends_on:
-      db:
-        condition: service_healthy
-    environment:
-      DB_HOST: ${DB_HOST}
-      DB_PORT: ${DB_PORT}
-      DB_NAME: ${DB_NAME}
-      DB_USER: ${DB_USER}
-      DB_PASSWORD: ${DB_PASSWORD}
-      SERVER_PORT: ${SERVER_PORT}
-      SERVER_SSL_KEY_STORE_PASSWORD: ${SERVER_SSL_KEY_STORE_PASSWORD}
-    ports:
-      - "${SERVER_PORT}:443"
+      - db
+    expose:
+      - "443"
     networks:
       - quesos-network
-    healthcheck:
-      test: ["CMD", "curl", "-k", "-f", "https://localhost:443/actuator/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 90s
+
+  nginx:
+    image: nginx:latest
+    container_name: nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+      - /home/vmuser/certs:/etc/nginx/certs
+    depends_on:
+      - app
+    networks:
+      - quesos-network
 
 volumes:
   db_data:
-    driver: local
 
 networks:
   quesos-network:
