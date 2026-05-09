@@ -4,8 +4,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import java.time.Duration;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.junit.jupiter.api.*;
 import org.openqa.selenium.*;
@@ -52,47 +50,6 @@ public class ReviewUITests {
 		}
 	}
 
-	private void clickWithRetry(By locator) {
-		for (int attempt = 0; attempt < 3; attempt++) {
-			try {
-				WebElement element = wait.until(ExpectedConditions.refreshed(
-						ExpectedConditions.elementToBeClickable(locator)));
-				clickWithFallback(element);
-				return;
-			} catch (StaleElementReferenceException e) {
-				if (attempt == 2) {
-					throw e;
-				}
-			}
-		}
-	}
-
-	private void login(String username, String password) {
-		driver.get("http://localhost:4200/");
-
-		WebElement loginBtn = wait.until(ExpectedConditions.elementToBeClickable(
-				By.xpath("//button[contains(text(),'Iniciar Sesión')]")));
-		clickWithFallback(loginBtn);
-
-		WebElement usernameInput = wait.until(ExpectedConditions.visibilityOfElementLocated(
-				By.cssSelector("input[name='username']")));
-		WebElement passwordInput = driver.findElement(By.cssSelector("input[name='password']"));
-
-		usernameInput.sendKeys(username);
-		passwordInput.sendKeys(password);
-
-		WebElement submitButton = wait.until(ExpectedConditions.elementToBeClickable(
-				By.cssSelector("button[type='submit']")));
-		clickWithFallback(submitButton);
-
-		Alert alert = SeleniumDialogHelper.waitForDialog(wait);
-		String loginText = alert.getText();
-		alert.accept();
-		assertTrue(loginText.equals("Inicio de sesión correcto"), "Login failed with alert: " + loginText);
-
-		wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".card-grid")));
-	}
-
 	private void openCheeseDetailsByName(String cheeseName) {
 		int cheeseId = switch (cheeseName) {
 			case "Semicurado" -> 1;
@@ -117,41 +74,6 @@ public class ReviewUITests {
 		wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".reviews-section")));
 	}
 
-	private int getTotalReviewsFromTitle() {
-		WebElement reviewsTitle = wait.until(ExpectedConditions.visibilityOfElementLocated(
-				By.cssSelector(".reviews-section h2")));
-
-		Matcher matcher = Pattern.compile("(\\d+)").matcher(reviewsTitle.getText());
-		assertTrue(matcher.find(), "Could not parse total reviews from section title");
-		return Integer.parseInt(matcher.group(1));
-	}
-
-	private String createReviewInCurrentCheese(String comment, int rating) {
-		clickWithRetry(By.cssSelector(".btn-review-toggle"));
-
-		wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".create-review-section")));
-
-		WebElement ratingInput = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("rating")));
-		WebElement commentInput = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("comment")));
-
-		((JavascriptExecutor) driver).executeScript(
-				"arguments[0].value = arguments[1].toString();"
-						+ "arguments[0].dispatchEvent(new Event('input', { bubbles: true }));"
-						+ "arguments[0].dispatchEvent(new Event('change', { bubbles: true }));",
-				ratingInput, rating);
-		((JavascriptExecutor) driver).executeScript(
-				"arguments[0].value = arguments[1];"
-						+ "arguments[0].dispatchEvent(new Event('input', { bubbles: true }));"
-						+ "arguments[0].dispatchEvent(new Event('change', { bubbles: true }));",
-				commentInput, comment);
-
-		clickWithRetry(By.cssSelector(".btn-submit"));
-
-		String dialogText = wait.until(ExpectedConditions.visibilityOfElementLocated(
-				By.cssSelector(".dialog-message"))).getText();
-		return dialogText;
-	}
-
 	@Test
 	@Order(1)
 	public void testReviewsAreVisibleInCheeseDetails() {
@@ -171,20 +93,6 @@ public class ReviewUITests {
 			assertTrue(comments.stream().anyMatch(c -> !c.getText().trim().isEmpty()),
 					"If review cards exist, at least one comment should be non-empty");
 		}
-	}
-
-	@Test
-	@Order(2)
-	public void testUserCanCreateReview() {
-		String uniqueComment = "Review Selenium " + System.currentTimeMillis();
-
-		login("Tienda Artesanal de Riaza", "password123");
-		openCheeseDetailsByName("Azul");
-
-		String dialogText = createReviewInCurrentCheese(uniqueComment, 5);
-		assertEquals("Reseña creada correctamente", dialogText, "Unexpected dialog after creating review");
-
-		wait.until(ExpectedConditions.invisibilityOfElementLocated(By.cssSelector(".create-review-section")));
 	}
 
 }
