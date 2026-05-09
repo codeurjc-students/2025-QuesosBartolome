@@ -156,7 +156,8 @@ public class DataBaseInitializer {
                 return savedOrder;
         }
 
-        private void createInvoice(User user, Order order, double taxableBase, double totalPrice, LocalDateTime invoiceDate,
+        private void createInvoice(User user, Order order, double taxableBase, double totalPrice,
+                        LocalDateTime invoiceDate,
                         int invoiceNumber) {
                 Invoice invoice = new Invoice(user, order);
                 invoice.setTaxableBase(round2(taxableBase));
@@ -262,25 +263,33 @@ public class DataBaseInitializer {
                 userAdmin2.setImage(saveImage("images/default-profile.jpg"));
 
                 // Create additional customers so the application opens with realistic activity.
-                User tiendaRiaza = createUser("Tienda Artesanal de Riaza", "riaza@ejemplo.com", "Plaza Mayor, Riaza", "70000001A");
+                User tiendaRiaza = createUser("Tienda Artesanal de Riaza", "riaza@ejemplo.com", "Plaza Mayor, Riaza",
+                                "70000001A");
                 tiendaRiaza.setImage(saveImage("images/image-tienda1.avif"));
-                User supermercadoAldeonte = createUser("Supermercado Aldeonte", "aldeonte@ejemplo.com", "Calle Real, Aldeonte", "70000002B");
+                User supermercadoAldeonte = createUser("Supermercado Aldeonte", "aldeonte@ejemplo.com",
+                                "Calle Real, Aldeonte", "70000002B");
                 supermercadoAldeonte.setImage(saveImage("images/image-tienda2.webp"));
                 User queseriaAyllon = createUser("Queseria Ayllon", "ayllon@ejemplo.com", "Ayllon", "70000003C");
                 queseriaAyllon.setImage(saveImage("images/image-tienda3.webp"));
-                User colmadoSepulveda = createUser("Colmado Sepulveda", "sepulveda@ejemplo.com", "Sepulveda", "70000004D");
+                User colmadoSepulveda = createUser("Colmado Sepulveda", "sepulveda@ejemplo.com", "Sepulveda",
+                                "70000004D");
                 colmadoSepulveda.setImage(saveImage("images/image-tienda4.png"));
-                User tiendaMaderuelo = createUser("Tienda de Maderuelo", "maderuelo@ejemplo.com", "Maderuelo", "70000005E");
+                User tiendaMaderuelo = createUser("Tienda de Maderuelo", "maderuelo@ejemplo.com", "Maderuelo",
+                                "70000005E");
                 tiendaMaderuelo.setImage(saveImage("images/image-tienda5.jpg"));
-                User mercadoCantalejo = createUser("Mercado de Cantalejo", "cantalejo@ejemplo.com", "Cantalejo", "70000006F");
+                User mercadoCantalejo = createUser("Mercado de Cantalejo", "cantalejo@ejemplo.com", "Cantalejo",
+                                "70000006F");
                 mercadoCantalejo.setImage(saveImage("images/image-tienda6.avif"));
-                User distribucionesBurgomillodo = createUser("Distribuciones Burgomillodo", "burgomillodo@ejemplo.com", "Burgomillodo", "70000007G");
+                User distribucionesBurgomillodo = createUser("Distribuciones Burgomillodo", "burgomillodo@ejemplo.com",
+                                "Burgomillodo", "70000007G");
                 distribucionesBurgomillodo.setImage(saveImage("images/image-tienda7.webp"));
-                User ecoValle = createUser("Eco Valle de Sepulveda", "ecovalle@ejemplo.com", "Valle de Sepulveda", "70000008H");
+                User ecoValle = createUser("Eco Valle de Sepulveda", "ecovalle@ejemplo.com", "Valle de Sepulveda",
+                                "70000008H");
                 ecoValle.setImage(saveImage("images/image-tienda8.jpg"));
                 User gourmetPedraza = createUser("Gourmet Pedraza", "pedraza@ejemplo.com", "Pedraza", "70000009I");
                 gourmetPedraza.setImage(saveImage("images/image-tienda9.jpg"));
-                User charcuteriaBoceguillas = createUser("Charcuteria Boceguillas", "boceguillas@ejemplo.com", "Boceguillas", "70000010J");
+                User charcuteriaBoceguillas = createUser("Charcuteria Boceguillas", "boceguillas@ejemplo.com",
+                                "Boceguillas", "70000010J");
                 charcuteriaBoceguillas.setImage(saveImage("images/image-tienda10.jpg"));
 
                 // Save cheeses to DB
@@ -302,25 +311,33 @@ public class DataBaseInitializer {
                 userRepository.save(gourmetPedraza);
                 userRepository.save(charcuteriaBoceguillas);
 
-
-                addReview(tiendaRiaza, semicurado, 5, "Muy equilibrado, entra perfecto en una cesta gourmet de la sierra.");
-                addReview(supermercadoAldeonte, azul, 4, "Para venta al público funciona muy bien, sabor potente pero comercial.");
-                addReview(queseriaAyllon, curado, 5, "Producto serio y con carácter, ideal para mostrador de quesería tradicional.");
-                addReview(colmadoSepulveda, chevrett, 4, "Muy cremoso y con buena presentación para un colmado de pueblo.");
+                addReview(tiendaRiaza, semicurado, 5,
+                                "Muy equilibrado, entra perfecto en una cesta gourmet de la sierra.");
+                addReview(supermercadoAldeonte, azul, 4,
+                                "Para venta al público funciona muy bien, sabor potente pero comercial.");
+                addReview(queseriaAyllon, curado, 5,
+                                "Producto serio y con carácter, ideal para mostrador de quesería tradicional.");
+                addReview(colmadoSepulveda, chevrett, 4,
+                                "Muy cremoso y con buena presentación para un colmado de pueblo.");
                 addReview(tiendaMaderuelo, tierno, 5, "Perfecto para familias y para tablas suaves de temporada.");
                 addReview(mercadoCantalejo, semicurado, 4, "Se vende muy bien, buen punto entre suavidad y sabor.");
-                addReview(distribucionesBurgomillodo, azul, 5, "Muy buen queso para distribución local y restauración.");
+                addReview(distribucionesBurgomillodo, azul, 5,
+                                "Muy buen queso para distribución local y restauración.");
                 addReview(ecoValle, curado, 4, "Encaja en una oferta de producto local con valor añadido.");
                 addReview(gourmetPedraza, chevrett, 5, "Ideal para tienda gourmet y maridajes con vinos de la zona.");
                 addReview(charcuteriaBoceguillas, tierno, 4, "Muy vendible, buen queso de entrada para mostrador.");
 
-                addReview(tiendaRiaza, azul, 4, "Intenso y con personalidad, muy recomendable para escaparate gourmet.");
-                addReview(supermercadoAldeonte, azul, 5, "Muy buen azul para venta al público y formatos de mostrador.");
-                addReview(queseriaAyllon, curado, 5, "Sabor largo y elegante, encaja muy bien en quesería tradicional.");
+                addReview(tiendaRiaza, azul, 4,
+                                "Intenso y con personalidad, muy recomendable para escaparate gourmet.");
+                addReview(supermercadoAldeonte, azul, 5,
+                                "Muy buen azul para venta al público y formatos de mostrador.");
+                addReview(queseriaAyllon, curado, 5,
+                                "Sabor largo y elegante, encaja muy bien en quesería tradicional.");
                 addReview(colmadoSepulveda, curado, 4, "Se adapta muy bien a raciones y tablas de colmado.");
                 addReview(tiendaMaderuelo, chevrett, 5, "Cremoso y muy vistoso en escaparate, sale mucho en tienda.");
                 addReview(mercadoCantalejo, chevrett, 4, "Gran textura para clientes que buscan algo suave.");
-                addReview(distribucionesBurgomillodo, tierno, 5, "Delicado y fácil de recomendar para distribución local.");
+                addReview(distribucionesBurgomillodo, tierno, 5,
+                                "Delicado y fácil de recomendar para distribución local.");
                 addReview(ecoValle, tierno, 4, "Buen queso de diario, funciona bien en una oferta de proximidad.");
 
                 if (!isRunningTest()) {
@@ -342,8 +359,7 @@ public class DataBaseInitializer {
                                         new int[] { 3, 1 },
                                         new int[] { 1, 1, 1, 1, 1 },
                                         new int[] { 2, 1, 2 },
-                                        new int[] { 4, 2 }
-                        );
+                                        new int[] { 4, 2 });
 
                         int invoiceCounter = 1;
                         int entryIndex = 0;
@@ -359,20 +375,25 @@ public class DataBaseInitializer {
                                                 int ordersThisMonth = 1 + ((storeIndex + month + year) % 3); // 1..3
 
                                                 for (int orderInMonth = 1; orderInMonth <= ordersThisMonth; orderInMonth++) {
-                                                        int patternIndex = (entryIndex + storeIndex + orderInMonth + month) % mixPatterns
-                                                                        .size();
+                                                        int patternIndex = (entryIndex
+                                                                        + storeIndex + orderInMonth + month)
+                                                                        % mixPatterns
+                                                                                        .size();
                                                         int[] counts = mixPatterns.get(patternIndex);
 
                                                         Cheese[] orderCheeses;
                                                         if (patternIndex == 0) {
-                                                                orderCheeses = new Cheese[] { semicurado, azul, curado };
+                                                                orderCheeses = new Cheese[] { semicurado, azul,
+                                                                                curado };
                                                         } else if (patternIndex == 1) {
                                                                 orderCheeses = new Cheese[] { chevrett, tierno };
                                                         } else if (patternIndex == 2) {
-                                                                orderCheeses = new Cheese[] { semicurado, azul, curado, chevrett,
+                                                                orderCheeses = new Cheese[] { semicurado, azul, curado,
+                                                                                chevrett,
                                                                                 tierno };
                                                         } else if (patternIndex == 3) {
-                                                                orderCheeses = new Cheese[] { curado, semicurado, tierno };
+                                                                orderCheeses = new Cheese[] { curado, semicurado,
+                                                                                tierno };
                                                         } else {
                                                                 orderCheeses = new Cheese[] { azul, chevrett };
                                                         }
@@ -409,84 +430,86 @@ public class DataBaseInitializer {
                                         }
                                 }
 
-                        // Pending orders left unprocessed so admin has a visible queue.
-                        createMixedOrder(tiendaMaderuelo, LocalDateTime.now().minusHours(8), false, 1001,
-                                        new Cheese[] { semicurado, curado, azul }, new int[] { 2, 1, 2 });
-                        createMixedOrder(mercadoCantalejo, LocalDateTime.now().minusHours(6), false, 1002,
-                                        new Cheese[] { chevrett, tierno }, new int[] { 3, 1 });
-                        createMixedOrder(distribucionesBurgomillodo, LocalDateTime.now().minusHours(4), false, 1003,
-                                        new Cheese[] { semicurado, azul, curado, chevrett, tierno },
-                                        new int[] { 1, 1, 1, 1, 1 });
-                        createMixedOrder(gourmetPedraza, LocalDateTime.now().minusHours(2), false, 1004,
-                                        new Cheese[] { curado, semicurado, tierno }, new int[] { 2, 1, 2 });
-                        createMixedOrder(charcuteriaBoceguillas, LocalDateTime.now().minusHours(1), false, 1005,
-                                        new Cheese[] { azul, chevrett }, new int[] { 4, 2 });
-                        createMixedOrder(tiendaRiaza, LocalDateTime.now().minusMinutes(50), false, 1006,
-                                        new Cheese[] { semicurado, azul, curado }, new int[] { 2, 2, 1 });
-                        createMixedOrder(supermercadoAldeonte, LocalDateTime.now().minusMinutes(40), false, 1007,
-                                        new Cheese[] { semicurado, azul, curado, chevrett, tierno },
-                                        new int[] { 1, 1, 1, 1, 1 });
-                        createMixedOrder(queseriaAyllon, LocalDateTime.now().minusMinutes(30), false, 1008,
-                                        new Cheese[] { chevrett, tierno }, new int[] { 3, 1 });
-                        createMixedOrder(colmadoSepulveda, LocalDateTime.now().minusMinutes(20), false, 1009,
-                                        new Cheese[] { curado, semicurado, tierno }, new int[] { 2, 1, 2 });
-                        createMixedOrder(ecoValle, LocalDateTime.now().minusMinutes(10), false, 1010,
-                                        new Cheese[] { azul, chevrett }, new int[] { 4, 2 });
+                                // Pending orders left unprocessed so admin has a visible queue.
+                                createMixedOrder(tiendaMaderuelo, LocalDateTime.now().minusHours(8), false, 1001,
+                                                new Cheese[] { semicurado, curado, azul }, new int[] { 2, 1, 2 });
+                                createMixedOrder(mercadoCantalejo, LocalDateTime.now().minusHours(6), false, 1002,
+                                                new Cheese[] { chevrett, tierno }, new int[] { 3, 1 });
+                                createMixedOrder(distribucionesBurgomillodo, LocalDateTime.now().minusHours(4), false,
+                                                1003,
+                                                new Cheese[] { semicurado, azul, curado, chevrett, tierno },
+                                                new int[] { 1, 1, 1, 1, 1 });
+                                createMixedOrder(gourmetPedraza, LocalDateTime.now().minusHours(2), false, 1004,
+                                                new Cheese[] { curado, semicurado, tierno }, new int[] { 2, 1, 2 });
+                                createMixedOrder(charcuteriaBoceguillas, LocalDateTime.now().minusHours(1), false, 1005,
+                                                new Cheese[] { azul, chevrett }, new int[] { 4, 2 });
+                                createMixedOrder(tiendaRiaza, LocalDateTime.now().minusMinutes(50), false, 1006,
+                                                new Cheese[] { semicurado, azul, curado }, new int[] { 2, 2, 1 });
+                                createMixedOrder(supermercadoAldeonte, LocalDateTime.now().minusMinutes(40), false,
+                                                1007,
+                                                new Cheese[] { semicurado, azul, curado, chevrett, tierno },
+                                                new int[] { 1, 1, 1, 1, 1 });
+                                createMixedOrder(queseriaAyllon, LocalDateTime.now().minusMinutes(30), false, 1008,
+                                                new Cheese[] { chevrett, tierno }, new int[] { 3, 1 });
+                                createMixedOrder(colmadoSepulveda, LocalDateTime.now().minusMinutes(20), false, 1009,
+                                                new Cheese[] { curado, semicurado, tierno }, new int[] { 2, 1, 2 });
+                                createMixedOrder(ecoValle, LocalDateTime.now().minusMinutes(10), false, 1010,
+                                                new Cheese[] { azul, chevrett }, new int[] { 4, 2 });
+                        }
+
+                        if (isRunningTest()) {
+                                Order chartOrder1 = createMixedOrder(tiendaRiaza,
+                                                LocalDateTime.of(2026, 1, 14, 10, 0),
+                                                true,
+                                                2001,
+                                                new Cheese[] { semicurado, azul },
+                                                new int[] { 1, 1 });
+                                double chartTotal1 = chartOrder1.getTotalPrice();
+                                double chartBase1 = Math.round((chartTotal1 / 1.04) * 100.0) / 100.0;
+                                createInvoice(tiendaRiaza, chartOrder1, chartBase1, chartTotal1,
+                                                LocalDateTime.of(2026, 1, 15, 10, 0), 9001);
+
+                                Order chartOrder2 = createMixedOrder(supermercadoAldeonte,
+                                                LocalDateTime.of(2026, 2, 18, 11, 30),
+                                                true,
+                                                2002,
+                                                new Cheese[] { curado, tierno },
+                                                new int[] { 1, 1 });
+                                double chartTotal2 = chartOrder2.getTotalPrice();
+                                double chartBase2 = Math.round((chartTotal2 / 1.04) * 100.0) / 100.0;
+                                createInvoice(supermercadoAldeonte, chartOrder2, chartBase2, chartTotal2,
+                                                LocalDateTime.of(2026, 2, 19, 11, 30), 9002);
+
+                                Order chartOrder3 = createMixedOrder(queseriaAyllon,
+                                                LocalDateTime.of(2026, 3, 12, 9, 45),
+                                                true,
+                                                2003,
+                                                new Cheese[] { chevrett, semicurado },
+                                                new int[] { 1, 1 });
+                                double chartTotal3 = chartOrder3.getTotalPrice();
+                                double chartBase3 = Math.round((chartTotal3 / 1.04) * 100.0) / 100.0;
+                                createInvoice(queseriaAyllon, chartOrder3, chartBase3, chartTotal3,
+                                                LocalDateTime.of(2026, 3, 13, 9, 45), 9003);
+                        }
+
+                        // Save updates
+                        userRepository.save(userAdmin2);
+                        userRepository.save(tiendaRiaza);
+                        userRepository.save(supermercadoAldeonte);
+                        userRepository.save(queseriaAyllon);
+                        userRepository.save(colmadoSepulveda);
+                        userRepository.save(tiendaMaderuelo);
+                        userRepository.save(mercadoCantalejo);
+                        userRepository.save(distribucionesBurgomillodo);
+                        userRepository.save(ecoValle);
+                        userRepository.save(gourmetPedraza);
+                        userRepository.save(charcuteriaBoceguillas);
+                        cheeseRepository.save(semicurado);
+                        cheeseRepository.save(azul);
+                        cheeseRepository.save(curado);
+                        cheeseRepository.save(chevrett);
+                        cheeseRepository.save(tierno);
+
                 }
-
-                if (isRunningTest()) {
-                        Order chartOrder1 = createMixedOrder(tiendaRiaza,
-                                        LocalDateTime.of(2026, 1, 14, 10, 0),
-                                        true,
-                                        2001,
-                                        new Cheese[] { semicurado, azul },
-                                        new int[] { 1, 1 });
-                        double chartTotal1 = chartOrder1.getTotalPrice();
-                        double chartBase1 = Math.round((chartTotal1 / 1.04) * 100.0) / 100.0;
-                        createInvoice(tiendaRiaza, chartOrder1, chartBase1, chartTotal1,
-                                        LocalDateTime.of(2026, 1, 15, 10, 0), 9001);
-
-                        Order chartOrder2 = createMixedOrder(supermercadoAldeonte,
-                                        LocalDateTime.of(2026, 2, 18, 11, 30),
-                                        true,
-                                        2002,
-                                        new Cheese[] { curado, tierno },
-                                        new int[] { 1, 1 });
-                        double chartTotal2 = chartOrder2.getTotalPrice();
-                        double chartBase2 = Math.round((chartTotal2 / 1.04) * 100.0) / 100.0;
-                        createInvoice(supermercadoAldeonte, chartOrder2, chartBase2, chartTotal2,
-                                        LocalDateTime.of(2026, 2, 19, 11, 30), 9002);
-
-                        Order chartOrder3 = createMixedOrder(queseriaAyllon,
-                                        LocalDateTime.of(2026, 3, 12, 9, 45),
-                                        true,
-                                        2003,
-                                        new Cheese[] { chevrett, semicurado },
-                                        new int[] { 1, 1 });
-                        double chartTotal3 = chartOrder3.getTotalPrice();
-                        double chartBase3 = Math.round((chartTotal3 / 1.04) * 100.0) / 100.0;
-                        createInvoice(queseriaAyllon, chartOrder3, chartBase3, chartTotal3,
-                                        LocalDateTime.of(2026, 3, 13, 9, 45), 9003);
-                }
-
-                // Save updates
-                userRepository.save(userAdmin2);
-                userRepository.save(tiendaRiaza);
-                userRepository.save(supermercadoAldeonte);
-                userRepository.save(queseriaAyllon);
-                userRepository.save(colmadoSepulveda);
-                userRepository.save(tiendaMaderuelo);
-                userRepository.save(mercadoCantalejo);
-                userRepository.save(distribucionesBurgomillodo);
-                userRepository.save(ecoValle);
-                userRepository.save(gourmetPedraza);
-                userRepository.save(charcuteriaBoceguillas);
-                cheeseRepository.save(semicurado);
-                cheeseRepository.save(azul);
-                cheeseRepository.save(curado);
-                cheeseRepository.save(chevrett);
-                cheeseRepository.save(tierno);
-
         }
-}
 }
