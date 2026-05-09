@@ -72,39 +72,39 @@ public class CheeseDetailsUITests {
         }
 
         @Test
-        public void testNavigateToSemicuradoDetails() {
+        public void testNavigateToAzulDetails() {
                 driver.get("http://localhost:4200/");
 
                 wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".card-grid")));
                 wait.until(ExpectedConditions.numberOfElementsToBeMoreThan(By.cssSelector(".card"), 0));
 
-                WebElement semicuradoCard = wait.until(ExpectedConditions.visibilityOfElementLocated(
-                                By.xpath("//div[contains(@class,'card')]//p[text()='Semicurado']/ancestor::div[contains(@class,'card')]")));
-                semicuradoCard.click();
+                WebElement azulCard = wait.until(ExpectedConditions.visibilityOfElementLocated(
+                                By.xpath("//div[contains(@class,'card')]//p[text()='Azul']/ancestor::div[contains(@class,'card')]")));
+                azulCard.click();
 
                 wait.until(ExpectedConditions.urlMatches("http://localhost:4200/cheeses/\\d+"));
 
                 WebElement title = wait
                                 .until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".cheese-title")));
-                assertEquals("Semicurado", title.getText(),
+                assertEquals("Azul", title.getText(),
                                 "The cheese details page must display the selected cheese name.");
         }
 
         @Test
-        public void testLoggedUserSeesStockAndControls() {
+        public void testLoggedUserSeesStockAndControlsForAzul() {
                 loginAsUser();
 
                 wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".card-grid")));
 
-                WebElement semicuradoCard = wait.until(ExpectedConditions.visibilityOfElementLocated(
-                                By.xpath("//div[contains(@class,'card')]//p[text()='Semicurado']/ancestor::div[contains(@class,'card')]")));
-                semicuradoCard.click();
+                WebElement azulCard = wait.until(ExpectedConditions.visibilityOfElementLocated(
+                                By.xpath("//div[contains(@class,'card')]//p[text()='Azul']/ancestor::div[contains(@class,'card')]")));
+                azulCard.click();
 
                 wait.until(ExpectedConditions.urlMatches("http://localhost:4200/cheeses/\\d+"));
 
                 WebElement title = wait
                                 .until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".cheese-title")));
-                assertEquals("Semicurado", title.getText(), "Cheese title should be Semicurado.");
+                assertEquals("Azul", title.getText(), "Cheese title should be Azul.");
 
                 WebElement boxesInput = wait
                                 .until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".cajas-input")));
@@ -118,24 +118,24 @@ public class CheeseDetailsUITests {
                                 By.xpath("//span[contains(@class,'stock-info')]")));
                 String stockText = stockLabel.getText().replaceAll("[^0-9]", "");
                 int stock = Integer.parseInt(stockText);
-                assertEquals(24, stock, "Semicurado stock must be 24.");
+                assertEquals(25, stock, "Azul stock must be 25.");
         }
 
         @Test
-        public void testAdminSeesEditButtonAndNoAddControls() {
+        public void testAdminSeesEditButtonAndNoAddControlsForAzul() {
                 loginAsAdmin();
 
                 wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".card-grid")));
 
-                WebElement semicuradoCard = wait.until(ExpectedConditions.visibilityOfElementLocated(
-                                By.xpath("//div[contains(@class,'card')]//p[text()='Semicurado']/ancestor::div[contains(@class,'card')]")));
-                semicuradoCard.click();
+                WebElement azulCard = wait.until(ExpectedConditions.visibilityOfElementLocated(
+                                By.xpath("//div[contains(@class,'card')]//p[text()='Azul']/ancestor::div[contains(@class,'card')]")));
+                azulCard.click();
 
                 wait.until(ExpectedConditions.urlMatches("http://localhost:4200/cheeses/\\d+"));
 
                 WebElement title = wait
                                 .until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".cheese-title")));
-                assertEquals("Semicurado", title.getText(), "Cheese title should be Semicurado.");
+                assertEquals("Azul", title.getText(), "Cheese title should be Azul.");
 
                 WebElement editButton = wait
                                 .until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".edit-btn")));
