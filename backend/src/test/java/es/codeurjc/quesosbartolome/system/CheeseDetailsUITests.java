@@ -206,14 +206,11 @@ public class CheeseDetailsUITests {
                                                         Path dst = Path.of("target", "screenshots", "CheeseDetails_Failure.png");
                                                         Files.createDirectories(dst.getParent());
                                                         Files.copy(img.toPath(), dst);
-                                                        System.out.println("Saved screenshot to: " + dst.toAbsolutePath());
                                                 }
                                                 String page = driver.getPageSource();
                                                 Path html = Path.of("target", "screenshots", "CheeseDetails_Failure.html");
                                                 Files.writeString(html, page);
-                                                System.out.println("Saved page source to: " + html.toAbsolutePath());
                                         } catch (Exception ex) {
-                                                System.out.println("Failed to capture debug artifacts: " + ex.getMessage());
                                         }
                                         throw te;
                                 }

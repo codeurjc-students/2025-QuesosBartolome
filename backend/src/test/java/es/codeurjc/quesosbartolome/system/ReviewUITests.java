@@ -3,7 +3,6 @@ package es.codeurjc.quesosbartolome.system;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.time.Duration;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -53,6 +52,21 @@ public class ReviewUITests {
 		}
 	}
 
+	private void clickWithRetry(By locator) {
+		for (int attempt = 0; attempt < 3; attempt++) {
+			try {
+				WebElement element = wait.until(ExpectedConditions.refreshed(
+						ExpectedConditions.elementToBeClickable(locator)));
+				clickWithFallback(element);
+				return;
+			} catch (StaleElementReferenceException e) {
+				if (attempt == 2) {
+					throw e;
+				}
+			}
+		}
+	}
+
 	private void login(String username, String password) {
 		driver.get("http://localhost:4200/");
 
@@ -73,7 +87,6 @@ public class ReviewUITests {
 
 		Alert alert = SeleniumDialogHelper.waitForDialog(wait);
 		String loginText = alert.getText();
-		System.out.println("[ReviewUITests] Login alert text: " + loginText);
 		alert.accept();
 		assertTrue(loginText.equals("Inicio de sesión correcto"), "Login failed with alert: " + loginText);
 
@@ -113,10 +126,8 @@ public class ReviewUITests {
 		return Integer.parseInt(matcher.group(1));
 	}
 
-	private void createReviewInCurrentCheese(String comment, int rating) {
-		WebElement toggleReviewButton = wait.until(ExpectedConditions.elementToBeClickable(
-				By.cssSelector(".btn-review-toggle")));
-		clickWithFallback(toggleReviewButton);
+	private String createReviewInCurrentCheese(String comment, int rating) {
+		clickWithRetry(By.cssSelector(".btn-review-toggle"));
 
 		wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".create-review-section")));
 
@@ -134,53 +145,11 @@ public class ReviewUITests {
 						+ "arguments[0].dispatchEvent(new Event('change', { bubbles: true }));",
 				commentInput, comment);
 
-		WebElement submitReviewButton = wait.until(ExpectedConditions.elementToBeClickable(
-				By.cssSelector(".btn-submit")));
-		installDialogHooks();
-		clickWithFallback(submitReviewButton);
-		((JavascriptExecutor) driver).executeScript(
-				"arguments[0].dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, view: window }));",
-				submitReviewButton);
+		clickWithRetry(By.cssSelector(".btn-submit"));
 
-		String text = tryReadAnyAlertText(Duration.ofSeconds(4));
-		if (text != null) {
-			System.out.println("[ReviewUITests] Create review alert text: " + text);
-		}
-	}
-
-	private void installDialogHooks() {
-		((JavascriptExecutor) driver).executeScript(
-				"window.__testAlerts = [];"
-						+ "window.__testConfirms = [];"
-						+ "window.alert = function(msg){ window.__testAlerts.push(String(msg)); };"
-						+ "window.confirm = function(msg){ window.__testConfirms.push(String(msg)); return true; };"
-		);
-	}
-
-	private List<String> getCapturedAlerts() {
-		Object value = ((JavascriptExecutor) driver).executeScript("return window.__testAlerts || []; ");
-		List<String> result = new ArrayList<>();
-		if (value instanceof List<?> rawList) {
-			for (Object item : rawList) {
-				result.add(String.valueOf(item));
-			}
-		}
-		return result;
-	}
-
-	private String tryReadAnyAlertText(Duration timeout) {
-		try {
-			Alert dialogAlert = SeleniumDialogHelper.waitForDialog(new WebDriverWait(driver, timeout));
-			String dialogText = dialogAlert.getText();
-			dialogAlert.accept();
-			return dialogText;
-		} catch (TimeoutException ignored) {
-			List<String> alerts = getCapturedAlerts();
-			if (!alerts.isEmpty()) {
-				return alerts.get(0);
-			}
-			return null;
-		}
+		String dialogText = wait.until(ExpectedConditions.visibilityOfElementLocated(
+				By.cssSelector(".dialog-message"))).getText();
+		return dialogText;
 	}
 
 	@Test
@@ -212,11 +181,10 @@ public class ReviewUITests {
 		login("Tienda Artesanal de Riaza", "password123");
 		openCheeseDetailsByName("Azul");
 
-		int previousTotal = getTotalReviewsFromTitle();
+		String dialogText = createReviewInCurrentCheese(uniqueComment, 5);
+		assertEquals("Reseña creada correctamente", dialogText, "Unexpected dialog after creating review");
 
-		createReviewInCurrentCheese(uniqueComment, 5);
-
-		wait.until(d -> getTotalReviewsFromTitle() >= previousTotal + 1);
+		wait.until(ExpectedConditions.invisibilityOfElementLocated(By.cssSelector(".create-review-section")));
 	}
 
 }
