@@ -125,6 +125,13 @@ class DataBaseInitializerUnitTest {
     }
 
     @Test
+    void isRunningTestReturnsTrueWhenJUnitIsAvailable() throws Exception {
+        Boolean runningTest = invokePrivate("isRunningTest", new Class<?>[] {});
+
+        assertThat(runningTest).isTrue();
+    }
+
+    @Test
     void createMixedOrderBuildsItemsTotalsAndPersistsOrder() throws Exception {
         when(orderRepository.save(any(Order.class))).thenAnswer(invocation -> invocation.getArgument(0));
         when(userRepository.save(any(User.class))).thenAnswer(invocation -> invocation.getArgument(0));
@@ -145,7 +152,8 @@ class DataBaseInitializerUnitTest {
         LocalDateTime orderDate = LocalDateTime.of(2026, 2, 10, 10, 30);
 
         Order order = invokePrivate("createMixedOrder",
-                new Class<?>[] { User.class, LocalDateTime.class, boolean.class, int.class, Cheese[].class, int[].class },
+                new Class<?>[] { User.class, LocalDateTime.class, boolean.class, int.class, Cheese[].class,
+                        int[].class },
                 user, orderDate, true, 7, new Cheese[] { semicurado, azul }, new int[] { 2, 1 });
 
         assertThat(order).isNotNull();

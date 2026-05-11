@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.io.IOException;
 import java.security.Principal;
 import java.util.List;
 
@@ -80,8 +81,6 @@ public class InvoiceRestController {
             return ResponseEntity.status(HttpStatus.CREATED).body(created);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.notFound().build();
-        } catch (IllegalStateException e) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).build();
         }
     }
 
@@ -101,7 +100,7 @@ public class InvoiceRestController {
             return new ResponseEntity<>(pdfContent, headers, HttpStatus.OK);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.notFound().build();
-        } catch (Exception e) {
+        } catch (IOException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
