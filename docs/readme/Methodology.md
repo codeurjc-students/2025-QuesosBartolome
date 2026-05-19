@@ -14,19 +14,21 @@ The project will be carried out in phases, each with a defined start and end dat
 - End date: January 12, 2026
 - Development of the application will begin by implementing the basic functionality and its automated tests. The application will also be packaged in Docker. At the end of this phase, the first release (version 0.1) of the application will be delivered.
 #### Phase 4: Version 0.2 - Intermediate functionality.
-- Start date:
-- End date:
+- Start date: January 12, 2026
+- End date: April 1, 2026
 - Development will continue with the implementation of intermediate functionalities, resulting in version 0.2 of the application.
 #### Phase 5: Version 1.0 - Advanced functionality.
-- Start date:
-- End date:
+- Start date: April 1, 2026
+- End date: May 10, 2026
 - The application development will be completed with the implementation of advanced functionalities, resulting in the final release (version 1.0) of the application.
 #### Phase 6: Report.
-- Start date:
-- End date:
+- Start date: May 10, 2026
+- End date: May 31, 2026
 - The final degree project report will be written.
 #### Phase 7: Defense.
-- Start date:
-- End date:
+- Start date: May 31, 2026
+- End date: June 17, 2026
 - The defense of the final degree project will take place.
 #### Gantt Chart
+
+![Gantt Chart](/Images/GanttChart.png)

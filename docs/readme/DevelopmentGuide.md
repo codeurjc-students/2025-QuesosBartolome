@@ -1,4 +1,4 @@
-## Guia de desarrollo
+## Development Guide
 
 - [Introduction](/docs/readme/Introduction.md)
 - [Technical Summary](/docs/readme/Technical_Summary.md)

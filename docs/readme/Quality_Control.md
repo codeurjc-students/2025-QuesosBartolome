@@ -31,7 +31,7 @@ All tests are executed automatically through GitHub Actions workflows, depending
 
 - Service:
   
-![TestBackend](/Images/BackendTests.png)
+![TestBackend](/Images/BackendResults.png)
 - Client:
   
 ![TestFrontend](/Images/FrontendResults.png)

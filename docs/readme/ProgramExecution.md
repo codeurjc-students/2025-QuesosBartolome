@@ -48,26 +48,34 @@ Once the application is running, access it at:
 https://localhost:443
 
 ### Access and Application Information
-The website includes two default users: one USER and one ADMIN.
+This website includes several users and one administrator user. Below are the access credentials for the administrator and two users of the site.
 
 | Type  | Username | Password     |
 |-------|----------|--------------|
-| ADMIN | German   | password123  |
-| USER  | Victor   | password123  |
-
-These names are used because they correspond to the owners of the cheese factory.  
-In future versions, more generic names may be used.
+| ADMIN | Admin   | password123  |
+| USER  | Tienda Artesanal de Riaza   | password123  |
+| USER  | Supermercado Aldeonte   | password123  |
 
 #### Sample Data
 The website includes a set of default data to demonstrate its functionality:
 
 **Users**
 
-- **User:** Victor, with all the fields of a registered user and an empty cart.  
-- **Admin:** German, with all the fields of an administrator.
+- **User:** 10 clients from fictional stores inspired by the cheese production area.
+- **Admin:** Admin, with all the fields of an administrator.
 
 **Cheeses**
 
 - The website includes **5 different types of cheeses**, each with its own attributes.  
-  All of them have boxes available for ordering except **Chevrett**, the fourth cheese.  
-- No reviews or orders have been added initially in this version, as they were not considered necessary to demonstrate the website’s functionality.
+  All of them have boxes available for ordering except **Chevrett**, the fourth cheese.
+- The cheese images correspond to real products from the dairy.
+
+**Reviews**
+
+- Between 2 and 4 reviews per cheese, written by clients, each with its corresponding rating and comment, visible on the detail page of each cheese.
+
+**Orders and invoices**
+
+- A total of 149 randomly generated invoices, with orders created in a realistic context to provide a database from which to extract metrics.
+- Additionally, each invoice has its corresponding processed order, and there are 10 unprocessed orders belonging to different clients.
+
