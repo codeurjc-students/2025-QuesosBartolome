@@ -17,4 +17,4 @@
 | Users | Functionalities |
 |----------|-----------------|
 | Registered users | -Users will be able to view their orders and their status. <br> -Users will be able to view their invoices and download them. |
-| Administrators | -View charts <br> -Send emails to users with invoices <br> -Filter charts by cheeses and customers |
+| Administrators | -View charts <br> -Filter charts by customers |

@@ -42,8 +42,7 @@ export class CheeseListComponent implements OnInit {
     private cheeseService: CheeseService,
     private router: Router,
     private userService: UserService,
-    private loginService: LoginService,
-    private dialogService: DialogService
+    private loginService: LoginService
   ) { }
 
   ngOnInit(): void {

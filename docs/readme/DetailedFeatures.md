@@ -18,11 +18,9 @@ Below we present the features that have already been implemented on the website,
 | Registered users | -Edit their profile <br> -Change their credentials <br> -View, edit, and delete their reviews |
 | Administrators | -Ban users <br> -Process orders <br> -Generate invoices <br> -Edit cheeses in the catalog <br> -Manage stock <br> -Add and remove cheeses |
 
-### FUTURE VERSIONS:
-
 - Advanced Functionality.
 
 | Users | Functionalities |
 |----------|-----------------|
 | Registered users | -Users will be able to view their orders and their status. <br> -Users will be able to view their invoices and download them. |
-| Administrators | -View charts <br> -Send emails to users with invoices <br> -Filter charts by cheeses and customers |
+| Administrators | -View charts <br> -Filter charts by customers |
