@@ -89,7 +89,7 @@ public class CheeseDetailsUITests {
                 assertEquals("Azul", title.getText(),
                                 "The cheese details page must display the selected cheese name.");
         }
-
+ 
         @Test
         public void testAdminSeesEditButtonAndNoAddControlsForAzul() {
                 loginAsAdmin();
