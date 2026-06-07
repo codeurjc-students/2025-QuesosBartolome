@@ -27,8 +27,7 @@ public class ApiLoginTests {
                 RestAssured.useRelaxedHTTPSValidation();
         }
 
-        @Test
-        @Disabled("Temporarily disabled due to CI-only instability")
+        @Test 
         void testRegisterUserSuccessfully() throws JSONException {
                 JSONObject requestBody = new JSONObject();
                 requestBody.put("name", "UserTest1");
