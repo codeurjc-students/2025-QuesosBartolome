@@ -3,6 +3,8 @@ package es.codeurjc.quesosbartolome.system;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.time.Duration;
+import java.util.UUID;
+import java.util.concurrent.ThreadLocalRandom;
 
 import org.junit.jupiter.api.*;
 import org.openqa.selenium.*;
@@ -53,8 +55,8 @@ public class RegisterUITests {
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("direccion")));
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("nif")));
 
-        String unique = "User" + System.currentTimeMillis();
-        String nif = (System.currentTimeMillis() % 100000000) + "A";
+        String unique = "User" + UUID.randomUUID().toString().replace("-", "");
+        String nif = String.format("%08d", ThreadLocalRandom.current().nextInt(100000000)) + "A";
 
         driver.findElement(By.id("nombre")).sendKeys(unique);
         driver.findElement(By.id("password")).sendKeys("password123");
