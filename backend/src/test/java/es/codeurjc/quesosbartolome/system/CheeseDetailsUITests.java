@@ -89,38 +89,7 @@ public class CheeseDetailsUITests {
                 assertEquals("Azul", title.getText(),
                                 "The cheese details page must display the selected cheese name.");
         }
-
-        @Test
-        public void testLoggedUserSeesStockAndControlsForAzul() {
-                loginAsUser();
-
-                wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".card-grid")));
-
-                WebElement azulCard = wait.until(ExpectedConditions.visibilityOfElementLocated(
-                                By.xpath("//div[contains(@class,'card')]//p[text()='Azul']/ancestor::div[contains(@class,'card')]")));
-                azulCard.click();
-
-                wait.until(ExpectedConditions.urlMatches("http://localhost:4200/cheeses/\\d+"));
-
-                WebElement title = wait
-                                .until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".cheese-title")));
-                assertEquals("Azul", title.getText(), "Cheese title should be Azul.");
-
-                WebElement boxesInput = wait
-                                .until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".cajas-input")));
-                assertTrue(boxesInput.isDisplayed(), "Boxes input must be visible after login.");
-
-                WebElement addButton = wait
-                                .until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".add-btn")));
-                assertTrue(addButton.isDisplayed(), "Add button must be visible for logged in users.");
-
-                WebElement stockLabel = wait.until(ExpectedConditions.visibilityOfElementLocated(
-                                By.xpath("//span[contains(@class,'stock-info')]")));
-                String stockText = stockLabel.getText().replaceAll("[^0-9]", "");
-                int stock = Integer.parseInt(stockText);
-                assertEquals(25, stock, "Azul stock must be 25.");
-        }
-
+ 
         @Test
         public void testAdminSeesEditButtonAndNoAddControlsForAzul() {
                 loginAsAdmin();

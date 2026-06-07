@@ -9,6 +9,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 
+import java.util.UUID;
+
 import static io.restassured.RestAssured.*;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -28,12 +30,17 @@ public class ApiLoginTests {
 
         @Test
         void testRegisterUserSuccessfully() throws JSONException {
+                String uniqueSuffix = UUID.randomUUID().toString().replace("-", "");
+                String userName = "UserTest1_" + uniqueSuffix;
+                String email = userName + "@example.com";
+                String nif = String.format("%08d", Math.abs(uniqueSuffix.hashCode()) % 100000000) + "A";
+
                 JSONObject requestBody = new JSONObject();
-                requestBody.put("name", "UserTest1");
+                requestBody.put("name", userName);
                 requestBody.put("password", "password123");
-                requestBody.put("gmail", "User@example.com");
+                requestBody.put("gmail", email);
                 requestBody.put("direction", "Calle Falsa 123");
-                requestBody.put("nif", "12345678A");
+                requestBody.put("nif", nif);
                 requestBody.put("image", JSONObject.NULL);
 
                 given()
@@ -44,10 +51,10 @@ public class ApiLoginTests {
                                 .then()
                                 .statusCode(201)
                                 .body("id", notNullValue())
-                                .body("name", equalTo("UserTest1"))
-                                .body("gmail", equalTo("User@example.com"))
+                                .body("name", equalTo(userName))
+                                .body("gmail", equalTo(email))
                                 .body("direction", equalTo("Calle Falsa 123"))
-                                .body("nif", equalTo("12345678A"));
+                                .body("nif", equalTo(nif));
         }
 
         @Test

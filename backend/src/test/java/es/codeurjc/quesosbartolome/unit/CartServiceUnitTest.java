@@ -27,6 +27,7 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
+import java.time.LocalDateTime;
 
 @ExtendWith(MockitoExtension.class)
 class CartServiceUnitTest {
@@ -209,6 +210,7 @@ class CartServiceUnitTest {
         assertThat(cart.getTotalPrice()).isGreaterThan(0);
         verify(cartRepository).save(cart);
         verify(cheeseRepository).save(cheese);
+        assertThat(cart.getItems().get(0).getAddedAt()).isNotNull();
     }
 
     @Test
@@ -261,5 +263,90 @@ class CartServiceUnitTest {
         assertThat(cheese.getBoxes()).hasSize(4); // 2 original + 2 returned
         verify(cartRepository).save(cart);
         verify(cheeseRepository).save(cheese);
+    }
+
+    @Test
+    void addItemToCartSetsAddedAt() {
+        Cart cart = new Cart();
+        cart.setItems(new ArrayList<>());
+        cart.setTotalWeight(0.0);
+        cart.setTotalPrice(0.0);
+
+        User user = new User();
+        user.setName("pepe");
+        user.setCart(cart);
+
+        Cheese cheese = new Cheese();
+        cheese.setId(1L);
+        cheese.setBoxes(new ArrayList<>(List.of(1.0, 2.0, 3.0)));
+        cheese.setPrice(10.0);
+
+        when(userRepository.findByName("pepe")).thenReturn(Optional.of(user));
+        when(cheeseRepository.findById(1L)).thenReturn(Optional.of(cheese));
+
+        CartDTO dto = cartService.addItemToCart("pepe", 1L, 2);
+
+        assertThat(dto).isNotNull();
+        assertThat(cart.getItems()).hasSize(1);
+        assertThat(cart.getItems().get(0).getAddedAt()).isNotNull();
+        verify(cartRepository).save(cart);
+        verify(cheeseRepository).save(cheese);
+    }
+
+    @Test
+    void purgeExpiredRemovesExpiredItems() {
+        Cart cart = new Cart();
+        cart.setItems(new ArrayList<>());
+        cart.setTotalWeight(2.0);
+        cart.setTotalPrice(20.0);
+
+        OrderItem item = new OrderItem();
+        item.setId(5L);
+        item.setCheeseId(1L);
+        item.setBoxes(List.of(1.0, 1.0));
+        item.setWeight(2.0);
+        item.setTotalPrice(20.0);
+        item.setAddedAt(LocalDateTime.now().minusMinutes(16));
+        cart.getItems().add(item);
+
+        Cheese cheese = new Cheese();
+        cheese.setId(1L);
+        cheese.setBoxes(new ArrayList<>(List.of(0.5, 0.5)));
+
+        when(cartRepository.findAll()).thenReturn(List.of(cart));
+        when(cheeseRepository.findById(1L)).thenReturn(Optional.of(cheese));
+
+        cartService.purgeExpiredCartItems();
+
+        assertThat(cart.getItems()).isEmpty();
+        assertThat(cart.getTotalWeight()).isEqualTo(0);
+        assertThat(cart.getTotalPrice()).isEqualTo(0);
+        assertThat(cheese.getBoxes()).hasSize(4);
+        verify(cartRepository).save(cart);
+        verify(cheeseRepository).save(cheese);
+    }
+
+    @Test
+    void purgeExpiredKeepsRecentItems() {
+        Cart cart = new Cart();
+        cart.setItems(new ArrayList<>());
+        cart.setTotalWeight(2.0);
+        cart.setTotalPrice(20.0);
+
+        OrderItem item = new OrderItem();
+        item.setId(6L);
+        item.setCheeseId(2L);
+        item.setBoxes(List.of(1.0, 1.0));
+        item.setWeight(2.0);
+        item.setTotalPrice(20.0);
+        item.setAddedAt(LocalDateTime.now());
+        cart.getItems().add(item);
+
+        when(cartRepository.findAll()).thenReturn(List.of(cart));
+
+        cartService.purgeExpiredCartItems();
+
+        assertThat(cart.getItems()).hasSize(1);
+        verify(cartRepository, never()).save(cart);
     }
 }

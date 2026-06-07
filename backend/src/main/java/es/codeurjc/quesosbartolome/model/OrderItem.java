@@ -3,6 +3,7 @@ package es.codeurjc.quesosbartolome.model;
 import jakarta.persistence.*;
 import java.util.List;
 import java.util.ArrayList;
+import java.time.LocalDateTime;
 
 @Entity
 public class OrderItem {
@@ -27,6 +28,7 @@ public class OrderItem {
     private List<Double> boxes;
     private Double weight;
     private Double totalPrice;
+    private LocalDateTime addedAt;
 
     // Constructor
     public OrderItem() {
@@ -42,6 +44,7 @@ public class OrderItem {
         this.boxes = new ArrayList<>(boxes);
         this.weight = weight;
         this.totalPrice = totalPrice;
+        this.addedAt = LocalDateTime.now();
     }
 
     // To Order
@@ -127,6 +130,14 @@ public class OrderItem {
 
     public void setTotalPrice(Double totalPrice) {
         this.totalPrice = totalPrice;
+    }
+
+    public LocalDateTime getAddedAt() {
+        return addedAt;
+    }
+
+    public void setAddedAt(LocalDateTime addedAt) {
+        this.addedAt = addedAt;
     }
 
 }
