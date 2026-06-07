@@ -21,6 +21,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.util.ArrayList;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -178,5 +179,21 @@ public class CartServiceIntegrationTest {
         assertThat(cart.getItems()).isEmpty();
         assertThat(cart.getTotalPrice()).isEqualTo(0.0);
         assertThat(cart.getTotalWeight()).isEqualTo(0.0);
+    }
+
+    @Test
+    void purgeExpiredIntegrationDoesNotWait15Min() {
+        cartService.addItemToCart("pepe", cheese.getId(), 1);
+        Cart cart = userRepository.findById(user.getId()).get().getCart();
+        OrderItem item = cart.getItems().get(0);
+        item.setAddedAt(LocalDateTime.now().minusMinutes(16));
+        cartRepository.save(cart);
+
+        cartService.purgeExpiredCartItems();
+
+        Cart updated = cartRepository.findById(cart.getId()).get();
+        assertThat(updated.getItems()).isEmpty();
+        assertThat(updated.getTotalPrice()).isEqualTo(0.0);
+        assertThat(updated.getTotalWeight()).isEqualTo(0.0);
     }
 }

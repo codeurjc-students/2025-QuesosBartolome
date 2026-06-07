@@ -3,6 +3,10 @@ package es.codeurjc.quesosbartolome.service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.time.LocalDateTime;
+
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.transaction.annotation.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -136,6 +140,46 @@ public class CartService {
         cartRepository.save(cart);
 
         return cartMapper.toDTO(cart);
+    }
+
+    // Scheduled task: remove items older than 15 minutes and return boxes to stock
+    private static final long EXPIRATION_MINUTES = 15;
+
+    @Scheduled(fixedRateString = "60000")
+    @Transactional
+    public void purgeExpiredCartItems() {
+        LocalDateTime cutoff = LocalDateTime.now().minusMinutes(EXPIRATION_MINUTES);
+
+        List<Cart> carts = cartRepository.findAll();
+
+        for (Cart cart : carts) {
+            List<OrderItem> toRemove = new ArrayList<>();
+            boolean changed = false;
+
+            for (OrderItem item : new ArrayList<>(cart.getItems())) {
+                if (item.getAddedAt() != null && item.getAddedAt().isBefore(cutoff)) {
+                    if (item.getCheeseId() != null) {
+                        cheeseRepository.findById(item.getCheeseId()).ifPresent(cheese -> {
+                            List<Double> updatedBoxes = new ArrayList<>(cheese.getBoxes());
+                            updatedBoxes.addAll(item.getBoxes());
+                            cheese.setBoxes(updatedBoxes);
+                            cheeseRepository.save(cheese);
+                        });
+                    }
+
+                    cart.setTotalWeight(round2(cart.getTotalWeight() - item.getWeight()));
+                    cart.setTotalPrice(round2(cart.getTotalPrice() - item.getTotalPrice()));
+
+                    toRemove.add(item);
+                    changed = true;
+                }
+            }
+
+            if (changed) {
+                cart.getItems().removeAll(toRemove);
+                cartRepository.save(cart);
+            }
+        }
     }
 
 }
