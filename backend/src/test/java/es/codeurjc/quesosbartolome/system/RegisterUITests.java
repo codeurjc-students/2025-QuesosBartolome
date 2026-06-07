@@ -41,7 +41,7 @@ public class RegisterUITests {
             driver.quit();
         }
     }
-
+  
     @Test
     @Disabled("Temporarily disabled due to CI-only instability")
     public void testRegisterUser() throws InterruptedException {
